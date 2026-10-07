@@ -3,7 +3,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { doctorHome, recordDecision } from '../../data/api'
 import type { DoctorDecision } from '../../data/types'
 import { useSession } from '../../session'
-import { Avatar, Loading, Section, Toast } from '../../components/ui'
+import { Avatar, BrandMark, Loading, Section, Toast } from '../../components/ui'
 
 const DECISIONS: Array<[DoctorDecision, string]> = [['approved', 'Approve'], ['approved_with_limits', 'With limits'], ['hold', 'Hold']]
 
@@ -19,7 +19,7 @@ function DecisionCard({ memberId, name, sub, note, initial, initialLimits }: { m
       <div role="group" aria-label="Decision" className="flex gap-2">
         {DECISIONS.map(([k, l]) => (
           <button key={k} type="button" aria-pressed={choice === k} onClick={() => setChoice(k)}
-            className={`min-h-11 flex-1 rounded-xl border text-[12px] font-semibold ${choice === k ? 'border-gold bg-gold text-on-gold' : 'border-[#3A3A42] text-ink'}`}>{l}</button>
+            className={`min-h-11 flex-1 rounded-xl border text-[12px] font-semibold ${choice === k ? 'border-gold bg-gold text-on-gold' : 'border-line-strong text-ink'}`}>{l}</button>
         ))}
       </div>
       {choice && choice !== 'approved' && (
@@ -46,7 +46,7 @@ export default function DoctorHome() {
   return (
     <>
       <header className="flex flex-col gap-2.5 px-5 pt-6 lg:px-8 lg:pt-8">
-        <div className="flex items-center justify-between lg:hidden"><div className="brand">Shaan Fitness · Doctor</div><Avatar name={user?.name ?? ''} gold /></div>
+        <div className="flex items-center justify-between lg:hidden"><BrandMark suffix="Doctor" /><Avatar name={user?.name ?? ''} gold /></div>
         <h1 className="title text-[38px] leading-tight">This week's consults</h1>
         <div className="text-[13px] text-muted">{d.holds.length + d.pending.length} to review · health details only, no payments</div>
       </header>

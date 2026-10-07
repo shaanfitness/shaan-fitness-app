@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query'
 import { coachHome } from '../../data/api'
 import { fmtTime, tierLabel } from '../../lib/format'
 import { useSession } from '../../session'
-import { Avatar, Icon, Loading, Section } from '../../components/ui'
+import { Avatar, BrandMark, Icon, Loading, Section } from '../../components/ui'
 
 export default function CoachHome() {
   const { user } = useSession()
@@ -16,7 +16,7 @@ export default function CoachHome() {
     <>
       <header className="flex flex-col gap-2.5 px-5 pt-6 lg:px-8 lg:pt-8">
         <div className="flex items-center justify-between lg:hidden">
-          <div className="brand">Shaan Fitness · Coach</div>
+          <BrandMark suffix="Coach" />
           <Avatar name={user?.name ?? ''} gold />
         </div>
         <h1 className="title text-[38px] leading-tight">{greet}, Coach</h1>

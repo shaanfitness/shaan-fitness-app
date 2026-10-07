@@ -2,7 +2,7 @@ import { NavLink, Outlet } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import type { Role } from '../data/types'
 import { useSession } from '../session'
-import { Avatar, Icon } from './ui'
+import { Avatar, BrandMark, Icon } from './ui'
 
 interface NavItem { to: string; label: string; icon: string }
 
@@ -61,8 +61,8 @@ export function AppShell() {
   return (
     <div className="min-h-dvh lg:flex">
       {/* Sidebar on laptops */}
-      <aside className="sticky top-0 hidden h-dvh w-[248px] flex-none flex-col border-r border-line bg-[#0F0F12] px-4 py-7 lg:flex">
-        <div className="brand px-3">Shaan Fitness</div>
+      <aside className="sticky top-0 hidden h-dvh w-[248px] flex-none flex-col border-r border-line bg-nav px-4 py-7 lg:flex">
+        <div className="px-2"><BrandMark size={36} /></div>
         <nav aria-label="Main" className="mt-8 flex flex-col gap-1">
           {items.map((it) => (
             <NavLink key={it.to} to={it.to}
@@ -87,7 +87,7 @@ export function AppShell() {
       </main>
 
       {/* Bottom bar on phones */}
-      <nav aria-label="Main" className="fixed inset-x-0 bottom-0 z-40 grid border-t border-line bg-[#0F0F12]/95 px-2 pt-2 pb-[calc(10px+env(safe-area-inset-bottom))] backdrop-blur lg:hidden"
+      <nav aria-label="Main" className="fixed inset-x-0 bottom-0 z-40 grid border-t border-line bg-nav/95 px-2 pt-2 pb-[calc(10px+env(safe-area-inset-bottom))] backdrop-blur lg:hidden"
         style={{ gridTemplateColumns: `repeat(${items.length}, minmax(0, 1fr))` }}>
         {items.map((it) => (
           <NavLink key={it.to} to={it.to}

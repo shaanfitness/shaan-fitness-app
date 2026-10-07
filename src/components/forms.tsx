@@ -13,7 +13,7 @@ function MethodPicker({ value, onChange }: { value: PaymentMethod; onChange: (m:
       <div role="radiogroup" aria-labelledby="method-l" className="grid grid-cols-4 gap-2">
         {METHODS.map(([m, l]) => (
           <button key={m} type="button" role="radio" aria-checked={value === m} onClick={() => onChange(m)}
-            className={`min-h-11 rounded-xl border text-[13px] font-semibold ${value === m ? 'border-gold bg-gold text-on-gold' : 'border-[#3A3A42] text-ink'}`}>{l}</button>
+            className={`min-h-11 rounded-xl border text-[13px] font-semibold ${value === m ? 'border-gold bg-gold text-on-gold' : 'border-line-strong text-ink'}`}>{l}</button>
         ))}
       </div>
     </div>

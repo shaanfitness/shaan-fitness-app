@@ -23,11 +23,11 @@ export default function Login() {
       <div aria-hidden="true" className="absolute -top-[60px] -right-[60px] h-[240px] w-[240px] rounded-full border border-gold/15" />
 
       <div className="relative flex items-center justify-between">
-        <div className="brand tracking-[.26em]">Shaan Fitness</div>
+        <img src="/icon-512.png" alt="Shaan Fitness" width="72" height="72" className="h-[72px] w-[72px] rounded-[18px] border border-line" />
         <div role="group" aria-label={t('common.language')} className="flex rounded-xl border border-line p-[3px]">
           {(['en', 'te'] as const).map((l) => (
             <button key={l} type="button" aria-pressed={i18n.language === l} onClick={() => setLanguage(l)}
-              className={`min-h-9 rounded-[10px] px-3 text-[12px] font-semibold ${i18n.language === l ? 'bg-ink text-on-gold' : 'text-muted'}`}>
+              className={`min-h-9 rounded-[10px] px-3 text-[12px] font-semibold ${i18n.language === l ? 'bg-ink text-ground' : 'text-muted'}`}>
               {l === 'en' ? 'EN' : 'తెలుగు'}
             </button>
           ))}
@@ -42,7 +42,7 @@ export default function Login() {
       <form className="relative flex flex-col gap-3.5" onSubmit={(e) => { e.preventDefault(); setNote(t('login.demoNote')) }}>
         <label htmlFor="phone" className="text-[12px] font-semibold text-muted">{t('login.mobile')}</label>
         <div className="flex gap-2">
-          <span className="inline-flex h-[54px] items-center rounded-[14px] border border-[#2E2E35] bg-surface px-3.5 font-semibold">+91</span>
+          <span className="inline-flex h-[54px] items-center rounded-[14px] border border-line-strong bg-surface px-3.5 font-semibold">+91</span>
           <input id="phone" type="tel" inputMode="numeric" autoComplete="tel-national" placeholder="98765 43210" value={phone}
             onChange={(e) => setPhone(e.target.value)}
             className="input h-[54px] min-w-0 flex-1 rounded-[14px] text-[17px] font-semibold tracking-wide" />

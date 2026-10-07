@@ -1,27 +1,114 @@
 @import "tailwindcss";
 
-/* Look A · black and gold. Every colour the app uses is defined here. */
+/* Themes. Every colour and font the app uses is a token here, so a whole
+   look can be swapped by setting data-theme on <html>.
+   "gold" is the accent token name; in the red and blue themes it holds red or blue.
+   Default (noir): black and gold. */
 @theme {
   --color-ground: #0B0B0D;
   --color-surface: #141417;
   --color-surface-2: #18181C;
   --color-surface-3: #1A1A1F;
+  --color-nav: #0F0F12;
+  --color-field: #0F0F12;
   --color-line: #26262C;
   --color-line-soft: #222227;
+  --color-line-strong: #3A3A42;
   --color-ink: #F3EFE6;
   --color-ink-soft: #CFC8BA;
   --color-muted: #A9A398;
+  --color-faint: #6F6A62;
   --color-gold: #D6B878;
   --color-gold-hover: #E3C78C;
   --color-gold-light: #E8CF97;
   --color-on-gold: #15130F;
+  --color-accent-tint: #1A1813;
+  --color-accent-line: #3A352A;
+  --color-chip: #1E1E23;
   --color-red: #F2705B;
   --color-amber: #E9A24B;
   --color-green: #7FC8A9;
   --color-info: #B9D3E0;
+  --color-av1: #E8CF97;
+  --color-av2: #B9D3E0;
+  --color-av3: #E4C2D2;
+  --color-av4: #B8D8B0;
+  --color-av5: #E9C08B;
   --font-display: "Bodoni Moda", "Didot", Georgia, serif;
   --font-sans: "Manrope", "Noto Sans Telugu", system-ui, -apple-system, "Segoe UI", sans-serif;
 }
+
+/* Club: black with the logo's red and blue. */
+:root[data-theme="club"] {
+  --color-ground: #0A0A0C;
+  --color-surface: #151518;
+  --color-surface-2: #1B1B1F;
+  --color-surface-3: #1F1F24;
+  --color-nav: #0F0F12;
+  --color-field: #0F0F12;
+  --color-line: #2A2A30;
+  --color-line-soft: #232328;
+  --color-line-strong: #3A3A42;
+  --color-ink: #F5F5F7;
+  --color-ink-soft: #D4D4DA;
+  --color-muted: #A8A8B3;
+  --color-faint: #7A7A85;
+  --color-gold: #E01020;
+  --color-gold-hover: #C80E1C;
+  --color-gold-light: #FF6B6B;
+  --color-on-gold: #FFFFFF;
+  --color-accent-tint: #1F0D10;
+  --color-accent-line: #4A1E22;
+  --color-chip: #1F1F24;
+  --color-red: #FF6B6B;
+  --color-amber: #FFB347;
+  --color-green: #5FD39B;
+  --color-info: #2DB7F5;
+  --color-av1: #FF8A8A;
+  --color-av2: #7FD3FA;
+  --color-av3: #F5B8D0;
+  --color-av4: #9BE0B8;
+  --color-av5: #FFC98A;
+  --font-display: "Barlow Condensed", "Arial Narrow", sans-serif;
+  --font-sans: "Barlow", "Noto Sans Telugu", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+/* Clinic: white and blue, calm and easy to read. */
+:root[data-theme="clinic"] {
+  --color-ground: #F4F6F8;
+  --color-surface: #FFFFFF;
+  --color-surface-2: #F7F9FB;
+  --color-surface-3: #EEF2F6;
+  --color-nav: #FFFFFF;
+  --color-field: #FFFFFF;
+  --color-line: #E1E6EB;
+  --color-line-soft: #EBEFF3;
+  --color-line-strong: #CBD3DC;
+  --color-ink: #0E1A2B;
+  --color-ink-soft: #2E3B4E;
+  --color-muted: #566375;
+  --color-faint: #8A94A3;
+  --color-gold: #0B63B5;
+  --color-gold-hover: #0A579F;
+  --color-gold-light: #0A4F91;
+  --color-on-gold: #FFFFFF;
+  --color-accent-tint: #E7F0FA;
+  --color-accent-line: #C9DBF0;
+  --color-chip: #EEF2F6;
+  --color-red: #C0352B;
+  --color-amber: #A65F00;
+  --color-green: #1E7A55;
+  --color-info: #1D5FA8;
+  --color-av1: #8A5A00;
+  --color-av2: #1D5FA8;
+  --color-av3: #9C2F5E;
+  --color-av4: #1E7A55;
+  --color-av5: #A14A12;
+  --font-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --font-sans: "Hanken Grotesk", "Noto Sans Telugu", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+:root[data-theme="clinic"] { color-scheme: light; }
+:root:not([data-theme="clinic"]) { color-scheme: dark; }
 
 /* Base styles live in the base layer so component and utility classes can override them. */
 @layer base {
@@ -40,29 +127,31 @@
   .eyebrow { margin: 0; font-size: 11px; letter-spacing: .18em; text-transform: uppercase; font-weight: 700; color: var(--color-gold); }
   .brand { font-size: 11px; letter-spacing: .22em; text-transform: uppercase; font-weight: 700; color: var(--color-gold); }
   .title { margin: 0; font-family: var(--font-display); font-weight: 500; letter-spacing: -.01em; }
+  :root[data-theme="club"] .title { font-weight: 700; letter-spacing: 0; }
+  :root[data-theme="clinic"] .title { font-weight: 600; letter-spacing: -.02em; }
   .chip { display: inline-flex; align-items: center; gap: 6px; height: 24px; padding: 0 10px; border-radius: 999px; font-size: 11px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; white-space: nowrap; }
-  .chip-gold { background: rgb(214 184 120 / .14); color: var(--color-gold); }
-  .chip-red { background: rgb(242 112 91 / .14); color: var(--color-red); }
-  .chip-amber { background: rgb(233 162 75 / .14); color: var(--color-amber); }
-  .chip-green { background: rgb(127 200 169 / .14); color: var(--color-green); }
-  .chip-info { background: rgb(185 211 224 / .12); color: var(--color-info); }
-  .chip-muted { background: #1E1E23; color: var(--color-muted); }
-  .icon-btn { width: 44px; height: 44px; border-radius: 12px; border: 1px solid #2E2E35; background: var(--color-surface-2); color: var(--color-ink); display: inline-flex; align-items: center; justify-content: center; cursor: pointer; flex: none; text-decoration: none; }
+  .chip-gold { background: color-mix(in srgb, var(--color-gold) 14%, transparent); color: var(--color-gold-light); }
+  .chip-red { background: color-mix(in srgb, var(--color-red) 14%, transparent); color: var(--color-red); }
+  .chip-amber { background: color-mix(in srgb, var(--color-amber) 14%, transparent); color: var(--color-amber); }
+  .chip-green { background: color-mix(in srgb, var(--color-green) 14%, transparent); color: var(--color-green); }
+  .chip-info { background: color-mix(in srgb, var(--color-info) 13%, transparent); color: var(--color-info); }
+  .chip-muted { background: var(--color-chip); color: var(--color-muted); }
+  .icon-btn { width: 44px; height: 44px; border-radius: 12px; border: 1px solid var(--color-line-strong); background: var(--color-surface-2); color: var(--color-ink); display: inline-flex; align-items: center; justify-content: center; cursor: pointer; flex: none; text-decoration: none; }
   .icon-btn:hover { border-color: var(--color-gold); color: var(--color-ink); }
-  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; padding: 0 16px; border-radius: 14px; border: 1px solid #3A3A42; background: var(--color-surface-2); color: var(--color-ink); font-weight: 600; font-size: 14px; cursor: pointer; text-decoration: none; }
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; padding: 0 16px; border-radius: 14px; border: 1px solid var(--color-line-strong); background: var(--color-surface-2); color: var(--color-ink); font-weight: 600; font-size: 14px; cursor: pointer; text-decoration: none; }
   .btn:hover { border-color: var(--color-gold); color: var(--color-ink); }
   .btn-gold { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; padding: 0 18px; border-radius: 14px; border: 0; background: var(--color-gold); color: var(--color-on-gold); font-weight: 700; font-size: 14px; cursor: pointer; text-decoration: none; }
   .btn-gold:hover { background: var(--color-gold-hover); color: var(--color-on-gold); }
   .btn-gold:disabled, .btn:disabled { opacity: .5; cursor: not-allowed; }
   .field { display: flex; flex-direction: column; gap: 6px; }
   .field label { font-size: 12px; font-weight: 600; color: var(--color-muted); }
-  .input { height: 48px; border-radius: 12px; border: 1px solid #2E2E35; background: #0F0F12; color: var(--color-ink); padding: 0 14px; font-size: 15px; font-weight: 500; width: 100%; }
+  .input { height: 48px; border-radius: 12px; border: 1px solid var(--color-line-strong); background: var(--color-field); color: var(--color-ink); padding: 0 14px; font-size: 15px; font-weight: 500; width: 100%; }
   .input:focus { border-color: var(--color-gold); outline: none; }
   .qa { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; min-height: 84px; border-radius: 16px; background: var(--color-surface); border: 1px solid var(--color-line); color: var(--color-ink); text-decoration: none; font-size: 12px; font-weight: 600; }
   .qa:hover { color: var(--color-ink); border-color: var(--color-gold); }
-  .mark { min-height: 40px; min-width: 76px; padding: 0 12px; border-radius: 10px; font-weight: 700; font-size: 12px; cursor: pointer; border: 1px solid #3A3A42; background: transparent; color: var(--color-muted); }
+  .mark { min-height: 40px; min-width: 76px; padding: 0 12px; border-radius: 10px; font-weight: 700; font-size: 12px; cursor: pointer; border: 1px solid var(--color-line-strong); background: transparent; color: var(--color-muted); }
   .mark[aria-pressed="true"].present { background: var(--color-gold); border-color: var(--color-gold); color: var(--color-on-gold); }
-  .mark[aria-pressed="true"].absent { border-color: rgb(242 112 91 / .6); color: var(--color-red); }
+  .mark[aria-pressed="true"].absent { border-color: color-mix(in srgb, var(--color-red) 60%, transparent); color: var(--color-red); }
   .row { display: flex; align-items: center; gap: 12px; padding: 14px 16px; border-bottom: 1px solid var(--color-line-soft); }
   .row:last-child { border-bottom: 0; }
   .bar { height: 6px; border-radius: 99px; background: var(--color-line); overflow: hidden; }

@@ -47,7 +47,8 @@ create table public.studios (
     "trials": {"free_sessions": 1},
     "renewal_reminders": {"days_before": [5], "sessions_left": null},
     "booking": {"cancel_cutoff_hours": 2, "advance_days": 7},
-    "working_days": [1, 2, 3, 4, 5, 6]
+    "working_days": [1, 2, 3, 4, 5, 6],
+    "themes": {"staff": "noir", "member": "club", "doctor": "clinic"}
   }'::jsonb,
   created_at timestamptz not null default now()
 );
@@ -84,6 +85,7 @@ create table public.profiles (
   phone text,
   email text,
   preferred_language text not null default 'en',
+  theme text check (theme in ('noir', 'club', 'clinic')),  -- null = the studio's default for their role
   avatar_url text,
   created_at timestamptz not null default now()
 );

@@ -5,6 +5,7 @@ import { getPlans, getStudio, resetDemo } from '../data/api'
 import { money } from '../lib/format'
 import { setLanguage } from '../i18n'
 import { useSession } from '../session'
+import { GROUP_LABEL, THEMES, groupOf, useTheme, type ThemeGroup, type ThemeId } from '../theme'
 import { Avatar, Icon, ScreenHeader, Section } from '../components/ui'
 
 const roleLabel = { owner: 'Owner', front_desk: 'Front desk', coach: 'Coach', doctor: 'Doctor', member: 'Member' }
@@ -16,6 +17,7 @@ export default function More() {
   const qc = useQueryClient()
   const { data: studio } = useQuery({ queryKey: ['studio'], queryFn: getStudio })
   const { data: plans } = useQuery({ queryKey: ['plans'], queryFn: getPlans })
+  const { theme, personal, defaults, setPersonal, setDefault } = useTheme()
   if (!user) return null
   const s = studio?.settings
 
@@ -37,6 +39,52 @@ export default function More() {
           ))}
         </div>
       </Section>
+
+      <Section title="Look" id="look-h">
+        <div role="radiogroup" aria-labelledby="look-h" className="grid grid-cols-3 gap-2.5">
+          {(Object.keys(THEMES) as ThemeId[]).map((id) => {
+            const th = THEMES[id]
+            const on = theme === id
+            return (
+              <button key={id} type="button" role="radio" aria-checked={on} onClick={() => setPersonal(id)}
+                className={`flex flex-col overflow-hidden rounded-2xl border-2 text-left ${on ? 'border-gold' : 'border-line'}`}>
+                <span aria-hidden="true" className="flex h-[92px] flex-col justify-between p-2.5" style={{ background: th.ground }}>
+                  <span className="text-[19px] leading-none" style={{ fontFamily: th.font, color: th.ink, fontWeight: id === 'club' ? 700 : 500 }}>Aa</span>
+                  <span className="flex flex-col gap-1.5 rounded-lg p-1.5" style={{ background: th.surface, border: `1px solid ${id === 'clinic' ? '#E1E6EB' : '#2A2A30'}` }}>
+                    <span className="h-1.5 w-3/5 rounded-full" style={{ background: th.ink, opacity: 0.5 }} />
+                    <span className="h-3 rounded-[5px]" style={{ background: th.accent }} />
+                  </span>
+                </span>
+                <span className="flex flex-col gap-0.5 bg-surface px-2.5 py-2">
+                  <span className="text-[12px] leading-tight font-bold">{th.name}</span>
+                  <span className="text-[11px] leading-tight text-muted">{th.note}</span>
+                </span>
+              </button>
+            )
+          })}
+        </div>
+        {personal && (
+          <button type="button" className="self-start text-[13px] font-semibold text-gold" onClick={() => setPersonal(null)}>
+            Use the studio's default ({THEMES[defaults[groupOf(user.role)]].name})
+          </button>
+        )}
+      </Section>
+
+      {user.role === 'owner' && (
+        <Section title="Default look for each login" id="defaults-h">
+          <p className="m-0 text-[13px] text-muted">New people start with these. Everyone can still pick their own look.</p>
+          <div className="card overflow-hidden">
+            {(Object.keys(GROUP_LABEL) as ThemeGroup[]).map((g) => (
+              <div key={g} className="row flex-wrap">
+                <label htmlFor={`def-${g}`} className="min-w-[140px] flex-1 text-[14px] font-semibold">{GROUP_LABEL[g]}</label>
+                <select id={`def-${g}`} className="input h-11 w-auto min-w-[170px]" value={defaults[g]} onChange={(e) => setDefault(g, e.target.value as ThemeId)}>
+                  {(Object.keys(THEMES) as ThemeId[]).map((id) => <option key={id} value={id}>{THEMES[id].name}</option>)}
+                </select>
+              </div>
+            ))}
+          </div>
+        </Section>
+      )}
 
       {user.role === 'owner' && s && (
         <Section title="Studio rules" id="rules-h">

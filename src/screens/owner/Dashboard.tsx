@@ -47,7 +47,7 @@ function CollectionsChart({ daily }: { daily: Array<{ date: string; amount: numb
       <svg viewBox={`0 0 ${W} ${H}`} className="block h-auto w-full" role="img" aria-label={`Daily collections for the last 30 days, ${money(total)} in total`} onMouseLeave={() => setHover(null)}>
         {ticks.map((t) => (
           <g key={t}>
-            <line x1={padL} x2={W - padR} y1={y(t)} y2={y(t)} stroke="#222227" strokeWidth="1" />
+            <line x1={padL} x2={W - padR} y1={y(t)} y2={y(t)} stroke="var(--color-line-soft)" strokeWidth="1" />
             <text x={padL - 8} y={y(t) + 4} textAnchor="end" fontSize="11" fill="var(--color-muted)">{t === 0 ? '0' : `₹${t / 1000}k`}</text>
           </g>
         ))}

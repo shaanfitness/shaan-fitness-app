@@ -4,7 +4,7 @@ import { memberHome } from '../../data/api'
 import { fmtDate, fmtTime, money, tierLabel, todayISO, addDays } from '../../lib/format'
 import { setLanguage } from '../../i18n'
 import { useSession } from '../../session'
-import { Avatar, Icon, Loading } from '../../components/ui'
+import { Avatar, BrandMark, Icon, Loading } from '../../components/ui'
 
 export default function MemberHome() {
   const { user } = useSession()
@@ -22,12 +22,12 @@ export default function MemberHome() {
   return (
     <div className="lg:mx-auto lg:max-w-[560px]">
       <header className="flex items-center justify-between px-5 pt-6">
-        <div className="brand">Shaan Fitness</div>
+        <BrandMark />
         <div className="flex items-center gap-2.5">
           <div role="group" aria-label={t('common.language')} className="flex rounded-xl border border-line p-[3px]">
             {(['en', 'te'] as const).map((l) => (
               <button key={l} type="button" aria-pressed={i18n.language === l} onClick={() => setLanguage(l)}
-                className={`min-h-9 rounded-[10px] px-3 text-[12px] font-semibold ${i18n.language === l ? 'bg-ink text-on-gold' : 'text-muted'}`}>{l === 'en' ? 'EN' : 'తెలుగు'}</button>
+                className={`min-h-9 rounded-[10px] px-3 text-[12px] font-semibold ${i18n.language === l ? 'bg-ink text-ground' : 'text-muted'}`}>{l === 'en' ? 'EN' : 'తెలుగు'}</button>
             ))}
           </div>
           <Avatar name={d.member.full_name} gold />
@@ -81,7 +81,7 @@ export default function MemberHome() {
 
       {c && c.days_left <= 7 && d.plan && (
         <section aria-labelledby="renew-h" className="px-5 pt-3">
-          <div className="flex flex-col gap-3 rounded-[20px] border border-gold/50 bg-[#1A1813] p-5">
+          <div className="flex flex-col gap-3 rounded-[20px] border border-gold/50 bg-accent-tint p-5">
             <h2 id="renew-h" className="title text-[24px]">{t('member.momentum')}</h2>
             <p className="m-0 text-[14px] leading-normal text-ink-soft">{t('member.renewText', { date: fmtDate(c.end_date, 'EEE d MMM'), plan, sessions: d.plan.sessions })}</p>
             <div className="flex items-center justify-between gap-3">
@@ -110,7 +110,7 @@ export default function MemberHome() {
 
       <section className="px-5 pt-3">
         <a href="#chat" className="card flex items-center gap-3.5 px-5 py-4 text-ink no-underline hover:text-ink">
-          <span className="flex h-11 w-11 flex-none items-center justify-center rounded-full border border-[#3A352A] bg-[#1C1A16] font-display text-gold-light">{coach[0]}</span>
+          <span className="flex h-11 w-11 flex-none items-center justify-center rounded-full border border-accent-line bg-accent-tint font-display text-gold-light">{coach[0]}</span>
           <span className="flex min-w-0 flex-1 flex-col gap-1"><span className="text-[15px] font-bold">Coach {coach}</span><span className="truncate text-[13px] text-muted">{t('member.chatPreview')}</span></span>
           <span className="flex h-6 min-w-6 items-center justify-center rounded-full bg-gold text-[12px] font-bold text-on-gold">1</span>
         </a>
@@ -118,8 +118,8 @@ export default function MemberHome() {
 
       <section aria-labelledby="offers-h" className="flex flex-col gap-2.5 px-5 pt-5">
         <div className="flex items-center justify-between"><h2 id="offers-h" className="eyebrow">{t('member.offers')}</h2><span className="text-[12px] text-muted">{t('member.swipe')}</span></div>
-        <a href="#offer" className="relative flex min-h-[200px] flex-col justify-end gap-2 overflow-hidden rounded-[20px] border border-[#3A352A] bg-[#16140F] p-[22px] text-ink no-underline hover:text-ink">
-          <span aria-hidden="true" className="absolute inset-x-3.5 top-3.5 flex h-[92px] items-center justify-center rounded-xl border border-dashed border-[#3A352A] text-[11px] tracking-[.14em] text-[#8E887D] uppercase">{t('member.posterImage')}</span>
+        <a href="#offer" className="relative flex min-h-[200px] flex-col justify-end gap-2 overflow-hidden rounded-[20px] border border-accent-line bg-accent-tint p-[22px] text-ink no-underline hover:text-ink">
+          <span aria-hidden="true" className="absolute inset-x-3.5 top-3.5 flex h-[92px] items-center justify-center rounded-xl border border-dashed border-accent-line text-[11px] tracking-[.14em] text-muted uppercase">{t('member.posterImage')}</span>
           <span className="font-display text-[26px] leading-tight">[Poster title]</span>
           <span className="text-[13px] text-muted">[Offer details] · till [end date]</span>
           <span className="flex items-center gap-1.5 text-[13px] font-bold text-gold">{t('member.viewOffer')}<Icon name="chevronRight" size={16} stroke={1.8} /></span>

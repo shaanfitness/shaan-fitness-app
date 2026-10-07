@@ -6,6 +6,7 @@ import './styles.css'
 import './i18n'
 import App from './App'
 import { SessionProvider } from './session'
+import { ThemeProvider } from './theme'
 
 const queryClient = new QueryClient({
   defaultOptions: { queries: { staleTime: 30_000, refetchOnWindowFocus: false } },
@@ -15,9 +16,11 @@ createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
       <SessionProvider>
-        <BrowserRouter>
-          <App />
-        </BrowserRouter>
+        <ThemeProvider>
+          <BrowserRouter>
+            <App />
+          </BrowserRouter>
+        </ThemeProvider>
       </SessionProvider>
     </QueryClientProvider>
   </StrictMode>,

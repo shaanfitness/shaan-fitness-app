@@ -40,17 +40,30 @@ export function Icon({ name, size = 22, stroke = 1.6, className, color }: { name
   )
 }
 
-const avatarTints = [
-  ['#2A2620', '#E8CF97'], ['#20262A', '#B9D3E0'], ['#262024', '#E4C2D2'], ['#20261F', '#B8D8B0'], ['#26221C', '#E9C08B'],
-]
+// Avatar colours come from the theme (--color-av1…5), so they read well in light and dark looks.
 export function Avatar({ name, size = 44, gold = false }: { name: string; size?: number; gold?: boolean }) {
-  const i = [...name].reduce((s, ch) => s + ch.charCodeAt(0), 0) % avatarTints.length
-  const [bg, fg] = avatarTints[i]
+  const i = ([...name].reduce((s, ch) => s + ch.charCodeAt(0), 0) % 5) + 1
+  const fg = `var(--color-av${i})`
   return (
     <span aria-hidden="true" className="inline-flex flex-none items-center justify-center rounded-full font-bold"
-      style={{ width: size, height: size, fontSize: size * 0.3, background: gold ? 'transparent' : bg, color: gold ? 'var(--color-gold)' : fg, border: gold ? '1px solid var(--color-gold)' : '2px solid var(--color-surface)' }}>
+      style={{
+        width: size, height: size, fontSize: size * 0.3,
+        background: gold ? 'transparent' : `color-mix(in srgb, ${fg} 24%, var(--color-surface))`,
+        color: gold ? 'var(--color-gold-light)' : fg,
+        border: gold ? '1px solid var(--color-gold)' : '2px solid var(--color-surface)',
+      }}>
       {toInitials(name)}
     </span>
+  )
+}
+
+// The Shaan Fitness logo on its dark tile, with the name beside it.
+export function BrandMark({ suffix, size = 32 }: { suffix?: string; size?: number }) {
+  return (
+    <div className="flex min-w-0 items-center gap-2.5">
+      <img src="/icon-192.png" alt="" width={size} height={size} className="flex-none rounded-[9px]" style={{ width: size, height: size }} />
+      <span className="brand truncate">Shaan Fitness{suffix ? ` · ${suffix}` : ''}</span>
+    </div>
   )
 }
 
@@ -67,7 +80,7 @@ export function ScreenHeader({ title, right, sub, brand = 'Shaan Fitness' }: { t
   return (
     <header className="flex flex-col gap-3 px-5 pt-6 pb-2 lg:px-8 lg:pt-8">
       <div className="flex items-center justify-between gap-3 lg:hidden">
-        <div className="brand">{brand}</div>
+        <BrandMark suffix={brand === 'Shaan Fitness' ? undefined : brand} />
         {right}
       </div>
       <div className="flex items-end justify-between gap-3">

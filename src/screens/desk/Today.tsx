@@ -83,7 +83,7 @@ export default function Today() {
                         <div className="text-[13px] text-muted">{s.coach}</div>
                       </div>
                       <div className="text-right">
-                        <div className="font-display text-[34px] leading-none">{live ? s.present : s.people.length}<span className="text-[22px] text-[#6F6A62]"> / {s.slot.capacity}</span></div>
+                        <div className="font-display text-[34px] leading-none">{live ? s.present : s.people.length}<span className="text-[22px] text-faint"> / {s.slot.capacity}</span></div>
                         <div className="text-[12px] text-muted">{live ? 'checked in' : 'booked'}</div>
                       </div>
                     </div>
@@ -91,7 +91,7 @@ export default function Today() {
                     <div className="flex items-center justify-between">
                       <div className="flex">
                         {shown.map((p, i) => <span key={p.member.id} style={{ marginLeft: i ? -8 : 0 }}><Avatar name={p.member.full_name} size={32} /></span>)}
-                        {s.people.length > 3 && <span className="-ml-2 inline-flex h-8 w-8 items-center justify-center rounded-full border-2 border-surface bg-[#1E1E23] text-[11px] font-bold text-muted">+{s.people.length - 3}</span>}
+                        {s.people.length > 3 && <span className="-ml-2 inline-flex h-8 w-8 items-center justify-center rounded-full border-2 border-surface bg-chip text-[11px] font-bold text-muted">+{s.people.length - 3}</span>}
                       </div>
                       {live && s.people.length - s.present > 0 && <div className="text-[13px] font-semibold text-red">{s.people.length - s.present} not in yet</div>}
                     </div>

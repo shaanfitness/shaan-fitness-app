@@ -16,7 +16,7 @@ function SlotRow({ s, date, open, onToggle }: { s: DaySlot; date: string; open: 
   }
   const canMark = s.state !== 'upcoming' || date === todayISO()
   return (
-    <div className={`border-b border-line-soft last:border-b-0 ${open ? 'bg-[#19191D]' : ''}`}>
+    <div className={`border-b border-line-soft last:border-b-0 ${open ? 'bg-surface-3' : ''}`}>
       <button type="button" onClick={onToggle} aria-expanded={open}
         className="flex w-full items-center gap-3.5 px-4 py-3.5 text-left text-ink">
         <div className={`w-[62px] flex-none font-display text-[19px] leading-tight ${s.state === 'live' ? 'text-gold' : s.state === 'done' ? 'text-muted' : ''}`}>
