@@ -5,23 +5,26 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import './styles.css'
 import './i18n'
 import App from './App'
-import { SessionProvider } from './session'
+import { AuthProvider } from './auth'
 import { ThemeProvider } from './theme'
+import { ToastProvider } from './components/toast'
 
 const queryClient = new QueryClient({
-  defaultOptions: { queries: { staleTime: 30_000, refetchOnWindowFocus: false } },
+  defaultOptions: { queries: { staleTime: 30_000, refetchOnWindowFocus: false, retry: 1 } },
 })
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
-      <SessionProvider>
+      <AuthProvider>
         <ThemeProvider>
-          <BrowserRouter>
-            <App />
-          </BrowserRouter>
+          <ToastProvider>
+            <BrowserRouter>
+              <App />
+            </BrowserRouter>
+          </ToastProvider>
         </ThemeProvider>
-      </SessionProvider>
+      </AuthProvider>
     </QueryClientProvider>
   </StrictMode>,
 )

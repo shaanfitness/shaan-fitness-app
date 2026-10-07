@@ -5,7 +5,7 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 PGBIN="${PGBIN:-/usr/lib/postgresql/16/bin}"
 DATA="$(mktemp -d)"
-PORT="${PORT:-54329}"
+PORT="${PORT:-54330}"
 RUN_AS=()
 if [ "$(id -u)" = "0" ]; then RUN_AS=(runuser -u postgres --); chown postgres "$DATA"; fi
 

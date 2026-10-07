@@ -1,20 +1,25 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { demoUsers, homeFor } from '../data/api'
+import { supabase } from '../lib/supabase'
 import { setLanguage } from '../i18n'
-import { useSession } from '../session'
+import { Field, Notice, TextInput } from '../components/controls'
 
+// Staff sign in with email and password. Members will sign in with a mobile
+// number and one-time code once the SMS / WhatsApp sender is connected.
 export default function Login() {
   const { t, i18n } = useTranslation()
-  const { signIn } = useSession()
-  const navigate = useNavigate()
-  const [phone, setPhone] = useState('')
-  const [note, setNote] = useState<string | null>(null)
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [error, setError] = useState<string | null>(null)
+  const [busy, setBusy] = useState(false)
 
-  const open = (u: (typeof demoUsers)[number]) => {
-    signIn({ role: u.role, name: u.name, initials: u.initials, staffId: u.staffId, memberId: u.memberId })
-    navigate(homeFor(u.role), { replace: true })
+  const submit = async () => {
+    setError(null)
+    if (!email.trim() || !password) return setError('Enter your email and password.')
+    setBusy(true)
+    const { error } = await supabase.auth.signInWithPassword({ email: email.trim(), password })
+    setBusy(false)
+    if (error) setError(/invalid/i.test(error.message) ? 'That email and password don’t match. Check them and try again.' : error.message)
   }
 
   return (
@@ -39,31 +44,13 @@ export default function Login() {
         <p className="m-0 text-[15px] leading-normal text-muted">{t('login.intro')}</p>
       </div>
 
-      <form className="relative flex flex-col gap-3.5" onSubmit={(e) => { e.preventDefault(); setNote(t('login.demoNote')) }}>
-        <label htmlFor="phone" className="text-[12px] font-semibold text-muted">{t('login.mobile')}</label>
-        <div className="flex gap-2">
-          <span className="inline-flex h-[54px] items-center rounded-[14px] border border-line-strong bg-surface px-3.5 font-semibold">+91</span>
-          <input id="phone" type="tel" inputMode="numeric" autoComplete="tel-national" placeholder="98765 43210" value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-            className="input h-[54px] min-w-0 flex-1 rounded-[14px] text-[17px] font-semibold tracking-wide" />
-        </div>
-        <button type="submit" className="btn-gold min-h-[54px] text-[15px]">{t('login.send')}</button>
-        <p className="m-0 text-[12px] leading-normal text-muted">{note ?? t('login.codeNote')}</p>
+      <form className="relative flex flex-col gap-3.5" onSubmit={(e) => { e.preventDefault(); submit() }}>
+        <Field label="Email" id="email"><TextInput id="email" type="email" inputMode="email" autoComplete="username" value={email} onChange={setEmail} /></Field>
+        <Field label="Password" id="password"><TextInput id="password" type="password" autoComplete="current-password" value={password} onChange={setPassword} /></Field>
+        {error && <Notice tone="error">{error}</Notice>}
+        <button type="submit" className="btn-gold min-h-[54px] text-[15px]" disabled={busy}>{busy ? 'Signing in…' : 'Sign in'}</button>
+        <p className="m-0 text-[12px] leading-normal text-muted">Owner, front desk, coaches and doctors sign in here. Members sign in with their mobile number once the member app opens.</p>
       </form>
-
-      <div className="flex-1" />
-
-      <div className="relative flex flex-col gap-2.5">
-        <div className="text-[11px] font-bold tracking-[.18em] text-muted uppercase">{t('login.demo')}</div>
-        <div className="grid grid-cols-3 gap-2">
-          {demoUsers.map((u) => (
-            <button key={u.role} type="button" onClick={() => open(u)}
-              className="min-h-11 rounded-xl border border-line text-[12px] font-semibold text-muted hover:border-gold hover:text-ink">
-              {u.label}
-            </button>
-          ))}
-        </div>
-      </div>
     </div>
   )
 }

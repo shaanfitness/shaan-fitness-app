@@ -1,6 +1,6 @@
 import { useEffect, useRef, type ReactNode } from 'react'
 import { initials as toInitials } from '../lib/format'
-import type { RiskLevel } from '../data/api'
+export type RiskLevel = 'red' | 'amber' | 'green'
 
 // Stroke icons used across the app (24px grid, currentColor).
 const paths: Record<string, ReactNode> = {
@@ -29,6 +29,11 @@ const paths: Record<string, ReactNode> = {
   settings: <><circle cx="12" cy="12" r="3" /><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z" /></>,
   logout: <><path d="M15 4h4v16h-4" /><path d="M10 8l-4 4 4 4M6 12h10" /></>,
   check: <path d="M5 12.5l4.5 4.5L19 7.5" />,
+  whatsapp: <><path d="M4 20l1.3-4A8 8 0 1 1 8 18.7z" /><path d="M9.5 9.5c.3 1.8 2.2 3.8 4 4.2l1.2-1.2 1.8.8-.4 1.6c-3.6.3-7.7-3.8-7.4-7.4l1.6-.4.8 1.8z" /></>,
+  history: <><path d="M4 12a8 8 0 1 0 2.4-5.7L4 8.6" /><path d="M4 4v4.6h4.6M12 8v4.5l3 1.8" /></>,
+  download: <><path d="M12 4v11M7.5 10.5L12 15l4.5-4.5" /><path d="M5 19h14" /></>,
+  filter: <path d="M4 5h16l-6 7.5V19l-4-2v-4.5z" />,
+  edit: <><path d="M4 20h4L19 9l-4-4L4 16z" /><path d="M13.5 6.5l4 4" /></>,
 }
 
 export function Icon({ name, size = 22, stroke = 1.6, className, color }: { name: keyof typeof paths | string; size?: number; stroke?: number; className?: string; color?: string }) {
@@ -94,6 +99,22 @@ export function ScreenHeader({ title, right, sub, brand = 'Shaan Fitness' }: { t
   )
 }
 
+// Staff page header: title, the studio line under it, and the page's main actions.
+export function PageHeader({ title, sub, actions }: { title: ReactNode; sub?: ReactNode; actions?: ReactNode }) {
+  return (
+    <header className="flex flex-col gap-4 px-5 pt-6 pb-1 lg:px-8 lg:pt-8">
+      <div className="lg:hidden"><BrandMark /></div>
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <div className="min-w-0">
+          <h1 className="title text-[34px] leading-[1.05] lg:text-[38px]">{title}</h1>
+          {sub && <div className="mt-1.5 text-[13px] text-muted">{sub}</div>}
+        </div>
+        {actions && <div className="flex flex-wrap items-center gap-2">{actions}</div>}
+      </div>
+    </header>
+  )
+}
+
 export function Section({ title, action, children, id, className = '' }: { title?: ReactNode; action?: ReactNode; children: ReactNode; id?: string; className?: string }) {
   return (
     <section aria-labelledby={title ? id : undefined} className={`flex flex-col gap-3 px-5 pt-5 lg:px-8 ${className}`}>
@@ -117,7 +138,7 @@ export function Loading() {
 }
 
 // A bottom sheet on phones, a centred dialog on wider screens.
-export function Sheet({ open, onClose, title, children }: { open: boolean; onClose: () => void; title: string; children: ReactNode }) {
+export function Sheet({ open, onClose, title, children, wide }: { open: boolean; onClose: () => void; title: string; children: ReactNode; wide?: boolean }) {
   const ref = useRef<HTMLDialogElement>(null)
   useEffect(() => {
     const d = ref.current
@@ -127,7 +148,7 @@ export function Sheet({ open, onClose, title, children }: { open: boolean; onClo
   }, [open])
   return (
     <dialog ref={ref} onClose={onClose} aria-label={title}
-      className="m-0 mt-auto w-full max-w-none rounded-t-[22px] border border-line bg-surface p-0 text-ink backdrop:bg-black/70 sm:m-auto sm:max-w-[440px] sm:rounded-[22px]">
+      className={`m-0 mt-auto max-h-[92dvh] w-full max-w-none overflow-y-auto rounded-t-[22px] border border-line bg-surface p-0 text-ink backdrop:bg-black/70 sm:m-auto sm:rounded-[22px] ${wide ? 'sm:max-w-[680px]' : 'sm:max-w-[440px]'}`}>
       <div className="flex items-center justify-between gap-3 px-5 pt-5">
         <h2 className="title text-[26px]">{title}</h2>
         <button type="button" className="icon-btn" aria-label="Close" onClick={onClose}><Icon name="close" size={18} /></button>

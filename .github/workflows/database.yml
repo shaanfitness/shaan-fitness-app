@@ -1,0 +1,71 @@
+# Applies new database changes to the live Supabase database whenever they reach main.
+# Needs one repository secret, SUPABASE_DB_URL (Supabase → Connect → Session pooler URI,
+# with the database password filled in). Until it's set, this workflow skips itself.
+# After each run, a short status (counts only, no personal data) is published to the
+# db-status branch so the build can be checked without opening Supabase.
+name: Database updates
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'supabase/migrations/**'
+      - 'supabase/seed.sql'
+      - 'supabase/rebuild-from-wave1.sql'
+      - 'scripts/apply-migrations.sh'
+      - '.github/workflows/database.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: database
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check the database secret
+        id: secret
+        env:
+          DATABASE_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: |
+          if [ -z "$DATABASE_URL" ]; then
+            echo "The SUPABASE_DB_URL secret is not set yet, so nothing was changed."
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Install the Postgres client
+        if: steps.secret.outputs.ready == 'true'
+        run: command -v psql || (sudo apt-get update -q && sudo apt-get install -y -q postgresql-client)
+
+      - name: Apply database changes
+        if: steps.secret.outputs.ready == 'true'
+        env:
+          DATABASE_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: |
+          set -o pipefail
+          scripts/apply-migrations.sh 2>&1 | tee migrate.log
+
+      - name: Publish the status
+        if: always() && steps.secret.outputs.ready == 'true'
+        run: |
+          if [ -s db-status.json ] && [ "${{ job.status }}" = "success" ]; then
+            cp db-status.json /tmp/status.json
+          else
+            python3 -c "import json; print(json.dumps({'error': 'The database update failed', 'log': open('migrate.log').read()[-4000:] if __import__('os').path.exists('migrate.log') else ''}))" > /tmp/status.json
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -q --orphan db-status-tmp
+          git rm -rfq . > /dev/null
+          cp /tmp/status.json status.json
+          git add status.json
+          git commit -q -m "Database status [skip ci]"
+          git push -q -f origin HEAD:db-status

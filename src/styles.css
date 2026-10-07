@@ -156,5 +156,33 @@
   .row:last-child { border-bottom: 0; }
   .bar { height: 6px; border-radius: 99px; background: var(--color-line); overflow: hidden; }
   .bar > span { display: block; height: 100%; border-radius: 99px; background: var(--color-gold); }
+  /* Dense controls and tables for the staff pages (YDL-style lists). */
+  .input-sm { height: 40px; border-radius: 10px; font-size: 14px; padding: 0 12px; }
+  select.input-sm { background-position: calc(100% - 18px) 17px, calc(100% - 13px) 17px; padding-right: 32px; }
+  textarea.input { height: auto; min-height: 96px; padding: 12px 14px; line-height: 1.45; resize: vertical; }
+  .btn-sm { min-height: 38px; padding: 0 12px; border-radius: 10px; font-size: 13px; }
+  .btn-danger { color: var(--color-red); }
+  .btn-danger:hover { border-color: var(--color-red); color: var(--color-red); }
+  .link-btn { background: none; border: 0; padding: 0; color: var(--color-gold); font-weight: 600; cursor: pointer; text-align: left; }
+  .link-btn:hover { color: var(--color-gold-light); text-decoration: underline; }
+  .tbl { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 13px; }
+  .tbl th { position: sticky; top: 0; z-index: 2; text-align: left; font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: var(--color-muted); font-weight: 700; padding: 10px 10px; border-bottom: 1px solid var(--color-line); background: var(--color-surface-2); white-space: nowrap; }
+  .tbl th:first-child { border-top-left-radius: 12px; }
+  .tbl th:last-child { border-top-right-radius: 12px; }
+  .tbl td { padding: 10px 10px; border-bottom: 1px solid var(--color-line-soft); vertical-align: top; }
+  .tbl td.nowrap, .tbl th.nowrap { white-space: nowrap; }
+  .icon-sm { width: 34px; height: 34px; border-radius: 10px; }
+  .tbl tbody tr:last-child td { border-bottom: 0; }
+  .tbl tbody tr:hover td { background: color-mix(in srgb, var(--color-surface-2) 70%, transparent); }
+  .tbl td.num, .tbl th.num { text-align: right; font-variant-numeric: tabular-nums; }
+  .kpi { display: flex; flex-direction: column; gap: 6px; padding: 16px; border-radius: 16px; background: var(--color-surface); border: 1px solid var(--color-line); text-decoration: none; color: var(--color-ink); }
+  a.kpi:hover { border-color: var(--color-gold); color: var(--color-ink); }
+  .kpi-label { font-size: 12px; font-weight: 600; color: var(--color-muted); }
+  .kpi-value { font-size: 24px; font-weight: 700; font-variant-numeric: tabular-nums; letter-spacing: -.01em; }
+  .check { width: 18px; height: 18px; accent-color: var(--color-gold); flex: none; }
+  .menu { position: absolute; z-index: 30; min-width: 220px; padding: 6px; border-radius: 14px; background: var(--color-surface-3); border: 1px solid var(--color-line-strong); box-shadow: 0 12px 32px rgba(0,0,0,.35); }
+  .menu button, .menu a { display: flex; width: 100%; align-items: center; gap: 10px; min-height: 40px; padding: 0 12px; border-radius: 10px; border: 0; background: none; color: var(--color-ink); font-size: 14px; font-weight: 500; text-align: left; cursor: pointer; text-decoration: none; }
+  .menu button:hover, .menu a:hover { background: var(--color-surface-2); color: var(--color-ink); }
+  .menu .danger { color: var(--color-red); }
   .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 }
