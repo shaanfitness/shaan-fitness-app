@@ -1,0 +1,12 @@
+{
+  "name": "Shaan Fitness",
+  "short_name": "Shaan Fitness",
+  "description": "Members, coaches, doctors and staff in one app.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0B0B0D",
+  "theme_color": "#0B0B0D",
+  "icons": [
+    { "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}
