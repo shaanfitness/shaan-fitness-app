@@ -865,3 +865,10 @@ grant usage on schema public to anon, authenticated;
 grant select, insert, update, delete on all tables in schema public to authenticated;
 revoke insert, update, delete on public.activity_log from authenticated;
 grant select on public.cycle_overview to authenticated;
+
+-- Server-side jobs (reminders, imports) run as service_role; it skips RLS but still needs privileges.
+grant usage on schema app to service_role;
+grant all on all tables in schema public to service_role;
+grant all on all sequences in schema public to service_role;
+grant execute on all functions in schema public to service_role;
+grant execute on all functions in schema app to service_role;
