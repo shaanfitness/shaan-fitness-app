@@ -1,6 +1,6 @@
 import { useMemo, useState, type ReactNode } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useMe } from '../auth'
 import { supabase } from '../lib/supabase'
 import { useBatches, useLists, usePlans, useServices, useStudio, useTeam } from '../db/studio'
@@ -8,7 +8,7 @@ import type { Batch, ListItem, Plan, Service, Studio } from '../db/types'
 import { plusDays, presets, rangeLabel, studioToday, type Range } from '../lib/dates'
 import { downloadCsv } from '../lib/csv'
 import { CheckboxGroup, Notice, Select, TextInput, type Option } from './controls'
-import { DataTable, Pager, type Column } from './table'
+import { BulkBar, DataTable, Pager, type Column } from './table'
 import { Icon, PageHeader, Sheet } from './ui'
 
 // One engine for YDL's registers: a date range with YDL's presets, dropdown filters,
@@ -28,6 +28,7 @@ export interface RegisterCtx {
   navigate: ReturnType<typeof useNavigate>
   role: string
   coupons: { id: string; name: string; code: string }[]
+  programs: { id: string; name: string }[]
 }
 
 export interface RegisterFilter {
@@ -61,6 +62,12 @@ export interface RegisterDef<T> {
   actions?: (ctx: RegisterCtx, rows: T[]) => ReactNode
   notice?: ReactNode
   clientFilter?: (rows: T[], ui: Record<string, string>) => T[]
+  /** Tick boxes on rows and the actions for the ticked rows (e.g. Delete on the waiting list). */
+  bulk?: (rows: T[], done: () => void, ctx: RegisterCtx) => ReactNode
+  /** A dropdown that must be chosen before anything is listed (e.g. "Select Program"). */
+  requires?: string
+  /** Extra things above the table that need the loaded rows (e.g. top trainers). */
+  summary?: (rows: T[], ctx: RegisterCtx) => ReactNode
 }
 
 const PAGE = 50
@@ -84,7 +91,11 @@ export function useRegisterCtx(): RegisterCtx {
     queryKey: ['coupons', me.studioId], staleTime: 5 * 60_000, enabled: me.role === 'owner' || me.role === 'front_desk',
     queryFn: async () => ((await supabase.from('coupons').select('id,name,code').eq('studio_id', me.studioId).order('name')).data ?? []) as { id: string; name: string; code: string }[],
   })
-  return { studio, team, plans, services, batches, lists, today: studioToday(), navigate, role: me.role, coupons }
+  const { data: programs = [] } = useQuery({
+    queryKey: ['program-names', me.studioId], staleTime: 5 * 60_000, enabled: me.role !== 'member',
+    queryFn: async () => ((await supabase.from('programs').select('id,name').eq('studio_id', me.studioId).order('name')).data ?? []) as { id: string; name: string }[],
+  })
+  return { studio, team, plans, services, batches, lists, today: studioToday(), navigate, role: me.role, coupons, programs }
 }
 
 export function Register<T extends { id?: string }>({ def }: { def: RegisterDef<T> }) {
@@ -100,6 +111,8 @@ export function Register<T extends { id?: string }>({ def }: { def: RegisterDef<
   const [payments, setPayments] = useState<string[]>([])
   const [panel, setPanel] = useState(false)
   const [page, setPage] = useState(0)
+  const [selected, setSelected] = useState<Set<string>>(new Set())
+  const qc = useQueryClient()
   const filters = def.filters?.(ctx) ?? []
   const soon = Number(ctx.studio?.settings.about_to_expire_days ?? 7)
 
@@ -129,20 +142,25 @@ export function Register<T extends { id?: string }>({ def }: { def: RegisterDef<
     for (const [col, asc] of def.order) q = q.order(col, { ascending: asc, nullsFirst: false })
     return q.limit(LIMIT)
   }
+  const blocked = !!def.requires && !ui[def.requires]
   const data = useQuery({
     queryKey: ['registers', ...key],
     placeholderData: (p) => p,
+    enabled: !blocked,
     queryFn: async () => {
       const res = await build()
       if (res.error) throw new Error(res.error.message)
       return (res.data ?? []) as T[]
     },
   })
-  const all = useMemo(() => (def.clientFilter ? def.clientFilter(data.data ?? [], ui) : data.data ?? []), [data.data, ui, def])
+  const all = useMemo(() => (blocked ? [] : def.clientFilter ? def.clientFilter(data.data ?? [], ui) : data.data ?? []), [data.data, ui, def, blocked])
+  const keyOf = def.rowKey ?? ((r: T) => String(r.id))
+  const picked = all.filter((r) => selected.has(keyOf(r)))
+  const done = () => { setSelected(new Set()); qc.invalidateQueries({ queryKey: ['registers'] }) }
   const rows = all.slice(page * PAGE, page * PAGE + PAGE)
   const columns = def.columns(ctx)
   const totals = def.totals?.(all) ?? []
-  const set = (k: string, v: string) => { setUi((x) => ({ ...x, [k]: v })); setPage(0) }
+  const set = (k: string, v: string) => { setUi((x) => ({ ...x, [k]: v })); setPage(0); setSelected(new Set()) }
   const exportCsv = () => {
     const cols = def.csv?.(ctx)
     if (!cols) return
@@ -190,8 +208,13 @@ export function Register<T extends { id?: string }>({ def }: { def: RegisterDef<
         </div>
         {all.length >= LIMIT && <Notice tone="warn">Showing the first {LIMIT} records. Narrow the dates to see the rest.</Notice>}
         {data.error && <Notice tone="error">{(data.error as Error).message}</Notice>}
-        <DataTable caption={def.title} rows={rows} loading={data.isLoading} rowKey={def.rowKey ?? ((r) => String(r.id))} columns={columns}
-          card={(r) => (def.card ? def.card(r, ctx) : <CardFallback row={r} columns={columns} />)} empty="No records for these filters." />
+        {def.summary && !blocked && def.summary(all, ctx)}
+        {def.bulk && <BulkBar count={picked.length} onClear={() => setSelected(new Set())}>{def.bulk(picked, done, ctx)}</BulkBar>}
+        {blocked ? <Notice>{filters.find((f) => f.key === def.requires)?.placeholder ?? 'Choose an option'} to see the list.</Notice> : (
+          <DataTable caption={def.title} rows={rows} loading={data.isLoading} rowKey={keyOf} columns={columns}
+            selectable={!!def.bulk} selected={selected} onSelect={setSelected}
+            card={(r) => (def.card ? def.card(r, ctx) : <CardFallback row={r} columns={columns} />)} empty="No records for these filters." />
+        )}
         <Pager page={page} pageSize={PAGE} total={all.length} onPage={setPage} />
       </div>
       {def.panel && (

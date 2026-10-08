@@ -82,7 +82,7 @@ function useModes() {
 }
 
 /** Look up a client by member code, enquiry code or phone (YDL "Lookup Member code"). */
-function ClientLookup({ label, onFound, exclude, required }: { label: string; onFound: (c: { id: string; label: string } | null) => void; exclude?: string; required?: boolean }) {
+export function ClientLookup({ label, onFound, exclude, required, id = 'lookup' }: { label: string; onFound: (c: { id: string; label: string; code: string | null } | null) => void; exclude?: string; required?: boolean; id?: string }) {
   const me = useMe()
   const [code, setCode] = useState('')
   const [found, setFound] = useState<string | null>(null)
@@ -93,12 +93,12 @@ function ClientLookup({ label, onFound, exclude, required }: { label: string; on
     if (!rows.length) { setFound(null); onFound(null); setErr('No client found with that code or number'); return }
     const r = rows[0]
     setFound(`${r.client_code ?? ''} ${r.full_name}`)
-    onFound({ id: r.id, label: `${r.client_code ?? ''} ${r.full_name}` })
+    onFound({ id: r.id, label: `${r.client_code ?? ''} ${r.full_name}`, code: r.client_code })
   }
   return (
-    <Field label={label} required={required} id="lookup" error={err} hint={found ? `Found: ${found}` : undefined}>
+    <Field label={label} required={required} id={id} error={err} hint={found ? `Found: ${found}` : undefined}>
       <div className="flex gap-2">
-        <TextInput id="lookup" value={code} onChange={(v) => { setCode(v); setFound(null); onFound(null) }} placeholder="Enter Member Code/Enquiry Code/Phone Number" />
+        <TextInput id={id} value={code} onChange={(v) => { setCode(v); setFound(null); onFound(null) }} placeholder="Enter Member Code/Enquiry Code/Phone Number" />
         <button type="button" className="btn btn-sm flex-none" onClick={look}>Lookup</button>
       </div>
     </Field>

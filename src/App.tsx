@@ -21,6 +21,13 @@ import { ClientReferrals, OtherBranchMembers } from './screens/staff/Referrals'
 import Print, { PrintReport } from './screens/Print'
 import * as R from './screens/staff/registers'
 import { CollectionReport, SessionRegisterRoute } from './screens/staff/RegisterExtras'
+import { BatchForm, BatchList } from './screens/staff/Batches'
+import { CapacityInfo, ClassBookings, ClassCalendar } from './screens/staff/Classes'
+import { ProgramForm, ProgramList } from './screens/staff/Programs'
+import { DailyAppointments } from './screens/staff/Appointments'
+import ClassFeedback from './screens/staff/ClassFeedback'
+import * as CR from './screens/staff/classRegisters'
+import { CheckinLeaderboard, ClientTraffic, StaffAttendance } from './screens/staff/AttendanceReports'
 import MemberHome from './screens/member/Home'
 import CoachHome from './screens/coach/Home'
 import DoctorHome from './screens/doctor/Home'
@@ -31,6 +38,7 @@ import { Notice } from './components/controls'
 
 const STAFF: Role[] = ['owner', 'front_desk', 'coach', 'doctor']
 const DESK: Role[] = ['owner', 'front_desk']
+const DC: Role[] = ['owner', 'front_desk', 'coach']
 
 function Only({ roles, children }: { roles: Role[]; children: ReactNode }) {
   const { user } = useAuth()
@@ -81,6 +89,26 @@ const BUILT: Record<string, { el: ReactNode; roles: Role[] }> = {
   '/registers/course-orders': { el: <R.RegisterPage def={R.courseOrders} />, roles: DESK },
   '/registers/receipt-log': { el: <R.RegisterPage def={R.receiptLog} />, roles: ['owner'] },
   '/registers/recurring': { el: <R.RegisterPage def={R.recurringRegister} />, roles: DESK },
+  // Batches & Classes
+  '/batches/new': { el: <BatchForm key="new" />, roles: DESK },
+  '/batches': { el: <BatchList />, roles: DC },
+  '/classes/bookings': { el: <ClassBookings />, roles: DC },
+  '/classes/calendar': { el: <ClassCalendar />, roles: DC },
+  '/programs/new': { el: <ProgramForm key="new" />, roles: DESK },
+  '/programs': { el: <ProgramList />, roles: DC },
+  '/programs/attendance': { el: <R.RegisterPage def={CR.programAttendance} />, roles: DC },
+  '/classes/capacity': { el: <CapacityInfo />, roles: DC },
+  '/batches/attendance': { el: <R.RegisterPage def={CR.batchwiseAttendance} />, roles: DC },
+  '/classes/waiting-list': { el: <R.RegisterPage def={CR.waitingList} />, roles: DC },
+  '/classes/attendance': { el: <R.RegisterPage def={CR.classAttendance} />, roles: DC },
+  '/classes/cancelled': { el: <R.RegisterPage def={CR.cancelledClasses} />, roles: DESK },
+  '/classes/deleted': { el: <R.RegisterPage def={CR.deletedClasses} />, roles: DESK },
+  '/classes/feedback': { el: <ClassFeedback />, roles: DC },
+  '/appointments/daily': { el: <DailyAppointments />, roles: DC },
+  // Attendance Reports
+  '/attendance/staff': { el: <StaffAttendance />, roles: DESK },
+  '/attendance/clients': { el: <ClientTraffic />, roles: DC },
+  '/attendance/leaderboard': { el: <CheckinLeaderboard />, roles: DC },
 }
 
 function Splash() {
@@ -121,6 +149,8 @@ export default function App() {
         <Route path="/clients/:id" element={<Only roles={['owner', 'front_desk', 'coach']}><ClientProfile /></Only>} />
         <Route path="/clients/:id/:tab" element={<Only roles={['owner', 'front_desk', 'coach']}><ClientProfile /></Only>} />
         <Route path="/plans/:id/edit" element={<Only roles={['owner']}><PlanForm /></Only>} />
+        <Route path="/batches/:id/edit" element={<Only roles={DESK}><BatchForm /></Only>} />
+        <Route path="/programs/:id/edit" element={<Only roles={DESK}><ProgramForm /></Only>} />
         {ALL_PAGES.filter((p) => !BUILT[p.path]).map((p) => <Route key={p.path} path={p.path} element={<Only roles={p.roles}><InProgress /></Only>} />)}
         <Route path="/menu" element={<Only roles={STAFF}><PageHeader title="Menu" /><div className="px-3 pt-3"><StaffMenu /></div></Only>} />
         <Route path="/coach" element={<Only roles={['coach']}><CoachHome /></Only>} />

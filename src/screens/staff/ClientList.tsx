@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useMe } from '../../auth'
 import { allClients, batchMemberIds, countClients, listClients, updateClients, type ClientFilters } from '../../db/clients'
@@ -49,7 +49,8 @@ export default function ClientList({ variant }: { variant: ClientListVariant }) 
   const { data: batches = [] } = useBatches()
   const team = useTeam()
   const today = studioToday()
-  const [ui, setUi] = useState<Ui>(variant === 'birthdays' ? { ...EMPTY, from: today, to: plusDays(today, 7) } : EMPTY)
+  const [params] = useSearchParams()
+  const [ui, setUi] = useState<Ui>(variant === 'birthdays' ? { ...EMPTY, from: today, to: plusDays(today, 7) } : { ...EMPTY, batch: params.get('batch') ?? '' })
   const [deactivated, setDeactivated] = useState(false)
   const [page, setPage] = useState(0)
   const [selected, setSelected] = useState<Set<string>>(new Set())
@@ -222,6 +223,8 @@ export default function ClientList({ variant }: { variant: ClientListVariant }) 
         options={[{ value: 'live', label: 'Live Members' }, ...(variant === 'members' ? [{ value: 'pending', label: 'Members with Pending Subscription' }] : []), { value: 'inactive', label: 'Inactive Members' }, ...(variant === 'members' ? [{ value: 'none', label: 'Members Without Subscription' }] : [])]} className="w-auto" />}
       <Select small ariaLabel="Client rep" value={ui.staff} onChange={(v) => set('staff', v)} placeholder="All client reps" options={[{ value: 'none', label: 'Not assigned' }, ...staffOpts]} className="w-auto" />
       {variant === 'database' && <Select small ariaLabel="Batch" value={ui.batch} onChange={(v) => set('batch', v)} placeholder="All batches" options={batches.map((b) => ({ value: b.id, label: `${fmtClock(b.start_time)} · ${b.name}` }))} className="w-auto" />}
+      {variant !== 'database' && ui.batch && <button type="button" className="chip chip-gold min-h-9 px-3" onClick={() => set('batch', '')}>
+        Batch: {batches.find((b) => b.id === ui.batch)?.name ?? '…'} <Icon name="close" size={12} /></button>}
       {variant === 'database' && <Select small ariaLabel="Client type" value={ui.clientType} onChange={(v) => set('clientType', v)} placeholder="All Clients" options={[{ value: 'enquiry', label: 'Enquiry' }, { value: 'member', label: 'Member' }]} className="w-auto" />}
       <Select small ariaLabel="Assigned trainer" value={ui.trainer} onChange={(v) => set('trainer', v)} placeholder="All trainers" options={trainerOpts} className="w-auto" />
       {variant === 'members' && <>

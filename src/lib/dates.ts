@@ -71,6 +71,9 @@ export function presets(kind: Kind, todayIso = studioToday()): Preset[] {
 export const fmtDay = (s: string | null | undefined, pattern = 'dd-MMM-yyyy') => (s ? format(parseISO(s.slice(0, 10)), pattern) : '')
 export const fmtDateTime = (s: string | null | undefined) =>
   s ? new Intl.DateTimeFormat('en-IN', { timeZone: 'Asia/Kolkata', day: '2-digit', month: 'short', year: 'numeric', hour: 'numeric', minute: '2-digit' }).format(new Date(s)) : ''
+/** The time of an instant in India time, e.g. 7:05 AM. */
+export const fmtTime = (s: string | null | undefined) =>
+  s ? new Intl.DateTimeFormat('en-IN', { timeZone: 'Asia/Kolkata', hour: 'numeric', minute: '2-digit' }).format(new Date(s)) : ''
 export const fmtClock = (hhmm: string | null | undefined) => {
   if (!hhmm) return ''
   const [h, m] = hhmm.split(':').map(Number)

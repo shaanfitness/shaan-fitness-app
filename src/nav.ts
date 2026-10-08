@@ -82,24 +82,24 @@ export const NAV: NavNode[] = [
     ]),
   ], 'receipt'),
   g('Batches & Classes', [
-    p('Add Batch', '/batches/new', '/fitness-center/batch/add-batch/', D),
-    p('Batch List', '/batches', '/fitness-center/batch/batch-list/', DC),
-    p('Class Bookings', '/classes/bookings', '/fitness-center/class/customer-list/0/', DC),
-    p('Classes Calender', '/classes/calendar', '/merchant/fitness-center/customers/day-classes/', DC),
+    p('Add Batch', '/batches/new', '/fitness-center/batch/add-batch/', D, { built: true }),
+    p('Batch List', '/batches', '/fitness-center/batch/batch-list/', DC, { built: true }),
+    p('Class Bookings', '/classes/bookings', '/fitness-center/class/customer-list/0/', DC, { built: true }),
+    p('Classes Calender', '/classes/calendar', '/merchant/fitness-center/customers/day-classes/', DC, { built: true }),
     g('Program', [
-      p('Add Program', '/programs/new', '/fixed-program/basic-information/', D),
-      p('Program List', '/programs', '/fixed-program/list/', DC),
-      p('Program Attendance', '/programs/attendance', '/fitness-center/program/program-attendance-list/', DC),
+      p('Add Program', '/programs/new', '/fixed-program/basic-information/', D, { built: true }),
+      p('Program List', '/programs', '/fixed-program/list/', DC, { built: true }),
+      p('Program Attendance', '/programs/attendance', '/fitness-center/program/program-attendance-list/', DC, { built: true }),
     ]),
     g('Other Options', [
-      p('Classes Capacity Info', '/classes/capacity', '/fitness-center/class/class-list/', DC),
-      p('Batchwise Attendance List', '/batches/attendance', '/fitness-center/batch/batch-attendance-list/', DC),
-      p('Class Waiting List', '/classes/waiting-list', '/fitness-center/class/customer-class-bookings/', DC),
-      p('Class Attendance', '/classes/attendance', '/merchant/fitness-center/customers/class-register/', DC),
-      p('Cancelled Class Register', '/classes/cancelled', '/merchant/fitness-center/customers/cancel-class-register/', D),
-      p('Deleted Class Register', '/classes/deleted', '/merchant/fitness-center/customers/delete-class-register/', D),
-      p('Class Feedbacks', '/classes/feedback', '/merchant/fitness-center/customers/class-feedback-listing/', DC),
-      p('Daily Booking Appointment', '/appointments/daily', '/merchant/fitness-center/customers/day-classes-appointment/', DC),
+      p('Classes Capacity Info', '/classes/capacity', '/fitness-center/class/class-list/', DC, { built: true }),
+      p('Batchwise Attendance List', '/batches/attendance', '/fitness-center/batch/batch-attendance-list/', DC, { built: true }),
+      p('Class Waiting List', '/classes/waiting-list', '/fitness-center/class/customer-class-bookings/', DC, { built: true }),
+      p('Class Attendance', '/classes/attendance', '/merchant/fitness-center/customers/class-register/', DC, { built: true }),
+      p('Cancelled Class Register', '/classes/cancelled', '/merchant/fitness-center/customers/cancel-class-register/', D, { built: true }),
+      p('Deleted Class Register', '/classes/deleted', '/merchant/fitness-center/customers/delete-class-register/', D, { built: true }),
+      p('Class Feedbacks', '/classes/feedback', '/merchant/fitness-center/customers/class-feedback-listing/', DC, { built: true }),
+      p('Daily Booking Appointment', '/appointments/daily', '/merchant/fitness-center/customers/day-classes-appointment/', DC, { built: true }),
     ]),
   ], 'calendar'),
   g('Accounts', [
@@ -186,9 +186,9 @@ export const NAV: NavNode[] = [
     p('Staff/Trainer Target', '/staff/targets', '/merchant/fitness-centers/staff-trainer-target/', O),
   ], 'person'),
   g('Attendance Reports', [
-    p('Staff & Trainer attendance', '/attendance/staff', '/gym-members-report-data/', D),
-    p('Client Attendance', '/attendance/clients', '/merchant/fitness-center/customers/traffic/', DC),
-    p('Check-ins Leaderboard', '/attendance/leaderboard', '/merchant/fitness-center/customers/checkins-leaderboard/', DC),
+    p('Staff & Trainer attendance', '/attendance/staff', '/gym-members-report-data/', D, { built: true }),
+    p('Client Attendance', '/attendance/clients', '/merchant/fitness-center/customers/traffic/', DC, { built: true }),
+    p('Check-ins Leaderboard', '/attendance/leaderboard', '/merchant/fitness-center/customers/checkins-leaderboard/', DC, { built: true }),
   ], 'qr'),
   g('App Settings', [
     p('On/Off Permission', '/app/permissions', '/fitness-center/app/permission/', O),
@@ -259,6 +259,8 @@ export const NAV: NavNode[] = [
 export const EXTRA_PAGES: NavPage[] = [
   { path: '/quick-billing', label: 'Quick Billing', ydl: '/fitness-center/customer/quick-add-customer-subscription/', roles: D, built: true },
   { path: '/notifications', label: 'Notifications', ydl: '/fitness-center/notifications/', roles: D },
+  { path: '/batches/import', label: 'Import Batches', ydl: '/fitness-center/batch/csv/import/', roles: D },
+  { path: '/plans/import', label: 'Import Membership', ydl: '(Import Membership button on My Membership Plans)', roles: O },
 ]
 
 export interface FlatPage extends NavPage { trail: string[] }
