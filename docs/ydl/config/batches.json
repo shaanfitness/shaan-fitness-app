@@ -1,0 +1,947 @@
+[
+ {
+  "ydl_id": "5765",
+  "name": "10:00 AM - 11:30 AM",
+  "info": "",
+  "capacity": 15,
+  "room": "",
+  "services": [
+   "Weight Training",
+   "Cardio",
+   "Cross-fit",
+   "Personal Training / Nutrition",
+   "HIIT",
+   "Strength Training",
+   "Group Activity",
+   "Nutrition",
+   "Steam",
+   "Locker"
+  ],
+  "start_date": null,
+  "end_date": null,
+  "days": [
+   "Monday",
+   "Tuesday",
+   "Wednesday",
+   "Thursday",
+   "Friday",
+   "Saturday"
+  ],
+  "slots": [
+   [
+    "10:00 a.m.",
+    "11:30 a.m.",
+    "unisex"
+   ]
+  ]
+ },
+ {
+  "ydl_id": "5767",
+  "name": "10:30 AM - 12:00 PM",
+  "info": "",
+  "capacity": 15,
+  "room": "",
+  "services": [
+   "Weight Training",
+   "Cardio",
+   "Cross-fit"
+  ],
+  "start_date": null,
+  "end_date": null,
+  "days": [
+   "Monday",
+   "Tuesday",
+   "Wednesday",
+   "Thursday",
+   "Friday",
+   "Saturday"
+  ],
+  "slots": [
+   [
+    "10:30 a.m.",
+    "12:00 p.m.",
+    "unisex"
+   ]
+  ]
+ },
+ {
+  "ydl_id": "5776",
+  "name": "2:00 PM - 3:30 PM",
+  "info": "",
+  "capacity": 15,
+  "room": "",
+  "services": [
+   "Weight Training",
+   "Cardio",
+   "Cross-fit",
+   "Personal Training / Nutrition",
+   "Calisthenics",
+   "HIIT",
+   "Strength Training",
+   "Group Activity",
+   "Nutrition",
+   "Steam",
+   "Locker"
+  ],
+  "start_date": null,
+  "end_date": null,
+  "days": [
+   "Monday",
+   "Tuesday",
+   "Wednesday",
+   "Thursday",
+   "Friday",
+   "Saturday"
+  ],
+  "slots": [
+   [
+    "14:00 p.m.",
+    "15:30 p.m.",
+    "unisex"
+   ]
+  ]
+ },
+ {
+  "ydl_id": "5777",
+  "name": "2:30 PM - 4:00 PM",
+  "info": "",
+  "capacity": 15,
+  "room": "",
+  "services": [
+   "Weight Training",
+   "Cardio",
+   "Cross-fit",
+   "Personal Training / Nutrition",
+   "Calisthenics",
+   "HIIT",
+   "Strength Training",
+   "Group Activity",
+   "Nutrition",
+   "Steam",
+   "Locker"
+  ],
+  "start_date": null,
+  "end_date": null,
+  "days": [
+   "Monday",
+   "Tuesday",
+   "Wednesday",
+   "Thursday",
+   "Friday",
+   "Saturday"
+  ],
+  "slots": [
+   [
+    "14:30 p.m.",
+    "16:00 p.m.",
+    "unisex"
+   ]
+  ]
+ },
+ {
+  "ydl_id": "5778",
+  "name": "3:00 PM - 4:30 PM",
+  "info": "",
+  "capacity": 15,
+  "room": "",
+  "services": [
+   "Weight Training",
+   "Cardio",
+   "Cross-fit",
+   "Personal Training / Nutrition",
+   "Calisthenics",
+   "HIIT",
+   "Strength Training",
+   "Group Activity",
+   "Nutrition",
+   "Steam",
+   "Locker"
+  ],
+  "start_date": null,
+  "end_date": null,
+  "days": [
+   "Monday",
+   "Tuesday",
+   "Wednesday",
+   "Thursday",
+   "Friday",
+   "Saturday"
+  ],
+  "slots": [
+   [
+    "15:00 p.m.",
+    "16:30 p.m.",
+    "unisex"
+   ]
+  ]
+ },
+ {
+  "ydl_id": "5779",
+  "name": "3:30 PM - 5:00 PM",
+  "info": "",
+  "capacity": 15,
+  "room": "",
+  "services": [
+   "Weight Training",
+   "Cardio",
+   "Cross-fit",
+   "Personal Training / Nutrition",
+   "Calisthenics",
+   "HIIT",
+   "Strength Training",
+   "Group Activity",
+   "Nutrition",
+   "Steam",
+   "Locker"
+  ],
+  "start_date": null,
+  "end_date": null,
+  "days": [
+   "Monday",
+   "Tuesday",
+   "Wednesday",
+   "Thursday",
+   "Friday",
+   "Saturday"
+  ],
+  "slots": [
+   [
+    "15:30 p.m.",
+    "17:00 p.m.",
+    "unisex"
+   ]
+  ]
+ },
+ {
+  "ydl_id": "5780",
+  "name": "4:00 PM - 5:30 PM",
+  "info": "",
+  "capacity": 15,
+  "room": "",
+  "services": [
+   "Weight Training",
+   "Cardio",
+   "Cross-fit",
+   "Personal Training / Nutrition",
+   "Calisthenics",
+   "HIIT",
+   "Strength Training",
+   "Group Activity",
+   "Nutrition",
+   "Steam",
+   "Locker"
+  ],
+  "start_date": null,
+  "end_date": null,
+  "days": [
+   "Monday",
+   "Tuesday",
+   "Wednesday",
+   "Thursday",
+   "Friday",
+   "Saturday"
+  ],
+  "slots": [
+   [
+    "16:00 p.m.",
+    "17:30 p.m.",
+    "unisex"
+   ]
+  ]
+ },
+ {
+  "ydl_id": "5775",
+  "name": "4:30 PM - 6:00 PM",
+  "info": "",
+  "capacity": 15,
+  "room": "",
+  "services": [
+   "Weight Training",
+   "Cardio",
+   "Cross-fit",
+   "Personal Training / Nutrition",
+   "Calisthenics",
+   "HIIT",
+   "Strength Training",
+   "Group Activity",
+   "Nutrition",
+   "Steam",
+   "Locker"
+  ],
+  "start_date": null,
+  "end_date": null,
+  "days": [
+   "Monday",
+   "Tuesday",
+   "Wednesday",
+   "Thursday",
+   "Friday",
+   "Saturday"
+  ],
+  "slots": [
+   [
+    "16:30 p.m.",
+    "18:00 p.m.",
+    "unisex"
+   ]
+  ]
+ },
+ {
+  "ydl_id": "5755",
+  "name": "5:00 AM - 6:30 AM",
+  "info": "",
+  "capacity": 15,
+  "room": "",
+  "services": [
+   "Weight Training",
+   "Cardio",
+   "Cross-fit",
+   "Personal Training / Nutrition",
+   "Calisthenics",
+   "HIIT",
+   "Strength Training",
+   "Group Activity",
+   "Nutrition",
+   "Steam",
+   "Locker"
+  ],
+  "start_date": null,
+  "end_date": null,
+  "days": [
+   "Monday",
+   "Tuesday",
+   "Wednesday",
+   "Thursday",
+   "Friday",
+   "Saturday"
+  ],
+  "slots": [
+   [
+    "05:00 a.m.",
+    "06:30 a.m.",
+    "unisex"
+   ]
+  ]
+ },
+ {
+  "ydl_id": "5768",
+  "name": "5:00 PM - 6:30 PM",
+  "info": "",
+  "capacity": 15,
+  "room": "",
+  "services": [
+   "Weight Training",
+   "Cardio",
+   "Cross-fit",
+   "Personal Training / Nutrition",
+   "Calisthenics",
+   "HIIT",
+   "Strength Training",
+   "Group Activity",
+   "Nutrition",
+   "Steam",
+   "Locker"
+  ],
+  "start_date": null,
+  "end_date": null,
+  "days": [
+   "Monday",
+   "Tuesday",
+   "Wednesday",
+   "Thursday",
+   "Friday",
+   "Saturday"
+  ],
+  "slots": [
+   [
+    "17:00 p.m.",
+    "18:30 p.m.",
+    "unisex"
+   ]
+  ]
+ },
+ {
+  "ydl_id": "5756",
+  "name": "5:30 AM - 7:00 AM",
+  "info": "",
+  "capacity": 15,
+  "room": "",
+  "services": [
+   "Weight Training",
+   "Cardio",
+   "Cross-fit",
+   "Personal Training / Nutrition",
+   "Calisthenics",
+   "HIIT",
+   "Strength Training",
+   "Group Activity",
+   "Nutrition",
+   "Steam",
+   "Locker"
+  ],
+  "start_date": null,
+  "end_date": null,
+  "days": [
+   "Monday",
+   "Tuesday",
+   "Wednesday",
+   "Thursday",
+   "Friday",
+   "Saturday"
+  ],
+  "slots": [
+   [
+    "05:30 a.m.",
+    "07:00 a.m.",
+    "unisex"
+   ]
+  ]
+ },
+ {
+  "ydl_id": "5769",
+  "name": "5:30 PM - 7:00 PM",
+  "info": "",
+  "capacity": 15,
+  "room": "",
+  "services": [
+   "Weight Training",
+   "Cardio",
+   "Cross-fit",
+   "Personal Training / Nutrition",
+   "Calisthenics",
+   "HIIT",
+   "Strength Training",
+   "Group Activity",
+   "Nutrition",
+   "Steam",
+   "Locker"
+  ],
+  "start_date": null,
+  "end_date": null,
+  "days": [
+   "Monday",
+   "Tuesday",
+   "Wednesday",
+   "Thursday",
+   "Friday",
+   "Saturday"
+  ],
+  "slots": [
+   [
+    "17:30 p.m.",
+    "19:00 p.m.",
+    "unisex"
+   ]
+  ]
+ },
+ {
+  "ydl_id": "5757",
+  "name": "6:00 AM - 7:30 AM",
+  "info": "",
+  "capacity": 15,
+  "room": "",
+  "services": [
+   "Weight Training",
+   "Cardio",
+   "Cross-fit",
+   "Personal Training / Nutrition",
+   "Calisthenics",
+   "HIIT",
+   "Strength Training",
+   "Group Activity",
+   "Nutrition",
+   "Steam",
+   "Locker"
+  ],
+  "start_date": null,
+  "end_date": null,
+  "days": [
+   "Monday",
+   "Tuesday",
+   "Wednesday",
+   "Thursday",
+   "Friday",
+   "Saturday"
+  ],
+  "slots": [
+   [
+    "06:00 a.m.",
+    "07:30 a.m.",
+    "unisex"
+   ]
+  ]
+ },
+ {
+  "ydl_id": "5770",
+  "name": "6:00 PM - 7:30 PM",
+  "info": "",
+  "capacity": 15,
+  "room": "",
+  "services": [
+   "Weight Training",
+   "Cardio",
+   "Cross-fit",
+   "Personal Training / Nutrition",
+   "Calisthenics",
+   "HIIT",
+   "Strength Training",
+   "Group Activity",
+   "Nutrition",
+   "Steam",
+   "Locker"
+  ],
+  "start_date": null,
+  "end_date": null,
+  "days": [
+   "Monday",
+   "Tuesday",
+   "Wednesday",
+   "Thursday",
+   "Friday",
+   "Saturday"
+  ],
+  "slots": [
+   [
+    "18:00 p.m.",
+    "19:30 p.m.",
+    "unisex"
+   ]
+  ]
+ },
+ {
+  "ydl_id": "5758",
+  "name": "6:30 AM - 8:00 AM",
+  "info": "",
+  "capacity": 15,
+  "room": "",
+  "services": [
+   "Weight Training",
+   "Cardio",
+   "Cross-fit",
+   "Personal Training / Nutrition",
+   "Calisthenics",
+   "HIIT",
+   "Strength Training",
+   "Group Activity",
+   "Nutrition",
+   "Steam",
+   "Locker"
+  ],
+  "start_date": null,
+  "end_date": null,
+  "days": [
+   "Monday",
+   "Tuesday",
+   "Wednesday",
+   "Thursday",
+   "Friday",
+   "Saturday"
+  ],
+  "slots": [
+   [
+    "06:30 a.m.",
+    "08:00 a.m.",
+    "unisex"
+   ]
+  ]
+ },
+ {
+  "ydl_id": "5771",
+  "name": "6:30 PM - 8:00 PM",
+  "info": "",
+  "capacity": 15,
+  "room": "",
+  "services": [
+   "Weight Training",
+   "Cardio",
+   "Cross-fit",
+   "Personal Training / Nutrition",
+   "Calisthenics",
+   "HIIT",
+   "Strength Training",
+   "Group Activity",
+   "Nutrition",
+   "Steam",
+   "Locker"
+  ],
+  "start_date": null,
+  "end_date": null,
+  "days": [
+   "Monday",
+   "Tuesday",
+   "Wednesday",
+   "Thursday",
+   "Friday",
+   "Saturday"
+  ],
+  "slots": [
+   [
+    "18:30 p.m.",
+    "20:00 p.m.",
+    "unisex"
+   ]
+  ]
+ },
+ {
+  "ydl_id": "5759",
+  "name": "7:00 AM - 8:30 AM",
+  "info": "",
+  "capacity": 15,
+  "room": "",
+  "services": [
+   "Weight Training",
+   "Cardio",
+   "Cross-fit",
+   "Personal Training / Nutrition",
+   "Calisthenics",
+   "HIIT",
+   "Strength Training",
+   "Group Activity",
+   "Nutrition",
+   "Steam",
+   "Locker"
+  ],
+  "start_date": null,
+  "end_date": null,
+  "days": [
+   "Monday",
+   "Tuesday",
+   "Wednesday",
+   "Thursday",
+   "Friday",
+   "Saturday"
+  ],
+  "slots": [
+   [
+    "07:00 a.m.",
+    "08:30 a.m.",
+    "unisex"
+   ]
+  ]
+ },
+ {
+  "ydl_id": "5772",
+  "name": "7:00 PM - 8:30 PM",
+  "info": "",
+  "capacity": 15,
+  "room": "",
+  "services": [
+   "Weight Training",
+   "Cardio",
+   "Cross-fit",
+   "Personal Training / Nutrition",
+   "Calisthenics",
+   "HIIT",
+   "Strength Training",
+   "Group Activity",
+   "Nutrition",
+   "Steam",
+   "Locker"
+  ],
+  "start_date": null,
+  "end_date": null,
+  "days": [
+   "Monday",
+   "Tuesday",
+   "Wednesday",
+   "Thursday",
+   "Friday",
+   "Saturday"
+  ],
+  "slots": [
+   [
+    "19:00 p.m.",
+    "20:30 p.m.",
+    "unisex"
+   ]
+  ]
+ },
+ {
+  "ydl_id": "5760",
+  "name": "7:30 AM - 9:00 AM",
+  "info": "",
+  "capacity": 15,
+  "room": "",
+  "services": [
+   "Weight Training",
+   "Cardio",
+   "Cross-fit",
+   "Personal Training / Nutrition",
+   "Calisthenics",
+   "HIIT",
+   "Strength Training",
+   "Group Activity",
+   "Nutrition",
+   "Steam",
+   "Locker"
+  ],
+  "start_date": null,
+  "end_date": null,
+  "days": [
+   "Monday",
+   "Tuesday",
+   "Wednesday",
+   "Thursday",
+   "Friday",
+   "Saturday"
+  ],
+  "slots": [
+   [
+    "07:30 a.m.",
+    "09:00 a.m.",
+    "unisex"
+   ]
+  ]
+ },
+ {
+  "ydl_id": "5773",
+  "name": "7:30 PM - 9:00 PM",
+  "info": "",
+  "capacity": 15,
+  "room": "",
+  "services": [
+   "Weight Training",
+   "Cardio",
+   "Cross-fit",
+   "Personal Training / Nutrition",
+   "Calisthenics",
+   "HIIT",
+   "Strength Training",
+   "Group Activity",
+   "Nutrition",
+   "Steam",
+   "Locker"
+  ],
+  "start_date": null,
+  "end_date": null,
+  "days": [
+   "Monday",
+   "Tuesday",
+   "Wednesday",
+   "Thursday",
+   "Friday",
+   "Saturday"
+  ],
+  "slots": [
+   [
+    "19:30 p.m.",
+    "21:00 p.m.",
+    "unisex"
+   ]
+  ]
+ },
+ {
+  "ydl_id": "5761",
+  "name": "8:00 AM - 9:30 AM",
+  "info": "",
+  "capacity": 15,
+  "room": "",
+  "services": [
+   "Weight Training",
+   "Cardio",
+   "Cross-fit",
+   "Personal Training / Nutrition",
+   "Calisthenics",
+   "HIIT",
+   "Strength Training",
+   "Group Activity",
+   "Nutrition",
+   "Steam",
+   "Locker"
+  ],
+  "start_date": null,
+  "end_date": null,
+  "days": [
+   "Monday",
+   "Tuesday",
+   "Wednesday",
+   "Thursday",
+   "Friday",
+   "Saturday"
+  ],
+  "slots": [
+   [
+    "08:00 a.m.",
+    "09:30 a.m.",
+    "unisex"
+   ]
+  ]
+ },
+ {
+  "ydl_id": "5766",
+  "name": "8:00 PM - 9:30 PM",
+  "info": "",
+  "capacity": 15,
+  "room": "",
+  "services": [
+   "Weight Training",
+   "Cardio",
+   "Cross-fit"
+  ],
+  "start_date": null,
+  "end_date": null,
+  "days": [
+   "Monday",
+   "Tuesday",
+   "Wednesday",
+   "Thursday",
+   "Friday",
+   "Saturday"
+  ],
+  "slots": [
+   [
+    "20:00 p.m.",
+    "21:30 p.m.",
+    "unisex"
+   ]
+  ]
+ },
+ {
+  "ydl_id": "5762",
+  "name": "8:30 AM - 10:00 AM",
+  "info": "",
+  "capacity": 15,
+  "room": "",
+  "services": [
+   "Weight Training",
+   "Cardio",
+   "Cross-fit",
+   "Personal Training / Nutrition",
+   "Calisthenics",
+   "HIIT",
+   "Strength Training",
+   "Group Activity",
+   "Nutrition",
+   "Steam",
+   "Locker"
+  ],
+  "start_date": null,
+  "end_date": null,
+  "days": [
+   "Monday",
+   "Tuesday",
+   "Wednesday",
+   "Thursday",
+   "Friday",
+   "Saturday"
+  ],
+  "slots": [
+   [
+    "08:30 a.m.",
+    "10:00 a.m.",
+    "unisex"
+   ]
+  ]
+ },
+ {
+  "ydl_id": "5774",
+  "name": "8:30 PM - 10:00 PM",
+  "info": "",
+  "capacity": 15,
+  "room": "",
+  "services": [
+   "Weight Training",
+   "Cardio",
+   "Cross-fit",
+   "Personal Training / Nutrition",
+   "Calisthenics",
+   "HIIT",
+   "Strength Training",
+   "Group Activity",
+   "Nutrition",
+   "Steam",
+   "Locker"
+  ],
+  "start_date": null,
+  "end_date": null,
+  "days": [
+   "Monday",
+   "Tuesday",
+   "Wednesday",
+   "Thursday",
+   "Friday",
+   "Saturday"
+  ],
+  "slots": [
+   [
+    "20:30 p.m.",
+    "22:00 p.m.",
+    "unisex"
+   ]
+  ]
+ },
+ {
+  "ydl_id": "5763",
+  "name": "9:00 AM - 10:30 AM",
+  "info": "",
+  "capacity": 15,
+  "room": "",
+  "services": [
+   "Weight Training",
+   "Cardio",
+   "Cross-fit",
+   "Personal Training / Nutrition",
+   "Calisthenics",
+   "HIIT",
+   "Strength Training",
+   "Group Activity",
+   "Nutrition",
+   "Steam",
+   "Locker"
+  ],
+  "start_date": null,
+  "end_date": null,
+  "days": [
+   "Monday",
+   "Tuesday",
+   "Wednesday",
+   "Thursday",
+   "Friday",
+   "Saturday"
+  ],
+  "slots": [
+   [
+    "09:00 a.m.",
+    "10:30 a.m.",
+    "unisex"
+   ]
+  ]
+ },
+ {
+  "ydl_id": "5764",
+  "name": "9:30 AM - 11:00 AM",
+  "info": "",
+  "capacity": 15,
+  "room": "",
+  "services": [
+   "Weight Training",
+   "Cardio",
+   "Cross-fit",
+   "Personal Training / Nutrition",
+   "Calisthenics",
+   "HIIT",
+   "Strength Training",
+   "Group Activity",
+   "Nutrition",
+   "Steam",
+   "Locker"
+  ],
+  "start_date": null,
+  "end_date": null,
+  "days": [
+   "Monday",
+   "Tuesday",
+   "Wednesday",
+   "Thursday",
+   "Friday",
+   "Saturday"
+  ],
+  "slots": [
+   [
+    "09:30 a.m.",
+    "11:00 a.m.",
+    "unisex"
+   ]
+  ]
+ }
+]

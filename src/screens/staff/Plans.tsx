@@ -39,7 +39,7 @@ export function PlanList() {
   const groups: [string, Plan[]][] = [
     ['Free Trials Memberships', rows.filter((p) => p.is_free_trial)],
     ['Membership plans (General)', rows.filter((p) => !p.is_free_trial && p.kind === 'gym')],
-    ['Membership Plans (Personalised)', rows.filter((p) => !p.is_free_trial && p.kind === 'pt')],
+    ['Membership Plans (Personalised)', rows.filter((p) => p.kind === 'pt')],
   ]
   const svc = (p: Plan) => services.filter((s) => p.service_ids.includes(s.id)).map((s) => s.custom_name ?? s.name).join(', ')
 
@@ -191,7 +191,7 @@ export function PlanForm() {
     mutationFn: async (close: boolean) => {
       const row = {
         studio_id: me.studioId, name: f.name.trim(), description: f.description || null, service_ids: f.service_ids, show_in_app: f.show_in_app === '1',
-        trainer_ids: f.trainer_ids, kind: f.trainer_ids.length ? 'pt' : 'gym',
+        trainer_ids: f.trainer_ids, kind: !f.unlimited_sessions && Number(f.session_count || 0) > 0 ? 'pt' : 'gym',
         session_count: f.unlimited_sessions ? null : Number(f.session_count || 0) || null, unlimited_sessions: f.unlimited_sessions,
         disable_messages_followups: f.disable_messages_followups === '1', terms: f.terms || null,
         tenure_value: Number(f.tenure_value), tenure_unit: f.tenure_unit, is_one_time: f.is_one_time, freeze_days: Number(f.freeze_days || 0),
@@ -240,7 +240,7 @@ export function PlanForm() {
         </section>
         <section className={card}>
           <h2 className="m-0 text-[16px] font-bold">Assign Trainer</h2>
-          <p className="m-0 text-[13px] text-muted">Select a trainer from below only if it's a personal training membership. Plans with trainers are listed as Personalised.</p>
+          <p className="m-0 text-[13px] text-muted">Select a trainer from below only if it's a personal training membership. Plans with a session count are listed as Personalised.</p>
           <Checkbox checked={team.trainers.length > 0 && f.trainer_ids.length === team.trainers.length} onChange={(on) => set('trainer_ids')(on ? team.trainers.map((t) => t.id) : [])} label="Select All" />
           <CheckboxGroup legend="Trainers" columns={3} values={f.trainer_ids} onChange={set('trainer_ids')} options={team.trainers.map((t) => ({ value: t.id, label: t.full_name }))} />
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">

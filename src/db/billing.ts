@@ -66,6 +66,7 @@ export interface Sub {
   member_phone: string | null
   member_email: string | null
   member_gender: string | null
+  member_kind: 'enquiry' | 'member'
   member_date_of_birth: string | null
   client_code: string | null
   trainer_name: string | null
@@ -94,6 +95,8 @@ export interface Receipt {
   bill_rep_name: string | null
   plan_name: string | null
   invoice_no: string | null
+  member_name: string
+  client_code: string | null
 }
 
 export const STATE_LABEL: Record<SubState, string> = {
@@ -177,8 +180,8 @@ export const recordPayment = (p: PaymentPayload) => rpc<string | null>('record_p
 export const freezeSubscription = (p: { subscription_id: string; start_date: string; days: number; fee?: number; mode?: string; note?: string }) => rpc<string>('freeze_subscription', { p })
 export const extendSubscription = (p: { subscription_id: string; days: number; fee?: number; mode?: string; note?: string }) => rpc<string>('extend_subscription', { p })
 export const transferSubscription = (p: { subscription_id: string; to_member_id: string; start_date: string; fee?: number; mode?: string }) => rpc<string>('transfer_subscription', { p })
-export const upgradeSubscription = (p: { subscription_id: string; plan_id: string; end_date: string; selling_price: number; coupon_code?: string; group?: boolean }) => rpc<string>('upgrade_subscription', { p })
-export const downgradeSubscription = (p: { subscription_id: string; plan_id: string; start_date: string; end_date: string; selling_price: number; note?: string; group?: boolean }) => rpc<string>('downgrade_subscription', { p })
+export const upgradeSubscription = (p: { subscription_id: string; plan_id: string; end_date: string; selling_price: number; coupon_code?: string; group?: boolean; trainer_id?: string }) => rpc<string>('upgrade_subscription', { p })
+export const downgradeSubscription = (p: { subscription_id: string; plan_id: string; start_date: string; end_date: string; selling_price: number; note?: string; group?: boolean; trainer_id?: string }) => rpc<string>('downgrade_subscription', { p })
 export const editSubscription = (p: { subscription_id: string; start_date?: string; end_date?: string; trainer_id?: string | null; second_trainer_ids?: string[]; sessions_total?: number | null; invoice_date?: string; invoice_no?: string }) =>
   rpc<void>('edit_subscription', { p })
 export const cancelSubscription = (id: string, reason: string, cancelReceipts: boolean) => rpc<void>('cancel_subscription', { p_id: id, p_reason: reason, p_cancel_receipts: cancelReceipts })

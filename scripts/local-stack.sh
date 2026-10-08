@@ -30,6 +30,7 @@ start() {
   "${PSQL[@]}" -f "$ROOT/supabase/tests/00_supabase_stubs.sql"
   for f in "$ROOT"/supabase/migrations/*.sql; do "${PSQL[@]}" -f "$f"; done
   "${PSQL[@]}" -f "$ROOT/supabase/seed.sql" >/dev/null
+  "${PSQL[@]}" -f "$ROOT/supabase/fixtures/test-plans.sql" >/dev/null
   "${PSQL[@]}" -f "$ROOT/scripts/local-api/demo-data.sql"
   node -e "
     const c=require('crypto');const s='local-dev-secret-not-for-production';

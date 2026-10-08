@@ -11,6 +11,7 @@ on:
     paths:
       - 'supabase/migrations/**'
       - 'supabase/seed.sql'
+      - 'supabase/seed-ydl.sql'
       - 'supabase/rebuild-from-wave1.sql'
       - 'scripts/apply-migrations.sh'
       - '.github/workflows/database.yml'

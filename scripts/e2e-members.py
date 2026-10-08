@@ -97,6 +97,8 @@ with sync_playwright() as p:
     dlg = page.get_by_role("dialog")
     dlg.locator("#sub").select_option(index=1)
     dlg.locator("#newplan").select_option(index=1)
+    if dlg.locator("#ctrainer").count():
+        dlg.locator("#ctrainer").select_option(index=1)
     shot(page, "upgrade")
     dlg.get_by_role("button", name="Upgrade Subscription").click()
     page.wait_for_url("**/payments/*")

@@ -474,6 +474,9 @@ begin
   if v_price <> greatest(pl.total_price - v_paid, 0) and not app.can_discount(s.studio_id) then
     raise exception 'You are not allowed to change the price';
   end if;
+  if pl.kind = 'pt' and coalesce(nullif(p->>'trainer_id', '')::uuid, s.trainer_id) is null then
+    raise exception 'Assign a trainer for %', pl.name;
+  end if;
   if p_kind = 'downgrade' then v_refund = greatest(v_paid - pl.total_price, 0); end if;
   if nullif(trim(p->>'coupon_code'), '') is not null then
     v_coupon = public.check_coupon(s.studio_id, p->>'coupon_code', pl.id, s.member_id, v_price);
@@ -482,7 +485,7 @@ begin
   end if;
   insert into public.subscriptions (studio_id, member_id, plan_id, kind, start_date, base_end_date, trainer_id, second_trainer_ids,
     group_member_ids, base_price, selling_price, coupon_id, coupon_code, coupon_discount, previous_subscription_id, note, balance_due_date)
-  values (s.studio_id, s.member_id, pl.id, pl.kind, v_start, v_end, s.trainer_id, s.second_trainer_ids,
+  values (s.studio_id, s.member_id, pl.id, pl.kind, v_start, v_end, coalesce(nullif(p->>'trainer_id', '')::uuid, s.trainer_id), s.second_trainer_ids,
     case when coalesce((p->>'group')::boolean, false) then s.group_member_ids else '{}' end,
     pl.total_price, v_price, v_coupon_id, case when v_coupon_id is null then null else upper(trim(p->>'coupon_code')) end, v_disc,
     s.id, nullif(p->>'note', ''), app.today(s.studio_id))

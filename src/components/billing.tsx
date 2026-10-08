@@ -450,9 +450,12 @@ function ChangePlanForm({ target, onDone }: { target: ActionTarget; onDone: () =
   const [couponMsg, setCouponMsg] = useState<string | null>(null)
   const [groupOn, setGroupOn] = useState(false)
   const [note, setNote] = useState('')
+  const [trainer, setTrainer] = useState('')
   const [error, setError] = useState<string | null>(null)
+  const team = useTeam()
   const sub = target.subs.find((s) => s.id === subId)
   const plan = plans.find((p) => p.id === planId)
+  const needsTrainer = plan?.kind === 'pt' && !sub?.trainer_id
   const paid = sub?.paid_amount ?? 0
   const difference = plan ? Math.max(plan.total_price - paid, 0) : 0
   const refund = plan && !up ? Math.max(paid - plan.total_price, 0) : 0
@@ -476,8 +479,8 @@ function ChangePlanForm({ target, onDone }: { target: ActionTarget; onDone: () =
   }
   const m = useMutation({
     mutationFn: () => up
-      ? upgradeSubscription({ subscription_id: subId, plan_id: planId, end_date: end, selling_price: Number(price || 0), coupon_code: couponOff ? coupon : undefined, group: groupOn })
-      : downgradeSubscription({ subscription_id: subId, plan_id: planId, start_date: start, end_date: end, selling_price: Number(price || 0), note, group: groupOn }),
+      ? upgradeSubscription({ subscription_id: subId, plan_id: planId, end_date: end, selling_price: Number(price || 0), coupon_code: couponOff ? coupon : undefined, group: groupOn, trainer_id: trainer || undefined })
+      : downgradeSubscription({ subscription_id: subId, plan_id: planId, start_date: start, end_date: end, selling_price: Number(price || 0), note, group: groupOn, trainer_id: trainer || undefined }),
     onSuccess: (id) => {
       invalidate(); toast(up ? 'Subscription upgraded' : 'Subscription downgraded'); onDone()
       if (Number(price || 0) - couponOff > 0) navigate(`/clients/${target.memberId}/payments/${id}`)
@@ -485,7 +488,12 @@ function ChangePlanForm({ target, onDone }: { target: ActionTarget; onDone: () =
     onError: (e: Error) => setError(e.message),
   })
   return (
-    <form className="flex flex-col gap-3.5" noValidate onSubmit={(e) => { e.preventDefault(); setError(null); if (!subId || !planId || !end) setError('Select the subscription, the new membership and the dates.'); else m.mutate() }}>
+    <form className="flex flex-col gap-3.5" noValidate onSubmit={(e) => {
+      e.preventDefault(); setError(null)
+      if (!subId || !planId || !end) setError('Select the subscription, the new membership and the dates.')
+      else if (needsTrainer && !trainer) setError('Assign a trainer for this personal training plan.')
+      else m.mutate()
+    }}>
       <p className="m-0 text-[13px] text-muted">Select the Customer's Subscription plan you wish to {up ? 'upgrade' : 'Downgrade'}.</p>
       <SubSelect target={target} value={subId} onChange={pickSub} placeholder={up ? 'Select Subscription you wish to upgrade' : 'Select Subscription'} />
       <Checkbox checked={groupOn} onChange={setGroupOn} label="Group: check Group to add subscription" />
@@ -494,6 +502,12 @@ function ChangePlanForm({ target, onDone }: { target: ActionTarget; onDone: () =
           options={choices.map((p) => ({ value: p.id, label: `${p.name} [${tenureLabel(p)}] · ${amt(p.total_price)}` }))} />
       </Field>
       <PlanNote plan={plan} />
+      {plan?.kind === 'pt' && (
+        <Field label="Assign Trainer" required={needsTrainer} id="ctrainer" hint={sub?.trainer_name ? `Currently ${sub.trainer_name}` : undefined}>
+          <Select id="ctrainer" value={trainer} onChange={setTrainer} placeholder={sub?.trainer_name ? 'Keep the current trainer' : 'Select Trainer'}
+            options={team.trainers.map((t) => ({ value: t.id, label: `${t.full_name} (${t.staff_code})` }))} />
+        </Field>
+      )}
       <div className="grid grid-cols-2 gap-3">
         <Field label="Start Date" id="cstart">
           {up ? <TextInput id="cstart" value={sub ? fmtDay(sub.start_date) : ''} onChange={() => {}} className="opacity-70" />

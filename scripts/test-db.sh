@@ -19,4 +19,16 @@ PSQL=("${RUN_AS[@]}" psql -h /tmp -p "$PORT" -U postgres -d postgres -v ON_ERROR
 "${PSQL[@]}" -f "$ROOT/supabase/tests/00_supabase_stubs.sql"
 for f in "$ROOT"/supabase/migrations/*.sql; do "${PSQL[@]}" -f "$f"; done
 "${PSQL[@]}" -f "$ROOT/supabase/seed.sql"
+"${PSQL[@]}" -f "$ROOT/supabase/fixtures/test-plans.sql"
 for t in "$ROOT"/supabase/tests/0[1-9]_*.sql; do "${PSQL[@]}" -f "$t"; done
+
+# The real setup: Shaan Fitness's YDL plans and batches load on a fresh database.
+"${RUN_AS[@]}" psql -h /tmp -p "$PORT" -U postgres -d postgres -q -c "create database ydlcheck"
+PSQL2=("${RUN_AS[@]}" psql -h /tmp -p "$PORT" -U postgres -d ydlcheck -v ON_ERROR_STOP=1 -q -t -A)
+"${PSQL2[@]}" -f "$ROOT/supabase/tests/00_supabase_stubs.sql" >/dev/null
+for f in "$ROOT"/supabase/migrations/*.sql; do "${PSQL2[@]}" -f "$f" >/dev/null; done
+"${PSQL2[@]}" -f "$ROOT/supabase/seed.sql" >/dev/null
+"${PSQL2[@]}" -f "$ROOT/supabase/seed-ydl.sql" >/dev/null
+"${PSQL2[@]}" -c "select format('YDL setup: %s plans (%s active, %s personal training), %s batches, every batch has services: %s',
+  (select count(*) from public.plans), (select count(*) from public.plans where active), (select count(*) from public.plans where kind = 'pt'),
+  (select count(*) from public.batches), (select bool_and(cardinality(service_ids) > 0) from public.batches))"

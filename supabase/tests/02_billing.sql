@@ -62,8 +62,10 @@ select test.fails($$select public.edit_subscription(jsonb_build_object('subscrip
   'Only the owner', 'front desk cannot change invoice numbers');
 
 -- Upgrade: the new bill is the difference -----------------------------------------------------------
+select test.fails($$select public.upgrade_subscription(jsonb_build_object('subscription_id', (select id from t_ids where k = 'sub1'),
+  'plan_id', (select id from public.plans where tier = 'elite')))$$, 'Assign a trainer', 'upgrading into personal training needs a trainer');
 insert into t_ids select 'sub2', public.upgrade_subscription(jsonb_build_object('subscription_id', (select id from t_ids where k = 'sub1'),
-  'plan_id', (select id from public.plans where tier = 'elite')));
+  'plan_id', (select id from public.plans where tier = 'elite'), 'trainer_id', '00000000-0000-4000-8000-0000000000c2'));
 select test.eq((select status from public.subscriptions where id = (select id from t_ids where k = 'sub1')), 'upgraded', 'the old subscription is marked upgraded');
 select test.eq((select selling_price from public.subscriptions where id = (select id from t_ids where k = 'sub2')),
   (select total_price from public.plans where tier = 'elite') - (select app.subscription_paid((select id from t_ids where k = 'sub1'))),
@@ -151,3 +153,28 @@ select test.eq((select count(*) from public.notifications)::int, 0, 'coach does 
 reset role;
 
 select 'all billing tests passed';
+
+-- PT sessions (Session Register) -----------------------------------------------------------------------------
+set role authenticated;
+select set_config('request.jwt.claim.sub', '10000000-0000-4000-8000-000000000002', false);
+insert into t_ids select 'pt', (public.sell_subscriptions(jsonb_build_object('member_id', (select id from t_ids where k = 'sita'),
+  'items', jsonb_build_array(jsonb_build_object('plan_id', (select id from public.plans where tier = 'elite'), 'trainer_id', '00000000-0000-4000-8000-0000000000c2', 'sessions_total', 2)))))[1];
+reset role;
+set role authenticated;
+select set_config('request.jwt.claim.sub', '10000000-0000-4000-8000-000000000003', false);
+insert into t_ids select 'sess1', public.record_session(jsonb_build_object('subscription_id', (select id from t_ids where k = 'pt'), 'activity', 'Legs'));
+select public.record_session(jsonb_build_object('subscription_id', (select id from t_ids where k = 'pt'), 'show', 'no_show'));
+select test.eq((select sessions_used from public.care_progress() where subscription_id = (select id from t_ids where k = 'pt')), 1, 'the trainer records a session; a plain no-show is not deducted');
+select public.record_session(jsonb_build_object('subscription_id', (select id from t_ids where k = 'pt'), 'show', 'no_show_deduct'));
+select test.fails($$select public.record_session(jsonb_build_object('subscription_id', (select id from t_ids where k = 'pt')))$$, 'sessions are used', 'no more sessions than bought');
+reset role;
+set role authenticated;
+select set_config('request.jwt.claim.sub', '10000000-0000-4000-8000-000000000001', false);
+select public.delete_session((select id from t_ids where k = 'sess1'), 'Marked by mistake');
+select test.eq((select reason from public.deleted_session_overview where attendance_id = (select id from t_ids where k = 'sess1')), 'Marked by mistake', 'deleted sessions are kept with the reason');
+select test.eq((select sessions_used from public.subscriptions where id = (select id from t_ids where k = 'pt')), 1, 'deleting a session gives it back');
+select test.eq((select count(*) from public.change_overview)::int >= 3, true, 'transfer, upgrade and downgrade show in the change registers');
+select test.eq((select count(*) from public.freeze_overview)::int >= 1, true, 'freeze register');
+select test.eq((select count(*) from public.payment_overview where tax_amount > 0)::int, 0, 'no tax while GST is off');
+reset role;
+select 'all session tests passed';

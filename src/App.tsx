@@ -18,7 +18,9 @@ import { PlanForm, PlanList } from './screens/staff/Plans'
 import Subscriptions from './screens/staff/Subscriptions'
 import QuickBilling from './screens/staff/QuickBilling'
 import { ClientReferrals, OtherBranchMembers } from './screens/staff/Referrals'
-import Print from './screens/Print'
+import Print, { PrintReport } from './screens/Print'
+import * as R from './screens/staff/registers'
+import { CollectionReport, SessionRegisterRoute } from './screens/staff/RegisterExtras'
 import MemberHome from './screens/member/Home'
 import CoachHome from './screens/coach/Home'
 import DoctorHome from './screens/doctor/Home'
@@ -55,6 +57,30 @@ const BUILT: Record<string, { el: ReactNode; roles: Role[] }> = {
   '/plans': { el: <PlanList />, roles: DESK },
   '/subscriptions': { el: <Subscriptions />, roles: DESK },
   '/quick-billing': { el: <QuickBilling />, roles: DESK },
+  '/registers/collection': { el: <CollectionReport />, roles: DESK },
+  '/registers/receipts': { el: <R.RegisterPage def={R.receiptRegister} />, roles: DESK },
+  '/registers/subscriptions': { el: <R.RegisterPage def={R.subscriptionsRegister} />, roles: DESK },
+  '/registers/cash': { el: <R.RegisterPage def={R.cashRegister} />, roles: DESK },
+  '/registers/sessions': { el: <SessionRegisterRoute />, roles: DESK },
+  '/registers/recorded-sessions': { el: <R.RegisterPage def={R.recordedSessions} />, roles: DESK },
+  '/registers/deleted-sessions': { el: <R.RegisterPage def={R.deletedSessions} />, roles: DESK },
+  '/registers/coupons': { el: <R.RegisterPage def={R.couponRegister} />, roles: DESK },
+  '/registers/expired': { el: <R.RegisterPage def={R.expiredRegister} />, roles: DESK },
+  '/registers/expired-sessions': { el: <R.RegisterPage def={R.expiredSessions} />, roles: DESK },
+  '/registers/balance-due': { el: <R.RegisterPage def={R.balanceDue} />, roles: DESK },
+  '/registers/tax': { el: <R.RegisterPage def={R.taxRegister} />, roles: ['owner'] },
+  '/registers/write-offs': { el: <R.RegisterPage def={R.writeOffRegister} />, roles: ['owner'] },
+  '/registers/deleted-subscriptions': { el: <R.RegisterPage def={R.deletedSubs} />, roles: ['owner'] },
+  '/registers/trials': { el: <R.RegisterPage def={R.trialRegister} />, roles: DESK },
+  '/registers/cancelled': { el: <R.RegisterPage def={R.cancelledSubs} />, roles: DESK },
+  '/registers/transfers': { el: <R.RegisterPage def={R.transferRegister} />, roles: DESK },
+  '/registers/freezes': { el: <R.RegisterPage def={R.freezeRegister} />, roles: DESK },
+  '/registers/upgrades': { el: <R.RegisterPage def={R.upgradeRegister} />, roles: DESK },
+  '/registers/extensions': { el: <R.RegisterPage def={R.extensionRegister} />, roles: DESK },
+  '/registers/downgrades': { el: <R.RegisterPage def={R.downgradeRegister} />, roles: DESK },
+  '/registers/course-orders': { el: <R.RegisterPage def={R.courseOrders} />, roles: DESK },
+  '/registers/receipt-log': { el: <R.RegisterPage def={R.receiptLog} />, roles: ['owner'] },
+  '/registers/recurring': { el: <R.RegisterPage def={R.recurringRegister} />, roles: DESK },
 }
 
 function Splash() {
@@ -85,6 +111,8 @@ export default function App() {
       <Route path="/login" element={user ? <Navigate to={homeFor(user.role)} replace /> : <Login />} />
       <Route path="/print/invoice/:id" element={<Only roles={DESK}><Print kind="invoice" /></Only>} />
       <Route path="/print/receipt/:id" element={<Only roles={DESK}><Print kind="receipt" /></Only>} />
+      <Route path="/print/collection" element={<Only roles={DESK}><PrintReport kind="collection" /></Only>} />
+      <Route path="/print/sales" element={<Only roles={DESK}><PrintReport kind="sales" /></Only>} />
       <Route element={user ? <AppShell /> : <Navigate to="/login" replace />}>
         <Route index element={user ? <Navigate to={homeFor(user.role)} replace /> : null} />
         {Object.entries(BUILT).map(([path, b]) => <Route key={path} path={path} element={<Only roles={b.roles}>{b.el}</Only>} />)}
