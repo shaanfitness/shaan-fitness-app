@@ -1,8 +1,8 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { NavLink, Outlet, useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { ROLE_LABEL, useAuth, useMe } from '../auth'
-import { navFor } from '../nav'
+import { containsPath, navFor, nodeKey, type NavNode } from '../nav'
 import type { Role } from '../db/types'
 import { Avatar, BrandMark, Icon } from './ui'
 
@@ -44,53 +44,73 @@ function barFor(role: Role, t: (k: string) => string): BarItem[] {
   }
 }
 
-export function StaffMenu({ onNavigate }: { onNavigate?: () => void }) {
-  const me = useMe()
-  const { pathname } = useLocation()
-  const groups = navFor(me.role)
-  const activeGroup = groups.find((g) => g.pages.some((p) => p.path === pathname || pathname.startsWith(p.path + '/')))?.key
-  const [open, setOpen] = useState<Set<string>>(() => new Set(activeGroup ? [activeGroup] : []))
-  useEffect(() => { if (activeGroup) setOpen((o) => new Set(o).add(activeGroup)) }, [activeGroup])
+const linkCls = (depth: number) => ({ isActive }: { isActive: boolean }) => depth === 0
+  ? `flex min-h-[42px] items-center gap-3 rounded-xl px-3 text-[14px] font-semibold no-underline ${isActive ? 'bg-surface-2 text-gold' : 'text-ink-soft hover:text-ink'}`
+  : `flex min-h-[34px] items-center justify-between gap-2 rounded-lg px-2.5 text-[13px] no-underline ${isActive ? 'bg-surface-2 font-semibold text-gold' : 'text-muted hover:text-ink'}`
+
+function MenuNodes({ nodes, depth, trail, open, toggle, pathname, onNavigate }: {
+  nodes: NavNode[]; depth: number; trail: string[]; open: Set<string>; toggle: (k: string) => void; pathname: string; onNavigate?: () => void
+}) {
   return (
-    <nav aria-label="Main" className="flex flex-col gap-0.5">
-      {me.role === 'coach' && (
-        <NavLink to="/coach" onClick={onNavigate} className={({ isActive }) => `flex min-h-[42px] items-center gap-3 rounded-xl px-3 text-[14px] font-semibold no-underline ${isActive ? 'bg-surface-2 text-gold' : 'text-ink-soft hover:text-ink'}`}>
-          <Icon name="home" size={18} />Today
-        </NavLink>
-      )}
-      {groups.map((g) => {
-        if (g.pages.length === 1) {
-          const p = g.pages[0]
+    <>
+      {nodes.map((n) => {
+        const key = nodeKey(n, trail)
+        if (n.page) {
           return (
-            <NavLink key={g.key} to={p.path} end onClick={onNavigate}
-              className={({ isActive }) => `flex min-h-[42px] items-center gap-3 rounded-xl px-3 text-[14px] font-semibold no-underline ${isActive ? 'bg-surface-2 text-gold' : 'text-ink-soft hover:text-ink'}`}>
-              <Icon name={g.icon} size={18} />{p.label}
+            <NavLink key={key} to={n.page.path} end onClick={onNavigate} className={linkCls(depth)}>
+              {depth === 0 && <Icon name={n.icon ?? 'list'} size={18} />}
+              <span className={depth === 0 ? '' : 'min-w-0 flex-1'}>{n.label}</span>
+              {depth > 0 && !n.page.built && <span aria-label="being built" title="Being built" className="h-1.5 w-1.5 flex-none rounded-full bg-line-strong" />}
             </NavLink>
           )
         }
-        const isOpen = open.has(g.key)
+        const isOpen = open.has(key)
+        const here = containsPath(n, pathname)
         return (
-          <div key={g.key}>
-            <button type="button" aria-expanded={isOpen}
-              onClick={() => setOpen((o) => { const n = new Set(o); if (n.has(g.key)) n.delete(g.key); else n.add(g.key); return n })}
-              className={`flex min-h-[42px] w-full items-center gap-3 rounded-xl border-0 bg-transparent px-3 text-left text-[14px] font-semibold ${activeGroup === g.key ? 'text-gold' : 'text-ink-soft hover:text-ink'}`}>
-              <Icon name={g.icon} size={18} /><span className="flex-1">{g.label}</span>
-              <Icon name="chevronRight" size={14} className={`transition-transform ${isOpen ? 'rotate-90' : ''}`} />
+          <div key={key}>
+            <button type="button" aria-expanded={isOpen} onClick={() => toggle(key)}
+              className={depth === 0
+                ? `flex min-h-[42px] w-full items-center gap-3 rounded-xl border-0 bg-transparent px-3 text-left text-[14px] font-semibold ${here ? 'text-gold' : 'text-ink-soft hover:text-ink'}`
+                : `flex min-h-[34px] w-full items-center gap-2 rounded-lg border-0 bg-transparent px-2.5 text-left text-[13px] font-semibold ${here ? 'text-gold' : 'text-ink-soft hover:text-ink'}`}>
+              {depth === 0 && <Icon name={n.icon ?? 'list'} size={18} />}
+              <span className="flex-1">{n.label}</span>
+              <Icon name="chevronRight" size={depth === 0 ? 14 : 12} className={`transition-transform ${isOpen ? 'rotate-90' : ''}`} />
             </button>
             {isOpen && (
-              <div className="mb-1 ml-[21px] flex flex-col border-l border-line pl-3">
-                {g.pages.map((p) => (
-                  <NavLink key={p.path} to={p.path} end onClick={onNavigate}
-                    className={({ isActive }) => `flex min-h-[36px] items-center justify-between gap-2 rounded-lg px-2.5 text-[13px] no-underline ${isActive ? 'bg-surface-2 font-semibold text-gold' : 'text-muted hover:text-ink'}`}>
-                    <span>{p.label}</span>
-                    {!p.built && <span aria-label="in progress" title="Being built" className="h-1.5 w-1.5 flex-none rounded-full bg-line-strong" />}
-                  </NavLink>
-                ))}
+              <div className={`mb-1 flex flex-col border-l border-line ${depth === 0 ? 'ml-[21px] pl-3' : 'ml-3 pl-2'}`}>
+                <MenuNodes nodes={n.children ?? []} depth={depth + 1} trail={[...trail, n.label]} open={open} toggle={toggle} pathname={pathname} onNavigate={onNavigate} />
               </div>
             )}
           </div>
         )
       })}
+    </>
+  )
+}
+
+// Every branch that leads to the page on screen, so the menu opens where you are.
+function openTrail(nodes: NavNode[], path: string, trail: string[] = []): string[] {
+  for (const n of nodes) {
+    if (n.children && containsPath(n, path)) return [nodeKey(n, trail), ...openTrail(n.children, path, [...trail, n.label])]
+  }
+  return []
+}
+
+export function StaffMenu({ onNavigate }: { onNavigate?: () => void }) {
+  const me = useMe()
+  const { pathname } = useLocation()
+  const nodes = useMemo(() => navFor(me.role), [me.role])
+  const [open, setOpen] = useState<Set<string>>(() => new Set(openTrail(nodes, pathname)))
+  useEffect(() => { setOpen((o) => new Set([...o, ...openTrail(nodes, pathname)])) }, [nodes, pathname])
+  const toggle = (k: string) => setOpen((o) => { const n = new Set(o); if (n.has(k)) n.delete(k); else n.add(k); return n })
+  return (
+    <nav aria-label="Main" className="flex flex-col gap-0.5">
+      {me.role === 'coach' && (
+        <NavLink to="/coach" onClick={onNavigate} className={linkCls(0)}>
+          <Icon name="home" size={18} />Today
+        </NavLink>
+      )}
+      <MenuNodes nodes={nodes} depth={0} trail={[]} open={open} toggle={toggle} pathname={pathname} onNavigate={onNavigate} />
     </nav>
   )
 }

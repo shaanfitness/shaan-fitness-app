@@ -1,4 +1,4 @@
-import { addDays, endOfMonth, format, parseISO, startOfMonth, subMonths } from 'date-fns'
+import { addDays, addMonths, endOfMonth, format, parseISO, startOfMonth, subMonths } from 'date-fns'
 
 // YDL's date-range dropdowns, with the same choices and labels.
 export interface Range { from: string | null; to: string | null }
@@ -83,3 +83,14 @@ export function localInput(daysAhead = 1, hour = 10) {
   const d = addDays(parseISO(studioToday()), daysAhead)
   return `${iso(d)}T${String(hour).padStart(2, '0')}:00`
 }
+
+/** Last day of a plan that starts on `start` (1 month from 7 Sep ends 6 Oct, like YDL). */
+export function planEndDate(start: string, value: number, unit: 'days' | 'months' | 'years') {
+  if (!start || !value) return ''
+  const s = parseISO(start)
+  const end = unit === 'days' ? addDays(s, value) : unit === 'years' ? addMonths(s, value * 12) : addMonths(s, value)
+  return iso(addDays(end, -1))
+}
+/** Whole days from a to b (b - a). */
+export const daysFrom = (a: string, b: string) => Math.round((parseISO(b).getTime() - parseISO(a).getTime()) / 86_400_000)
+export const plusDays = (d: string, n: number) => iso(addDays(parseISO(d), n))

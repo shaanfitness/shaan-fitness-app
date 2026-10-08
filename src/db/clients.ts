@@ -22,6 +22,15 @@ export interface ClientFilters {
   active?: boolean           // false = deactivated list
   liveStatus?: MemberOverview['live_status'][]
   hasApp?: 'yes' | 'no'
+  levels?: string[]
+  services?: string            // service id in the current plan
+  plan?: string                // current plan id
+  memberIds?: string[]         // e.g. the members of a batch
+  neverCheckedIn?: boolean
+  retained?: boolean           // renewed at least once
+  newSince?: string            // joined on or after (new members)
+  incorrect?: boolean          // mobile number or email that doesn't look right
+  birthday?: { from: string; to: string } // MM-DD, may wrap past December
 }
 
 // Search text goes inside PostgREST's or=(...) syntax, so drop characters that would break it.
@@ -52,7 +61,30 @@ export function applyClientFilters<Q extends { eq: Function; is: Function; in: F
   if (f.tapped) x = x.eq('tapped', f.tapped === 'tapped')
   if (f.liveStatus?.length) x = x.in('live_status', f.liveStatus)
   if (f.hasApp) x = x.eq('has_app', f.hasApp === 'yes')
+  if (f.levels?.length) x = x.in('level', f.levels)
+  if (f.services) x = x.contains('current_service_ids', [f.services])
+  if (f.plan) x = x.eq('current_plan_id', f.plan)
+  if (f.memberIds) x = x.in('id', f.memberIds.length ? f.memberIds : ['00000000-0000-0000-0000-000000000000'])
+  if (f.neverCheckedIn) x = x.eq('checkins_total', 0)
+  if (f.retained) x = x.gt('subscription_count', 1)
+  if (f.newSince) x = x.gte('joined_on', f.newSince)
+  if (f.incorrect) x = x.or('phone.is.null,phone.not.match.^[6-9][0-9]{9}$,email.not.match.^[^@ ]+@[^@ ]+[.][^@ ]+$')
+  if (f.birthday) {
+    const { from, to } = f.birthday
+    x = from <= to ? x.gte('birthday_md', from).lte('birthday_md', to) : x.or(`birthday_md.gte.${from},birthday_md.lte.${to}`)
+  }
   return x
+}
+
+export async function countClients(studioId: string, f: ClientFilters) {
+  const q = applyClientFilters(supabase.from('member_overview').select('id', { count: 'exact', head: true }).eq('studio_id', studioId), f)
+  const res = await q
+  if (res.error) throw new Error(res.error.message)
+  return res.count ?? 0
+}
+
+export async function batchMemberIds(batchId: string) {
+  return (throwIf(await supabase.from('batch_members').select('member_id').eq('batch_id', batchId)) as { member_id: string }[]).map((r) => r.member_id)
 }
 
 export async function listClients(studioId: string, f: ClientFilters, page: number, pageSize: number, order: string) {

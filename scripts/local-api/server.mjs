@@ -102,6 +102,8 @@ function filterSql(col, expr, params, types) {
       const elemCast = type ? `::${type}` : ''
       sql = `${c} in (${items.map((v) => { params.push(v); return `$${params.length}${elemCast}` }).join(',')})`; break
     }
+    case 'match': params.push(raw); sql = `${c}::text ~ $${params.length}`; break
+    case 'imatch': params.push(raw); sql = `${c}::text ~* $${params.length}`; break
     case 'cs': sql = `${c} @> ${p(raw)}`; break
     case 'cd': sql = `${c} <@ ${p(raw)}`; break
     case 'ov': sql = `${c} && ${p(raw)}`; break

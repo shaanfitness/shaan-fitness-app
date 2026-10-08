@@ -19,4 +19,4 @@ PSQL=("${RUN_AS[@]}" psql -h /tmp -p "$PORT" -U postgres -d postgres -v ON_ERROR
 "${PSQL[@]}" -f "$ROOT/supabase/tests/00_supabase_stubs.sql"
 for f in "$ROOT"/supabase/migrations/*.sql; do "${PSQL[@]}" -f "$f"; done
 "${PSQL[@]}" -f "$ROOT/supabase/seed.sql"
-"${PSQL[@]}" -f "$ROOT/supabase/tests/01_access_rules.sql"
+for t in "$ROOT"/supabase/tests/0[1-9]_*.sql; do "${PSQL[@]}" -f "$t"; done

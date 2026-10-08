@@ -11,6 +11,14 @@ import EnquiryForm from './screens/staff/EnquiryForm'
 import FollowUps from './screens/staff/FollowUps'
 import Lists from './screens/staff/Lists'
 import InProgress from './screens/staff/InProgress'
+import ClientList from './screens/staff/ClientList'
+import ClientProfile from './screens/staff/ClientProfile'
+import PaymentDetails from './screens/staff/PaymentDetails'
+import { PlanForm, PlanList } from './screens/staff/Plans'
+import Subscriptions from './screens/staff/Subscriptions'
+import QuickBilling from './screens/staff/QuickBilling'
+import { ClientReferrals, OtherBranchMembers } from './screens/staff/Referrals'
+import Print from './screens/Print'
 import MemberHome from './screens/member/Home'
 import CoachHome from './screens/coach/Home'
 import DoctorHome from './screens/doctor/Home'
@@ -36,6 +44,17 @@ const BUILT: Record<string, { el: ReactNode; roles: Role[] }> = {
   '/enquiries/new': { el: <EnquiryForm />, roles: DESK },
   '/follow-ups': { el: <FollowUps />, roles: ['owner', 'front_desk', 'coach'] },
   '/settings/lists': { el: <Lists />, roles: ['owner'] },
+  '/members/new': { el: <EnquiryForm key="member" mode="member" />, roles: DESK },
+  '/members/quick': { el: <EnquiryForm key="quick" mode="quick" />, roles: DESK },
+  '/members': { el: <ClientList key="members" variant="members" />, roles: ['owner', 'front_desk', 'coach'] },
+  '/clients': { el: <ClientList key="database" variant="database" />, roles: DESK },
+  '/clients/referrals': { el: <ClientReferrals />, roles: DESK },
+  '/members/birthdays': { el: <ClientList key="birthdays" variant="birthdays" />, roles: DESK },
+  '/members/other-branches': { el: <OtherBranchMembers />, roles: DESK },
+  '/plans/new': { el: <PlanForm key="new" />, roles: ['owner'] },
+  '/plans': { el: <PlanList />, roles: DESK },
+  '/subscriptions': { el: <Subscriptions />, roles: DESK },
+  '/quick-billing': { el: <QuickBilling />, roles: DESK },
 }
 
 function Splash() {
@@ -64,10 +83,16 @@ export default function App() {
   return (
     <Routes>
       <Route path="/login" element={user ? <Navigate to={homeFor(user.role)} replace /> : <Login />} />
+      <Route path="/print/invoice/:id" element={<Only roles={DESK}><Print kind="invoice" /></Only>} />
+      <Route path="/print/receipt/:id" element={<Only roles={DESK}><Print kind="receipt" /></Only>} />
       <Route element={user ? <AppShell /> : <Navigate to="/login" replace />}>
         <Route index element={user ? <Navigate to={homeFor(user.role)} replace /> : null} />
         {Object.entries(BUILT).map(([path, b]) => <Route key={path} path={path} element={<Only roles={b.roles}>{b.el}</Only>} />)}
         <Route path="/clients/:id/edit" element={<Only roles={DESK}><EnquiryForm /></Only>} />
+        <Route path="/clients/:id/payments/:subId" element={<Only roles={DESK}><PaymentDetails /></Only>} />
+        <Route path="/clients/:id" element={<Only roles={['owner', 'front_desk', 'coach']}><ClientProfile /></Only>} />
+        <Route path="/clients/:id/:tab" element={<Only roles={['owner', 'front_desk', 'coach']}><ClientProfile /></Only>} />
+        <Route path="/plans/:id/edit" element={<Only roles={['owner']}><PlanForm /></Only>} />
         {ALL_PAGES.filter((p) => !BUILT[p.path]).map((p) => <Route key={p.path} path={p.path} element={<Only roles={p.roles}><InProgress /></Only>} />)}
         <Route path="/menu" element={<Only roles={STAFF}><PageHeader title="Menu" /><div className="px-3 pt-3"><StaffMenu /></div></Only>} />
         <Route path="/coach" element={<Only roles={['coach']}><CoachHome /></Only>} />

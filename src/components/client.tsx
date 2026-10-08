@@ -9,7 +9,7 @@ export const fullPhone = (cc: string | null | undefined, phone: string | null | 
 export function ClientCell({ id, name, code, countryCode, phone }: { id: string; name: string; code?: string | null; countryCode?: string | null; phone?: string | null }) {
   return (
     <div className="flex min-w-0 flex-col gap-0.5">
-      <Link to={`/clients/${id}/edit`} className="truncate font-semibold text-ink no-underline hover:text-gold">{name}</Link>
+      <Link to={`/clients/${id}`} className="truncate font-semibold text-ink no-underline hover:text-gold">{name}</Link>
       <div className="flex flex-wrap items-center gap-x-2 text-[12px] text-muted">
         {code && <span>{code}</span>}
         {phone && <span>{fullPhone(countryCode, phone)}</span>}

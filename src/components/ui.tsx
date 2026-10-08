@@ -34,6 +34,11 @@ const paths: Record<string, ReactNode> = {
   download: <><path d="M12 4v11M7.5 10.5L12 15l4.5-4.5" /><path d="M5 19h14" /></>,
   filter: <path d="M4 5h16l-6 7.5V19l-4-2v-4.5z" />,
   edit: <><path d="M4 20h4L19 9l-4-4L4 16z" /><path d="M13.5 6.5l4 4" /></>,
+  help: <><circle cx="12" cy="12" r="8.5" /><path d="M9.6 9.5a2.5 2.5 0 1 1 3.4 2.3c-.6.3-1 .8-1 1.5v.7M12 17h.01" /></>,
+  clock: <><circle cx="12" cy="12" r="8.5" /><path d="M12 7.5V12l3 2" /></>,
+  trash: <><path d="M5 7h14M10 7V4.5h4V7M7 7l1 13h8l1-13" /></>,
+  eye: <><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z" /><circle cx="12" cy="12" r="3" /></>,
+  rupee: <path d="M7 5h10M7 9h10M8 5c5 0 5 8 0 8h-1l7 7" />,
 }
 
 export function Icon({ name, size = 22, stroke = 1.6, className, color }: { name: keyof typeof paths | string; size?: number; stroke?: number; className?: string; color?: string }) {

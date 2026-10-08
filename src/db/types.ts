@@ -8,9 +8,21 @@ export interface Studio {
   name: string
   branch_name: string | null
   slug: string
+  tag_line: string | null
+  description: string | null
   email: string | null
   mobile: string | null
+  landline: string | null
+  street1: string | null
+  street2: string | null
   city: string | null
+  state: string | null
+  country: string
+  pincode: string | null
+  capacity: number | null
+  facilities: string[]
+  logo_url: string | null
+  default_language: string
   timezone: string
   currency: string
   tax_label: string
@@ -52,19 +64,43 @@ export interface Staff {
 
 export interface Plan {
   id: string
+  studio_id: string
   name: string
   plan_code: string | null
   kind: 'gym' | 'pt'
   service_ids: string[]
+  show_in_app: boolean
+  trainer_ids: string[]
+  terms: string | null
+  session_count: number | null
+  unlimited_sessions: boolean
+  disable_messages_followups: boolean
   price: number
   discount_price: number | null
   total_price: number
   tenure_value: number
   tenure_unit: 'days' | 'months' | 'years'
-  session_count: number | null
+  is_one_time: boolean
+  freeze_days: number
+  weekly_class_limit: number | null
   is_free_trial: boolean
-  active: boolean
+  app_sequence: number
+  image_url: string | null
+  appointment_type: string | null
   tier: string | null
+  includes_personal_coach: boolean
+  includes_doctor: boolean
+  description: string | null
+  faqs: string | null
+  guidelines: string | null
+  dos_donts: string | null
+  shopping_list: string | null
+  snack_list: string | null
+  activities: string | null
+  other_text: string | null
+  active: boolean
+  created_by: string | null
+  created_at: string
 }
 
 export interface Batch {
@@ -131,6 +167,8 @@ export interface Member {
   level: string | null
   photo_url: string | null
   app_installed_at: string | null
+  biometric_code: number | null
+  rfid: string | null
   active: boolean
   joined_on: string | null
   created_at: string
@@ -147,6 +185,8 @@ export interface MemberOverview extends Member {
   live_status: 'active' | 'pending' | 'inactive' | 'none'
   current_subscription_id: string | null
   current_plan_id: string | null
+  current_service_ids: string[] | null
+  current_start_date: string | null
   current_plan_name: string | null
   current_end_date: string | null
   subscription_count: number
