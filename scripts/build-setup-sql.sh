@@ -11,6 +11,12 @@ OUT="$ROOT/supabase/setup-all.sql"
   echo "-- Paste everything into Supabase → SQL Editor → New query, then click Run."
   echo "begin;"
   echo
+  echo "do \$guard\$ begin"
+  echo "  if to_regclass('app.schema_migrations') is not null then"
+  echo "    raise exception 'This database is already set up. Run the latest update file (update.sql) instead. Nothing was changed.';"
+  echo "  end if;"
+  echo "end \$guard\$;"
+  echo
   echo "-- ===== rebuild-from-wave1.sql ====="; cat "$ROOT/supabase/rebuild-from-wave1.sql"; echo
   for f in "$ROOT"/supabase/migrations/*.sql; do echo "-- ===== $(basename "$f") ====="; cat "$f"; echo; done
   echo "-- ===== seed.sql ====="; cat "$ROOT/supabase/seed.sql"; echo

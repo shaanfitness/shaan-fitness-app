@@ -54,8 +54,10 @@ for p in plans:
         q(p['activities']), q(p['other']), 'true' if p['active'] else 'false',
     ]) + ')')
 out.append(',\n'.join(rows))
-out.append(') as v')
-out.append(f'where not exists (select 1 from public.plans x where x.studio_id = {STUDIO});')
+out.append(') as v(studio_id, plan_code, name, description, kind, service_ids, show_in_app, terms, session_count, unlimited_sessions,')
+out.append('  disable_messages_followups, tenure_value, tenure_unit, is_one_time, freeze_days, weekly_class_limit, is_free_trial, price,')
+out.append('  discount_price, app_sequence, appointment_type, faqs, guidelines, dos_donts, shopping_list, snack_list, activities, other_text, active)')
+out.append('where not exists (select 1 from public.plans x where x.studio_id = v.studio_id and x.plan_code = v.plan_code);')
 out.append('')
 
 out.append('insert into public.batches (studio_id, batch_code, name, info, capacity, room, service_ids, start_date, end_date, days, start_time, end_time, gender)')
@@ -70,7 +72,7 @@ for b in sorted(batches, key=lambda b: clock(b['slots'][0][0])):
         f"'{clock(start)}'::time", f"'{clock(end)}'::time", q('all' if gender == 'unisex' else gender),
     ]) + ')')
 out.append(',\n'.join(rows))
-out.append(') as v')
-out.append(f'where not exists (select 1 from public.batches x where x.studio_id = {STUDIO});')
+out.append(') as v(studio_id, batch_code, name, info, capacity, room, service_ids, start_date, end_date, days, start_time, end_time, gender)')
+out.append('where not exists (select 1 from public.batches x where x.studio_id = v.studio_id and x.batch_code = v.batch_code);')
 (root / 'supabase/seed-ydl.sql').write_text('\n'.join(out) + '\n')
 print(f'wrote supabase/seed-ydl.sql: {len(plans)} plans ({sum(p["active"] for p in plans)} active), {len(batches)} batches')

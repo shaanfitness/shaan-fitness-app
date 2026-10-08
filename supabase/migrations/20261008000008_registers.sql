@@ -325,6 +325,53 @@ create policy courses_owner on public.courses for all to authenticated using (ap
 create policy course_orders_read on public.course_orders for select to authenticated using (app.is_desk(studio_id) or app.is_self(member_id));
 create policy course_orders_desk on public.course_orders for insert to authenticated with check (app.is_desk(studio_id));
 
+-- ---------------------------------------------------------------------------
+-- Upgrade / downgrade into personal training asks for a trainer (replaces the version in migration 7)
+-- ---------------------------------------------------------------------------
+create or replace function app.change_plan(p jsonb, p_kind text)
+returns uuid language plpgsql security definer set search_path = '' as $$
+declare s public.subscriptions; pl public.plans; v_paid numeric; v_price numeric; v_new uuid; v_start date; v_end date;
+        v_coupon jsonb; v_disc numeric = 0; v_coupon_id uuid; v_refund numeric = 0;
+begin
+  s = app.live_subscription((p->>'subscription_id')::uuid);
+  select * into pl from public.plans where id = (p->>'plan_id')::uuid and studio_id = s.studio_id and active;
+  if pl.id is null then raise exception 'Choose the membership to %', p_kind; end if;
+  if pl.id = s.plan_id then raise exception 'Choose a different membership'; end if;
+  v_paid = app.subscription_paid(s.id);
+  v_start = case when p_kind = 'upgrade' then s.start_date else coalesce(nullif(p->>'start_date', '')::date, s.start_date) end;
+  v_end = coalesce(nullif(p->>'end_date', '')::date, app.plan_end_date(v_start, pl.tenure_value, pl.tenure_unit));
+  if v_end < v_start then raise exception 'The end date is before the start date'; end if;
+  v_price = coalesce(nullif(p->>'selling_price', '')::numeric, greatest(pl.total_price - v_paid, 0));
+  if v_price < 0 then raise exception 'The price can''t be negative'; end if;
+  if v_price <> greatest(pl.total_price - v_paid, 0) and not app.can_discount(s.studio_id) then
+    raise exception 'You are not allowed to change the price';
+  end if;
+  if pl.kind = 'pt' and coalesce(nullif(p->>'trainer_id', '')::uuid, s.trainer_id) is null then
+    raise exception 'Assign a trainer for %', pl.name;
+  end if;
+  if p_kind = 'downgrade' then v_refund = greatest(v_paid - pl.total_price, 0); end if;
+  if nullif(trim(p->>'coupon_code'), '') is not null then
+    v_coupon = public.check_coupon(s.studio_id, p->>'coupon_code', pl.id, s.member_id, v_price);
+    if not (v_coupon->>'ok')::boolean then raise exception '%', v_coupon->>'message'; end if;
+    v_disc = (v_coupon->>'discount')::numeric; v_coupon_id = (v_coupon->>'coupon_id')::uuid;
+  end if;
+  insert into public.subscriptions (studio_id, member_id, plan_id, kind, start_date, base_end_date, trainer_id, second_trainer_ids,
+    group_member_ids, base_price, selling_price, coupon_id, coupon_code, coupon_discount, previous_subscription_id, note, balance_due_date)
+  values (s.studio_id, s.member_id, pl.id, pl.kind, v_start, v_end, coalesce(nullif(p->>'trainer_id', '')::uuid, s.trainer_id), s.second_trainer_ids,
+    case when coalesce((p->>'group')::boolean, false) then s.group_member_ids else '{}' end,
+    pl.total_price, v_price, v_coupon_id, case when v_coupon_id is null then null else upper(trim(p->>'coupon_code')) end, v_disc,
+    s.id, nullif(p->>'note', ''), app.today(s.studio_id))
+  returning id into v_new;
+  update public.subscriptions set status = case when p_kind = 'upgrade' then 'upgraded' else 'downgraded' end where id = s.id;
+  insert into public.subscription_changes (studio_id, kind, from_subscription_id, to_subscription_id, from_member_id, to_member_id,
+    old_amount, new_amount, refund_amount, note)
+  values (s.studio_id, p_kind, s.id, v_new, s.member_id, s.member_id, v_paid, pl.total_price, v_refund, nullif(p->>'note', ''));
+  update public.follow_ups set status = 'done', response = 'Plan changed', response_kind = 'successful', responded_at = now()
+  where subscription_id = s.id and type = 'Balance due' and status = 'open' and source = 'system';
+  perform app.balance_follow_up(v_new);
+  return v_new;
+end $$;
+
 -- Grants: logs and records that only change through the database's own functions stay read-only.
 create or replace procedure app.apply_grants()
 language plpgsql as $$
