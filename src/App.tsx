@@ -44,6 +44,11 @@ import Website from './site/Website'
 import Privacy from './site/Privacy'
 import { ForgotPassword, Join, Login, ResetPassword } from './site/Auth'
 import WebsiteSettings from './screens/staff/WebsiteSettings'
+import { BiometricManager, CenterEdit, CenterList, CenterView, CurrencySetting, EmailManager, InvoiceSettings, OtpManager } from './screens/staff/Center'
+import { AppPermissions, CenterSettings, MeasurementSettings } from './screens/staff/CenterSettings'
+import { Equipment, FeedbackList, Holidays, Notices, Rules } from './screens/staff/CenterLists'
+import { ActionForm, ActionList, BannerForm, BannerList, GalleryForm, GalleryList, ServicesList, SocialLinks } from './screens/staff/AppContent'
+import { AppCoaches, AppContact, AppFeedback, AppNotices, AppPlans, AppResults } from './screens/member/AppPages'
 import { prettyPhone, telLink, useSite } from './db/site'
 import { Notice } from './components/controls'
 
@@ -155,6 +160,33 @@ const BUILT: Record<string, { el: ReactNode; roles: Role[] }> = {
   '/payroll/register': { el: <PayrollRegister />, roles: DESK },
   '/expenses': { el: <ExpenseList />, roles: ['owner'] },
   '/vendors': { el: <VendorList />, roles: ['owner'] },
+  // Fitness Center
+  '/centers': { el: <CenterList />, roles: DESK },
+  '/centers/settings': { el: <CenterSettings />, roles: DESK },
+  '/centers/invoice-settings': { el: <InvoiceSettings />, roles: DESK },
+  '/centers/biometric': { el: <BiometricManager key="bio" />, roles: DESK },
+  '/centers/biometric-extended': { el: <BiometricManager key="bio-x" extended />, roles: DESK },
+  '/centers/otp': { el: <OtpManager />, roles: ['owner'] },
+  '/centers/email': { el: <EmailManager />, roles: ['owner'] },
+  '/centers/holidays': { el: <Holidays />, roles: DESK },
+  '/centers/equipment': { el: <Equipment />, roles: DESK },
+  '/centers/notices': { el: <Notices />, roles: DESK },
+  '/centers/rules': { el: <Rules />, roles: DESK },
+  '/centers/currency': { el: <CurrencySetting />, roles: ['owner'] },
+  '/centers/feedback': { el: <FeedbackList />, roles: DESK },
+  // App Settings
+  '/app-settings/permissions': { el: <AppPermissions />, roles: DESK },
+  '/app-settings/services': { el: <ServicesList />, roles: DESK },
+  '/app-settings/gallery/new': { el: <GalleryForm key="new" />, roles: DESK },
+  '/app-settings/gallery': { el: <GalleryList />, roles: DESK },
+  '/app-settings/actions/new': { el: <ActionForm key="a-new" kind="action" />, roles: DESK },
+  '/app-settings/actions': { el: <ActionList kind="action" />, roles: DESK },
+  '/app-settings/quick-actions/new': { el: <ActionForm key="q-new" kind="quick" />, roles: DESK },
+  '/app-settings/quick-actions': { el: <ActionList kind="quick" />, roles: DESK },
+  '/app-settings/banners/new': { el: <BannerForm key="new" />, roles: DESK },
+  '/app-settings/banners': { el: <BannerList />, roles: DESK },
+  '/app-settings/social': { el: <SocialLinks />, roles: DESK },
+  '/app-settings/measurements': { el: <MeasurementSettings />, roles: DESK },
   // Shaan Fitness additions
   '/settings/website': { el: <WebsiteSettings />, roles: ['owner'] },
 }
@@ -237,6 +269,13 @@ export default function App() {
           <Route path="plan" element={<ComingSoon title="Plan" note="Workout and diet plans from your coach come with the member app." />} />
           <Route path="chat" element={<ComingSoon title="Chat" note="Care chat between members, coaches and doctors comes next, with online status and phone notifications." />} />
           <Route path="profile" element={<More />} />
+          <Route path="notices" element={<AppNotices key="notices" kind="notices" />} />
+          <Route path="rules" element={<AppNotices key="rules" kind="rules" />} />
+          <Route path="feedback" element={<AppFeedback />} />
+          <Route path="plans" element={<AppPlans />} />
+          <Route path="coaches" element={<AppCoaches />} />
+          <Route path="contact" element={<AppContact />} />
+          <Route path="results" element={<AppResults />} />
         </Route>
         <Route path="/home" element={<Navigate to="/app" replace />} />
         <Route path="/book" element={<Navigate to="/app/book" replace />} />
@@ -256,6 +295,12 @@ export default function App() {
           <Route path="/staff/:id/edit" element={<Only roles={DESK} right={['staff_accounts', 'edit']}><PersonForm kind="staff" /></Only>} />
           <Route path="/batches/:id/edit" element={<Only roles={DESK} right={['batches', 'edit']}><BatchForm /></Only>} />
           <Route path="/programs/:id/edit" element={<Only roles={DESK} right={['programs', 'edit']}><ProgramForm /></Only>} />
+          <Route path="/centers/:id" element={<Only roles={DESK} right={['fitness_center', 'view']}><CenterView /></Only>} />
+          <Route path="/centers/:id/edit" element={<Only roles={DESK} right={['fitness_center', 'edit']}><CenterEdit /></Only>} />
+          <Route path="/app-settings/gallery/:id/edit" element={<Only roles={DESK} right={['app_settings', 'on']}><GalleryForm /></Only>} />
+          <Route path="/app-settings/actions/:id/edit" element={<Only roles={DESK} right={['app_settings', 'on']}><ActionForm kind="action" /></Only>} />
+          <Route path="/app-settings/quick-actions/:id/edit" element={<Only roles={DESK} right={['app_settings', 'on']}><ActionForm kind="quick" /></Only>} />
+          <Route path="/app-settings/banners/:id/edit" element={<Only roles={DESK} right={['app_settings', 'on']}><BannerForm /></Only>} />
           {ALL_PAGES.filter((p) => !BUILT[p.path]).map((p) => <Route key={p.path} path={p.path} element={<Only roles={p.roles}><InProgress /></Only>} />)}
           <Route path="/menu" element={<Only roles={STAFF}><PageHeader title="Menu" /><div className="px-3 pt-3"><StaffMenu /></div></Only>} />
           <Route path="/coach" element={<Only roles={['coach']}><CoachHome /></Only>} />

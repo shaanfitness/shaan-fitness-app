@@ -42,6 +42,7 @@ export function Wordmark({ size = 34 }: { size?: number }) {
 export function AccountButtons({ stacked }: { stacked?: boolean }) {
   const { t } = useTranslation()
   const { user } = useAuth()
+  const { data: site } = useSite()
   if (user) {
     return (
       <Link to={homeFor(user.role)} className={`btn-gold ${stacked ? '' : 'btn-sm'} whitespace-nowrap`}>
@@ -52,7 +53,7 @@ export function AccountButtons({ stacked }: { stacked?: boolean }) {
   return (
     <div className={`flex items-center gap-2 ${stacked ? 'flex-col items-stretch' : ''}`}>
       <Link to="/login" className={`btn ${stacked ? '' : 'btn-sm'} whitespace-nowrap`}>{t('site.login')}</Link>
-      <Link to="/join" className={`btn-gold ${stacked ? '' : 'btn-sm'} whitespace-nowrap`}>{t('site.join')}</Link>
+      {site?.studio.can_sign_up !== false && <Link to="/join" className={`btn-gold ${stacked ? '' : 'btn-sm'} whitespace-nowrap`}>{t('site.join')}</Link>}
     </div>
   )
 }

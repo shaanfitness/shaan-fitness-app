@@ -180,6 +180,21 @@ export function Join() {
     if (e) setError(authError(e.message, t)); else setResent(true)
   }
 
+  if (site && site.studio.can_sign_up === false) {
+    return (
+      <AuthFrame title={t('auth.joinTitle')}>
+        <Notice>{t('auth.closed')}</Notice>
+        {phone && (
+          <div className="flex flex-wrap gap-2.5">
+            <a href={telLink(phone) ?? undefined} className="btn"><Icon name="phone" size={18} />{prettyPhone(phone)}</a>
+            <a href={whatsappLink(site.website.whatsapp || phone) ?? undefined} target="_blank" rel="noreferrer" className="btn"><Icon name="whatsapp" size={18} />WhatsApp</a>
+          </div>
+        )}
+        <Link to="/login" className="text-[14px] font-semibold no-underline">{t('auth.haveAccount')} {t('auth.signIn')}</Link>
+      </AuthFrame>
+    )
+  }
+
   if (done) {
     return (
       <AuthFrame title={t('auth.checkTitle')}>

@@ -62,12 +62,16 @@ const en = {
     sideTitle: 'One login. Your own space.', side1: 'Members: your plan, batch, bookings and coach', side2: 'Coaches: today’s sessions, clients and follow-ups',
     side3: 'Owner and front desk: the full dashboard', newPassword: 'Set a new password', save: 'Save password', saving: 'Saving…', again: 'Type it again',
     mismatch: 'The two passwords don’t match.', expired: 'This reset link has expired. Ask for a new one.',
+    closed: 'Joining online is closed right now. Call or WhatsApp us and we’ll set up your membership and app login.',
   },
   app: {
     welcome: 'Welcome, {{name}}', ready: 'Your account is ready. Our team will call you soon, or tell us now what you’d like.',
     bookTrial: 'Book a trial', callMe: 'Call me back', sentTrial: 'Done. We’ll call you to fix a time for your trial.', sentCall: 'Done. We’ll call you soon.',
     already: 'We already have your request. We’ll call you soon.', plans: 'Plans', want: 'I want this plan', sentPlan: 'Got it. We’ll call you to start {{plan}}.',
     talk: 'Talk to us', noPlan: 'No current plan', website: 'Website',
+    notices: 'Notices', rules: 'Rules', feedback: 'Send feedback', feedbackHint: 'Tell us what’s working and what we can do better. Only the gym team reads it.',
+    feedbackSend: 'Send', feedbackSent: 'Thank you. Your feedback reached the team.', yourFeedback: 'Your feedback', coaches: 'Our coaches', contact: 'Contact us',
+    results: 'Results', noNotices: 'No notices right now.', noRules: 'No rules posted yet.', back: 'Back', soon: 'This opens in the app soon.',
   },
 }
 
@@ -130,12 +134,16 @@ const te: typeof en = {
     sideTitle: 'ఒకే లాగిన్. మీ స్వంత పేజీ.', side1: 'సభ్యులు: మీ ప్లాన్, బ్యాచ్, బుకింగ్‌లు, కోచ్', side2: 'కోచ్‌లు: ఈరోజు సెషన్లు, క్లయింట్లు, ఫాలో-అప్‌లు',
     side3: 'యజమాని, ఫ్రంట్ డెస్క్: పూర్తి డాష్‌బోర్డ్', newPassword: 'కొత్త పాస్‌వర్డ్ పెట్టుకోండి', save: 'పాస్‌వర్డ్ సేవ్ చేయండి', saving: 'సేవ్ అవుతోంది…', again: 'మళ్ళీ టైప్ చేయండి',
     mismatch: 'రెండు పాస్‌వర్డ్‌లు సరిపోలలేదు.', expired: 'ఈ రీసెట్ లింక్ గడువు ముగిసింది. కొత్తది అడగండి.',
+    closed: 'ప్రస్తుతం ఆన్‌లైన్‌లో చేరడం మూసివేయబడింది. మాకు కాల్ లేదా వాట్సాప్ చేయండి, మీ మెంబర్‌షిప్, యాప్ లాగిన్ మేమే సిద్ధం చేస్తాం.',
   },
   app: {
     welcome: 'స్వాగతం, {{name}}', ready: 'మీ అకౌంట్ సిద్ధంగా ఉంది. మా టీమ్ త్వరలో మీకు కాల్ చేస్తుంది. మీకు ఏం కావాలో ఇప్పుడే చెప్పవచ్చు.',
     bookTrial: 'ట్రయల్ బుక్ చేయండి', callMe: 'నాకు కాల్ చేయండి', sentTrial: 'సరే. మీ ట్రయల్ సమయం ఖరారు చేయడానికి మేము కాల్ చేస్తాం.', sentCall: 'సరే. త్వరలో కాల్ చేస్తాం.',
     already: 'మీ అభ్యర్థన ఇప్పటికే మాకు అందింది. త్వరలో కాల్ చేస్తాం.', plans: 'ప్లాన్‌లు', want: 'ఈ ప్లాన్ కావాలి', sentPlan: 'అందింది. {{plan}} మొదలుపెట్టడానికి మేము కాల్ చేస్తాం.',
     talk: 'మాతో మాట్లాడండి', noPlan: 'ప్రస్తుతం ప్లాన్ లేదు', website: 'వెబ్‌సైట్',
+    notices: 'నోటీసులు', rules: 'నియమాలు', feedback: 'అభిప్రాయం పంపండి', feedbackHint: 'ఏది బాగుంది, ఏది మెరుగుపరచాలో చెప్పండి. జిమ్ టీమ్ మాత్రమే చదువుతుంది.',
+    feedbackSend: 'పంపండి', feedbackSent: 'ధన్యవాదాలు. మీ అభిప్రాయం టీమ్‌కు చేరింది.', yourFeedback: 'మీ అభిప్రాయం', coaches: 'మా కోచ్‌లు', contact: 'సంప్రదించండి',
+    results: 'ఫలితాలు', noNotices: 'ప్రస్తుతం నోటీసులు లేవు.', noRules: 'ఇంకా నియమాలు పెట్టలేదు.', back: 'వెనక్కి', soon: 'ఇది త్వరలో యాప్‌లో తెరుచుకుంటుంది.',
   },
 }
 

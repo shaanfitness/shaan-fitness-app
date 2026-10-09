@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
 import { NavLink, Outlet, useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import { useStudio } from '../db/studio'
+import { setCurrency } from '../lib/format'
 import { ROLE_LABEL, useAuth, useMe } from '../auth'
 import { containsPath, navFor, nodeKey, type NavNode } from '../nav'
 import { useAccess } from '../access'
@@ -132,6 +134,8 @@ function RoleSwitch() {
 
 export function AppShell() {
   const me = useMe()
+  const { data: studio } = useStudio()
+  setCurrency(studio?.currency)
   const { t } = useTranslation()
   const items = barFor(me.role, t)
   const staff = me.role !== 'member' && me.role !== 'doctor'

@@ -43,6 +43,11 @@ export const PAGE_RIGHT: Record<string, [string, string]> = {
   '/centers/biometric': ['biometric', 'on'], '/centers/biometric-extended': ['biometric', 'on'], '/centers/rules': ['rules', 'on'], '/centers/feedback': ['feedback', 'on'],
   '/staff/new': ['staff_accounts', 'add'], '/staff': ['staff_accounts', 'view'], '/staff/targets': ['targets', 'view_page'],
   '/community': ['community', 'on'], '/app-settings/permissions': ['app_settings', 'on'], '/app-settings/services': ['app_settings', 'on'],
+  '/centers/notices': ['notices', 'on'],
+  '/app-settings/gallery/new': ['app_settings', 'on'], '/app-settings/gallery': ['app_settings', 'on'], '/app-settings/actions/new': ['app_settings', 'on'],
+  '/app-settings/actions': ['app_settings', 'on'], '/app-settings/quick-actions/new': ['app_settings', 'on'], '/app-settings/quick-actions': ['app_settings', 'on'],
+  '/app-settings/banners/new': ['app_settings', 'on'], '/app-settings/banners': ['app_settings', 'on'], '/app-settings/social': ['app_settings', 'on'],
+  '/app-settings/measurements': ['app_settings', 'on'],
 }
 
 /** YDL "Download CSV Access": which list or register may be exported (path → CSV right). */

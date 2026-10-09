@@ -35,6 +35,7 @@ if [ "$fresh" = "t" ]; then
   RUN -f supabase/seed.sql
   RUN -f supabase/seed-ydl.sql
   RUN -f supabase/seed-ydl-offers.sql
+  RUN -f supabase/seed-ydl-center.sql
 fi
 
 Q "select json_build_object(

@@ -1,5 +1,7 @@
 import { Link, NavLink, Outlet } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import { useStudio } from '../db/studio'
+import { setCurrency } from '../lib/format'
 import { useMe } from '../auth'
 import { Avatar, BrandMark, Icon } from './ui'
 
@@ -7,6 +9,8 @@ import { Avatar, BrandMark, Icon } from './ui'
 // tabs sit in a top bar and the pages stay in a comfortable reading width.
 export function MemberShell() {
   const me = useMe()
+  const { data: studio } = useStudio()
+  setCurrency(studio?.currency)
   const { t } = useTranslation()
   const items = [
     { to: '/app', label: t('nav.home'), icon: 'home', end: true },

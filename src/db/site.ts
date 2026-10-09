@@ -8,12 +8,15 @@ export interface SiteStudio {
   name: string; branch: string | null; slug: string; tag_line: string | null; description: string | null
   mobile: string | null; landline: string | null; email: string | null; street1: string | null; street2: string | null
   city: string | null; state: string | null; pincode: string | null; facilities: string[]; logo_url: string | null
-  currency: string; theme: string
+  currency: string; theme: string; locality?: string | null; landmark?: string | null
+  timings?: { days: number[]; sessions: { from: string; to: string; gender: 'unisex' | 'men' | 'women' }[] } | null
+  can_sign_up?: boolean
 }
 export interface SiteSettings {
   hero_title: string | null; hero_text: string | null; about: string | null; hero_image_url: string | null
   opening_hours: string | null; whatsapp: string | null; instagram: string | null; facebook: string | null; youtube: string | null
   map_url: string | null; show_prices: boolean; show_timings: boolean; show_trainers: boolean; show_results: boolean
+  twitter?: string | null; linkedin?: string | null; video?: string | null
 }
 export interface SitePlan {
   id: string; name: string; kind: 'gym' | 'pt'; tenure_value: number; tenure_unit: 'days' | 'months' | 'years'
@@ -76,6 +79,21 @@ export function openingHours(batches: SiteBatch[]): HoursRow[] {
   return rows
 }
 
+/** Opening hours from Fitness Center › Timings (days and up to three sessions), alike days grouped. */
+export function centerHours(t: NonNullable<SiteStudio['timings']>): HoursRow[] {
+  const spans = t.sessions.filter((x) => x.from && x.to).map((x) => `${toClock(toMin(x.from))} – ${toClock(toMin(x.to))}${x.gender === 'men' ? ' (men)' : x.gender === 'women' ? ' (women)' : ''}`)
+  const rows: HoursRow[] = []
+  for (let d = 1; d <= 7; d++) {
+    const today = t.days.includes(d) ? spans : []
+    const last = rows[rows.length - 1]
+    if (last && last.spans.join() === today.join() && last.days[last.days.length - 1] === d - 1) last.days.push(d)
+    else rows.push({ days: [d], spans: today })
+  }
+  return rows
+}
+/** The hours the website shows: the center's timings, else worked out from the batches. */
+export const siteHours = (site: SiteInfo) => (site.studio.timings?.sessions?.length ? centerHours(site.studio.timings) : openingHours(site.batches))
+
 /** Batch start times by part of the day. */
 export function startTimes(batches: SiteBatch[]) {
   const starts = [...new Set(batches.map((b) => b.start_time.slice(0, 5)))].sort()
@@ -100,9 +118,9 @@ export function prettyPhone(num: string | null | undefined) {
 }
 export function mapsLink(s: SiteStudio, w: SiteSettings) {
   if (w.map_url) return w.map_url
-  const q = [s.name, s.street1, s.street2, s.branch, s.city, s.state, s.pincode].filter(Boolean).join(', ')
+  const q = [s.name, s.street1, s.street2, s.locality ?? s.branch, s.city, s.state, s.pincode].filter(Boolean).join(', ')
   return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(q)}`
 }
 export const addressLines = (s: SiteStudio) =>
-  [[s.street1, s.street2].filter(Boolean).join(', '), [s.street1 ? null : s.branch, s.city].filter(Boolean).join(', '), [s.state, s.pincode].filter(Boolean).join(' ')]
+  [[s.street1, s.street2].filter(Boolean).join(', '), [s.landmark, s.locality ?? s.branch, s.city].filter(Boolean).join(', '), [s.state, s.pincode].filter(Boolean).join(' ')]
     .filter(Boolean)

@@ -9,6 +9,8 @@ import { setLanguage } from '../../i18n'
 import { Avatar, BrandMark, Icon, Loading } from '../../components/ui'
 import { Notice } from '../../components/controls'
 import { PlanCard } from '../../site/Website'
+import { useStudio } from '../../db/studio'
+import { HomeExtras } from './AppPages'
 
 // Member home: this plan's progress, their batch time, and renew when it's ending.
 export default function MemberHome() {
@@ -40,6 +42,8 @@ export default function MemberHome() {
       </header>
 
       <h1 className="title px-5 pt-5 text-[42px]">{c ? t('member.hi', { name: first }) : t('app.welcome', { name: first })}</h1>
+
+      <HomeExtras paid={!!c} pt={d.subscriptions.some((x) => x.kind === 'pt' && (x.state === 'active' || x.state === 'frozen'))} />
 
       {!c && <Welcome memberId={me.memberId!} />}
 
@@ -97,6 +101,8 @@ export default function MemberHome() {
 function Welcome({ memberId }: { memberId: string }) {
   const { t } = useTranslation()
   const { data: site } = useSite()
+  const { data: studio } = useStudio()
+  const app = ((studio?.settings as unknown as { app?: Record<string, unknown> })?.app ?? {})
   const [msg, setMsg] = useState<{ tone: 'success' | 'error'; text: string } | null>(null)
   const ask = useMutation({
     mutationFn: (v: { what: 'trial' | 'callback' | 'plan'; plan?: string }) => requestCallback(memberId, v.what, v.plan),
@@ -118,12 +124,12 @@ function Welcome({ memberId }: { memberId: string }) {
           {msg && <Notice tone={msg.tone}>{msg.text}</Notice>}
         </div>
       </section>
-      {site && site.plans.length > 0 && (
+      {site && site.plans.length > 0 && app.show_membership_plans !== false && (
         <section aria-labelledby="plans-h" className="flex flex-col gap-3 px-5 pt-6">
           <h2 id="plans-h" className="eyebrow">{t('app.plans')}</h2>
           <div className="grid gap-3 sm:grid-cols-2">
             {site.plans.map((p) => (
-              <PlanCard key={p.id} p={p} action={
+              <PlanCard key={p.id} p={p} hidePrice={app.show_membership_plans_prices === false} action={
                 <button type="button" className="btn w-full" disabled={ask.isPending} onClick={() => ask.mutate({ what: 'plan', plan: p.name })}>{t('app.want')}</button>
               } />
             ))}

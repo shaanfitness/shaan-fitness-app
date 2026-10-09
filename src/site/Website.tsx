@@ -3,11 +3,11 @@ import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '../auth'
 import {
-  addressLines, mapsLink, openingHours, prettyPhone, startTimes, telLink, useSite, whatsappLink,
-  type HoursRow, type SiteBatch, type SiteInfo, type SitePlan,
+  addressLines, mapsLink, prettyPhone, siteHours, startTimes, telLink, useSite, whatsappLink,
+  type HoursRow, type SiteInfo, type SitePlan,
 } from '../db/site'
 import { fmtClock } from '../lib/dates'
-import { money } from '../lib/format'
+import { money, setCurrency } from '../lib/format'
 import { Avatar, Icon } from '../components/ui'
 import { SitePage } from './chrome'
 
@@ -15,6 +15,7 @@ import { SitePage } from './chrome'
 // coaches, results and how to reach us. Everything comes from the CRM, so it stays current.
 export default function Website() {
   const { data, isLoading } = useSite()
+  setCurrency(data?.studio.currency)
   useEffect(() => {
     const s = data?.studio
     document.title = s ? `${s.name} · ${[s.branch, s.city].filter(Boolean).join(', ')}` : 'Shaan Fitness'
@@ -81,7 +82,9 @@ function Hero({ site }: { site?: SiteInfo | null }) {
           <div className="flex flex-wrap gap-3">
             {user?.role === 'member'
               ? <Link to="/app" className="btn-gold min-h-[54px] px-7 text-[15px]">{t('site.openApp')}</Link>
-              : <Link to="/join" className="btn-gold min-h-[54px] px-7 text-[15px]">{t('site.join')}</Link>}
+              : site?.studio.can_sign_up === false
+                ? (phone ? <a href={telLink(phone) ?? undefined} className="btn-gold min-h-[54px] px-7 text-[15px]">{t('site.callUs')}</a> : null)
+                : <Link to="/join" className="btn-gold min-h-[54px] px-7 text-[15px]">{t('site.join')}</Link>}
             <a href="#plans" className="btn min-h-[54px] px-6 text-[15px]">{t('site.seePlans')}</a>
           </div>
           {phone && (
@@ -103,20 +106,23 @@ function Hero({ site }: { site?: SiteInfo | null }) {
 const dayRange = (days: number[], t: (k: string) => string) =>
   days.length === 1 ? t(`site.days.${days[0]}`) : `${t(`site.days.${days[0]}`)} – ${t(`site.days.${days[days.length - 1]}`)}`
 
-function openSpan(batches: SiteBatch[]) {
-  if (!batches.length) return null
-  const first = batches.reduce((a, b) => (b.start_time < a ? b.start_time : a), batches[0].start_time)
-  const last = batches.reduce((a, b) => (b.end_time > a ? b.end_time : a), batches[0].end_time)
+function openSpan(site: SiteInfo) {
+  const t = site.studio.timings
+  const pairs = t?.sessions?.length ? t.sessions.filter((x) => x.from && x.to).map((x) => [x.from, x.to])
+    : site.batches.map((b) => [b.start_time.slice(0, 5), b.end_time.slice(0, 5)])
+  if (!pairs.length) return null
+  const first = pairs.reduce((a, p) => (p[0] < a ? p[0] : a), pairs[0][0])
+  const last = pairs.reduce((a, p) => (p[1] > a ? p[1] : a), pairs[0][1])
   return `${fmtClock(first)} – ${fmtClock(last)}`
 }
 
 function Stats({ site }: { site: SiteInfo }) {
   const { t } = useTranslation()
-  const hours = openingHours(site.batches)
+  const hours = siteHours(site)
   const openDays = hours.filter((r) => r.spans.length).flatMap((r) => r.days)
   const contiguous = openDays.every((d, i) => i === 0 || d === openDays[i - 1] + 1)
   const items: [string, string][] = []
-  const span = openSpan(site.batches)
+  const span = openSpan(site)
   if (span) items.push([t('site.statHours'), span.replace(/:00 /g, ' ')])
   if (openDays.length) items.push([t('site.statDays'), contiguous ? dayRange(openDays, t) : openDays.map((d) => t(`site.days.${d}`)).join(', ')])
   if (site.batches.length) items.push([t('site.statBatches'), String(site.batches.length)])
@@ -169,7 +175,7 @@ export function planDuration(p: Pick<SitePlan, 'tenure_value' | 'tenure_unit'>, 
   return t('site.dur.days', { count: v })
 }
 
-export function PlanCard({ p, action }: { p: SitePlan; action: ReactNode }) {
+export function PlanCard({ p, action, hidePrice }: { p: SitePlan; action: ReactNode; hidePrice?: boolean }) {
   const { t } = useTranslation()
   const extra = p.services.length - 4
   return (
@@ -178,10 +184,12 @@ export function PlanCard({ p, action }: { p: SitePlan; action: ReactNode }) {
         <h3 className="m-0 text-[17px] leading-snug font-bold">{p.name}</h3>
         {p.is_free_trial && <span className="chip chip-gold">{t('site.trial')}</span>}
       </div>
-      <div className="flex flex-wrap items-baseline gap-x-2.5">
-        <span className="font-display text-[38px] leading-none font-bold">{money(p.total_price)}</span>
-        {p.discount_price != null && p.discount_price < p.price && <s className="text-[15px] text-faint">{money(p.price)}</s>}
-      </div>
+      {!hidePrice && (
+        <div className="flex flex-wrap items-baseline gap-x-2.5">
+          <span className="font-display text-[38px] leading-none font-bold">{money(p.total_price)}</span>
+          {p.discount_price != null && p.discount_price < p.price && <s className="text-[15px] text-faint">{money(p.price)}</s>}
+        </div>
+      )}
       <div className="text-[13px] font-semibold text-muted">
         {[planDuration(p, t), p.unlimited_sessions ? t('site.unlimited') : p.session_count ? t('site.sessions', { count: p.session_count }) : null].filter(Boolean).join(' · ')}
       </div>
@@ -222,7 +230,9 @@ function Plans({ site }: { site: SiteInfo }) {
         className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {list.map((p) => (
           <PlanCard key={p.id} p={p} action={
-            <Link to={user?.role === 'member' ? '/app' : `/join?plan=${p.id}`} className="btn w-full">{t('site.choose')}</Link>
+            user?.role === 'member' || site.studio.can_sign_up !== false
+              ? <Link to={user?.role === 'member' ? '/app/plans' : `/join?plan=${p.id}`} className="btn w-full">{t('site.choose')}</Link>
+              : site.studio.mobile ? <a href={telLink(site.studio.mobile) ?? undefined} className="btn w-full">{t('site.callUs')}</a> : null
           } />
         ))}
       </div>
@@ -249,14 +259,15 @@ export function HoursList({ rows }: { rows: HoursRow[] }) {
 
 function Timings({ site }: { site: SiteInfo }) {
   const { t } = useTranslation()
-  if (!site.batches.length && !site.website.opening_hours) return null
+  const hours = siteHours(site)
+  if (!hours.some((r) => r.spans.length) && !site.website.opening_hours) return null
   const groups = startTimes(site.batches)
   return (
     <Block id="timings" title={t('site.timingsTitle')} sub={t('site.timingsSub')}>
       <div className="grid gap-4 lg:grid-cols-[.9fr_1.1fr]">
         <div className="card flex flex-col gap-2 p-5">
           <h3 className="eyebrow">{t('site.hours')}</h3>
-          {site.batches.length > 0 && <HoursList rows={openingHours(site.batches)} />}
+          <HoursList rows={hours} />
           {site.website.opening_hours && <p className="m-0 text-[14px] leading-relaxed whitespace-pre-line text-ink-soft">{site.website.opening_hours}</p>}
         </div>
         {groups.length > 0 && (
@@ -329,7 +340,7 @@ function Results({ site }: { site: SiteInfo }) {
 function Cta({ site }: { site: SiteInfo }) {
   const { t } = useTranslation()
   const { user } = useAuth()
-  if (user) return null
+  if (user || site.studio.can_sign_up === false) return null
   const phone = site.studio.mobile
   return (
     <section className="bg-gold text-on-gold">
@@ -352,7 +363,8 @@ function Contact({ site }: { site: SiteInfo }) {
   const s = site.studio
   const w = site.website
   const wa = whatsappLink(w.whatsapp || s.mobile, t('site.waHello'))
-  const social = ([['Instagram', w.instagram], ['Facebook', w.facebook], ['YouTube', w.youtube]] as const).filter(([, u]) => u && /^https:\/\//.test(u))
+  const social = ([['Instagram', w.instagram], ['Facebook', w.facebook], ['YouTube', w.youtube], ['X (Twitter)', w.twitter], ['LinkedIn', w.linkedin]] as const)
+    .filter(([, u]) => u && /^https:\/\//.test(u))
   return (
     <Block id="contact" title={t('site.contactTitle')}>
       <div className="grid gap-4 lg:grid-cols-2">
@@ -374,10 +386,10 @@ function Contact({ site }: { site: SiteInfo }) {
             </div>
           )}
         </div>
-        {(site.batches.length > 0 || w.opening_hours) && (
+        {(siteHours(site).some((r) => r.spans.length) || w.opening_hours) && (
           <div className="card flex flex-col gap-2 p-5">
             <h3 className="eyebrow">{t('site.hours')}</h3>
-            {site.batches.length > 0 && <HoursList rows={openingHours(site.batches)} />}
+            <HoursList rows={siteHours(site)} />
             {w.opening_hours && <p className="m-0 text-[14px] leading-relaxed whitespace-pre-line text-ink-soft">{w.opening_hours}</p>}
           </div>
         )}

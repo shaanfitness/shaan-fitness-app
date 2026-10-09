@@ -15,6 +15,8 @@ export interface Studio {
   landline: string | null
   street1: string | null
   street2: string | null
+  locality: string | null
+  landmark: string | null
   city: string | null
   state: string | null
   country: string
@@ -26,6 +28,7 @@ export interface Studio {
   timezone: string
   currency: string
   tax_label: string
+  active: boolean
   settings: StudioSettings
 }
 
@@ -43,7 +46,7 @@ export interface StudioSettings {
 }
 
 export interface ListItem { id: string; studio_id: string; list: string; label: string; kind: string | null; sort: number; active: boolean }
-export interface Service { id: string; name: string; custom_name: string | null; show_in_app: boolean; navigate_to: string | null; sort: number; active: boolean }
+export interface Service { id: string; name: string; custom_name: string | null; show_in_app: boolean; navigate_to: string | null; banner_url: string | null; sort: number; active: boolean }
 
 export interface Staff {
   id: string

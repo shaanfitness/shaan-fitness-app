@@ -22,6 +22,7 @@ OUT="$ROOT/supabase/setup-all.sql"
   echo "-- ===== seed.sql ====="; cat "$ROOT/supabase/seed.sql"; echo
   echo "-- ===== seed-ydl.sql ====="; cat "$ROOT/supabase/seed-ydl.sql"; echo
   echo "-- ===== seed-ydl-offers.sql ====="; cat "$ROOT/supabase/seed-ydl-offers.sql"; echo
+  echo "-- ===== seed-ydl-center.sql ====="; cat "$ROOT/supabase/seed-ydl-center.sql"; echo
   echo "-- ===== versions ====="
   echo "create table if not exists app.schema_migrations (version text primary key, applied_at timestamptz not null default now());"
   for f in "$ROOT"/supabase/migrations/*.sql; do echo "insert into app.schema_migrations (version) values ('$(basename "$f" .sql)') on conflict do nothing;"; done

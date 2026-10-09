@@ -20,8 +20,14 @@ export const minutesOf = (hhmm: string) => {
   return h * 60 + m
 }
 
-const inr = new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 })
-export const money = (n: number) => inr.format(Math.round(n))
+// Amounts show in the studio's currency (Fitness Center › Currency Setting); rupees until it loads.
+let fmt = new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 })
+let current = 'INR'
+export function setCurrency(code: string | null | undefined) {
+  if (!code || code === current) return
+  try { fmt = new Intl.NumberFormat('en-IN', { style: 'currency', currency: code, maximumFractionDigits: 0 }); current = code } catch { /* unknown code: keep rupees */ }
+}
+export const money = (n: number) => fmt.format(Math.round(n))
 
 export const initials = (name: string) =>
   name.replace(/[^\p{L}\s]/gu, '').split(/\s+/).filter(Boolean).slice(0, 2).map((p) => p[0]!.toUpperCase()).join('')
