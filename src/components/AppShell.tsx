@@ -36,11 +36,11 @@ function barFor(role: Role, t: (k: string) => string): BarItem[] {
       ]
     case 'member':
       return [
-        { to: '/home', label: t('nav.home'), icon: 'home' },
-        { to: '/book', label: t('nav.book'), icon: 'calendar' },
-        { to: '/plan', label: t('nav.plan'), icon: 'dumbbell' },
-        { to: '/chat', label: t('nav.chat'), icon: 'chat' },
-        { to: '/more', label: t('nav.profile'), icon: 'person' },
+        { to: '/app', label: t('nav.home'), icon: 'home' },
+        { to: '/app/book', label: t('nav.book'), icon: 'calendar' },
+        { to: '/app/plan', label: t('nav.plan'), icon: 'dumbbell' },
+        { to: '/app/chat', label: t('nav.chat'), icon: 'chat' },
+        { to: '/app/profile', label: t('nav.profile'), icon: 'person' },
       ]
   }
 }
@@ -153,6 +153,9 @@ export function AppShell() {
         </div>
         <div className="flex flex-col gap-3 border-t border-line p-4">
           <RoleSwitch />
+          <a href="/" target="_blank" rel="noreferrer" className="flex items-center justify-between rounded-xl px-1 text-[12px] font-semibold text-muted no-underline hover:text-ink">
+            Open the website <Icon name="chevronRight" size={14} />
+          </a>
           <NavLink to="/more" className="flex items-center gap-3 rounded-2xl border border-line p-3 no-underline hover:border-gold">
             <Avatar name={me.name} size={38} gold />
             <div className="min-w-0">

@@ -1,11 +1,14 @@
 {
+  "id": "/app",
   "name": "Shaan Fitness",
   "short_name": "Shaan Fitness",
-  "description": "Members, coaches, doctors and staff in one app.",
-  "start_url": "/",
+  "description": "Your Shaan Fitness app: plans, batches, check-ins and your coach. Staff open the dashboard from the same app.",
+  "start_url": "/app",
+  "scope": "/",
   "display": "standalone",
-  "background_color": "#0B0B0D",
-  "theme_color": "#0B0B0D",
+  "orientation": "portrait",
+  "background_color": "#0A0A0C",
+  "theme_color": "#0A0A0C",
   "icons": [
     {
       "src": "/icon-192.png",
@@ -24,6 +27,16 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "My app",
+      "url": "/app"
+    },
+    {
+      "name": "Dashboard (staff)",
+      "url": "/dashboard"
     }
   ]
 }

@@ -28,6 +28,8 @@ interface ThemeValue {
   defaults: Record<ThemeGroup, ThemeId>
   setPersonal: (t: ThemeId | null) => Promise<void>
   setDefault: (g: ThemeGroup, t: ThemeId) => Promise<void>
+  /** The website and sign-in pages wear the studio's member look, whoever is signed in. */
+  force: (t: ThemeId | null) => void
 }
 const ThemeContext = createContext<ThemeValue | null>(null)
 
@@ -35,6 +37,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   const { user } = useAuth()
   const qc = useQueryClient()
   const [last] = useState(readLast)
+  const [forced, setForced] = useState<ThemeId | null>(null)
   const studio = useQuery({
     queryKey: ['studio-themes', user?.studioId], enabled: !!user, staleTime: 5 * 60_000,
     queryFn: async () => {
@@ -54,16 +57,16 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     doctor: isTheme(saved.doctor) ? saved.doctor : DEFAULT_THEMES.doctor,
   }
   const personal = isTheme(profile.data) ? profile.data : null
-  const theme: ThemeId = user ? (personal ?? defaults[groupOf(user.role)]) : last
+  const theme: ThemeId = forced ?? (user ? (personal ?? defaults[groupOf(user.role)]) : last)
 
   useEffect(() => {
     document.documentElement.dataset.theme = theme
     document.querySelector('meta[name="theme-color"]')?.setAttribute('content', THEMES[theme].ground)
-    if (user) { try { localStorage.setItem('sf.lastTheme', theme) } catch { /* this visit only */ } }
-  }, [theme, user])
+    if (user && !forced) { try { localStorage.setItem('sf.lastTheme', theme) } catch { /* this visit only */ } }
+  }, [theme, user, forced])
 
   const value: ThemeValue = {
-    theme, personal, defaults,
+    theme, personal, defaults, force: setForced,
     setPersonal: async (t) => {
       if (!user) return
       const res = await supabase.from('profiles').update({ theme: t }).eq('id', user.userId)
@@ -87,3 +90,14 @@ export function useTheme() {
   if (!ctx) throw new Error('useTheme must be used inside ThemeProvider')
   return ctx
 }
+
+/** Shows a page in one look while it is open (the website uses the studio's member look). */
+export function useForcedTheme(t: ThemeId | null | undefined) {
+  const { force } = useTheme()
+  useEffect(() => {
+    if (!t) return
+    force(t)
+    return () => force(null)
+  }, [t, force])
+}
+export const asTheme = (v: unknown): ThemeId | null => (isTheme(v) ? v : null)

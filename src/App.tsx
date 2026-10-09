@@ -1,11 +1,10 @@
-import { Navigate, Route, Routes, useLocation } from 'react-router-dom'
-import type { ReactNode } from 'react'
+import { Link, Navigate, Outlet, Route, Routes, useLocation } from 'react-router-dom'
+import { useEffect, type ReactNode } from 'react'
 import { AppShell, StaffMenu } from './components/AppShell'
 import { homeFor, useAuth } from './auth'
 import type { Role } from './db/types'
 import { ALL_PAGES, pageFor } from './nav'
 import { useAccess } from './access'
-import Login from './screens/Login'
 import Dashboard from './screens/staff/Dashboard'
 import Enquiries from './screens/staff/Enquiries'
 import EnquiryForm from './screens/staff/EnquiryForm'
@@ -33,7 +32,6 @@ import { PeopleList, PersonForm } from './screens/staff/People'
 import { AccessControl, LeaveRequests, Targets, Transformations } from './screens/staff/TeamExtras'
 import { PayrollCalculator, PayrollRegister } from './screens/staff/Payroll'
 import { ExpenseList, VendorList } from './screens/staff/Expenses'
-import ResetPassword from './screens/ResetPassword'
 import { CheckinLeaderboard, ClientTraffic, StaffAttendance } from './screens/staff/AttendanceReports'
 import MemberHome from './screens/member/Home'
 import CoachHome from './screens/coach/Home'
@@ -41,6 +39,12 @@ import DoctorHome from './screens/doctor/Home'
 import More from './screens/More'
 import ComingSoon from './screens/ComingSoon'
 import { PageHeader } from './components/ui'
+import { MemberShell } from './components/MemberShell'
+import Website from './site/Website'
+import Privacy from './site/Privacy'
+import { ForgotPassword, Join, Login, ResetPassword } from './site/Auth'
+import WebsiteSettings from './screens/staff/WebsiteSettings'
+import { prettyPhone, telLink, useSite } from './db/site'
 import { Notice } from './components/controls'
 
 const STAFF: Role[] = ['owner', 'front_desk', 'coach', 'doctor']
@@ -151,6 +155,8 @@ const BUILT: Record<string, { el: ReactNode; roles: Role[] }> = {
   '/payroll/register': { el: <PayrollRegister />, roles: DESK },
   '/expenses': { el: <ExpenseList />, roles: ['owner'] },
   '/vendors': { el: <VendorList />, roles: ['owner'] },
+  // Shaan Fitness additions
+  '/settings/website': { el: <WebsiteSettings />, roles: ['owner'] },
 }
 
 function Splash() {
@@ -159,56 +165,107 @@ function Splash() {
 
 function NoAccess() {
   const { signOut, session, rolesError } = useAuth()
+  const { data: site } = useSite()
+  const phone = site?.studio.mobile
   return (
     <div className="mx-auto flex min-h-dvh max-w-[480px] flex-col justify-center gap-4 px-6">
       <img src="/icon-192.png" alt="" width="64" height="64" className="rounded-[16px]" />
       <h1 className="title text-[32px]">This login isn’t linked yet</h1>
       {rolesError
         ? <Notice tone="error">{rolesError}</Notice>
-        : <p className="m-0 text-[15px] text-muted">{session?.user.email ?? 'This account'} signed in, but no staff or member record uses this email or mobile number. Ask the owner to add it, then sign in again.</p>}
-      <button type="button" className="btn" onClick={() => signOut()}>Sign out</button>
+        : <p className="m-0 text-[15px] leading-relaxed text-muted">{session?.user.email ?? 'This account'} is signed in, but no member or staff record uses this email yet. If you just joined, give it a minute and sign in again. Otherwise ask the front desk to add this email to your record{phone ? <>: <a href={telLink(phone) ?? undefined}>{prettyPhone(phone)}</a></> : ''}.</p>}
+      <div className="flex flex-wrap gap-2.5">
+        <button type="button" className="btn" onClick={() => signOut()}>Sign out</button>
+        <Link to="/" className="btn">Website</Link>
+      </div>
     </div>
   )
 }
 
-export default function App() {
+// Pages behind a login wait until we know who is signed in.
+function Gate() {
   const { ready, session, user, noAccess, rolesError } = useAuth()
   if (!ready) return <Splash />
   if (session && (noAccess || (rolesError && !user))) return <NoAccess />
   if (session && !user) return <Splash />
+  return <Outlet />
+}
+
+function SignedOutOnly({ children }: { children: ReactNode }) {
+  const { user } = useAuth()
+  return user ? <Navigate to={homeFor(user.role)} replace /> : <>{children}</>
+}
+
+// A new page starts at the top (links to #sections on the same page still scroll to them).
+function ScrollToTop() {
+  const { pathname, hash } = useLocation()
+  useEffect(() => {
+    if (hash) document.getElementById(hash.slice(1))?.scrollIntoView()
+    else window.scrollTo(0, 0)
+  }, [pathname, hash])
+  return null
+}
+
+// One address for everything:
+//   /              the public website (plans, timings, coaches, contact, Log in and Join)
+//   /login, /join  one sign-in for all; afterwards each person lands on their own place
+//   /app           the member app (phone-first, installable)
+//   /coach, /doctor the coach's and doctor's day
+//   /dashboard …   the CRM for the owner and front desk
+export default function App() {
+  const { user } = useAuth()
   return (
+    <>
+    <ScrollToTop />
     <Routes>
+      <Route path="/" element={<Website />} />
+      <Route path="/privacy" element={<Privacy />} />
       <Route path="/reset-password" element={<ResetPassword />} />
-      <Route path="/login" element={user ? <Navigate to={homeFor(user.role)} replace /> : <Login />} />
-      <Route path="/print/invoice/:id" element={<Only roles={DESK}><Print kind="invoice" /></Only>} />
-      <Route path="/print/receipt/:id" element={<Only roles={DESK}><Print kind="receipt" /></Only>} />
-      <Route path="/print/collection" element={<Only roles={DESK}><PrintReport kind="collection" /></Only>} />
-      <Route path="/print/sales" element={<Only roles={DESK}><PrintReport kind="sales" /></Only>} />
-      <Route element={user ? <AppShell /> : <Navigate to="/login" replace />}>
-        <Route index element={user ? <Navigate to={homeFor(user.role)} replace /> : null} />
-        {Object.entries(BUILT).map(([path, b]) => <Route key={path} path={path} element={<Only roles={b.roles}>{b.el}</Only>} />)}
-        <Route path="/clients/:id/edit" element={<Only roles={DESK}><EnquiryForm /></Only>} />
-        <Route path="/clients/:id/payments/:subId" element={<Only roles={DESK}><PaymentDetails /></Only>} />
-        <Route path="/clients/:id" element={<Only roles={['owner', 'front_desk', 'coach']}><ClientProfile /></Only>} />
-        <Route path="/clients/:id/:tab" element={<Only roles={['owner', 'front_desk', 'coach']}><ClientProfile /></Only>} />
-        <Route path="/plans/:id/edit" element={<Only roles={DESK} right={['plans', 'edit']}><PlanForm /></Only>} />
-        <Route path="/coupons/:id/edit" element={<Only roles={DESK} right={['coupons', 'on']}><CouponForm /></Only>} />
-        <Route path="/combos/:id/edit" element={<Only roles={DESK} right={['plans', 'add']}><ComboForm /></Only>} />
-        <Route path="/trainers/:id/edit" element={<Only roles={DESK} right={['trainers', 'edit']}><PersonForm kind="trainer" /></Only>} />
-        <Route path="/staff/:id/edit" element={<Only roles={DESK} right={['staff_accounts', 'edit']}><PersonForm kind="staff" /></Only>} />
-        <Route path="/batches/:id/edit" element={<Only roles={DESK} right={['batches', 'edit']}><BatchForm /></Only>} />
-        <Route path="/programs/:id/edit" element={<Only roles={DESK} right={['programs', 'edit']}><ProgramForm /></Only>} />
-        {ALL_PAGES.filter((p) => !BUILT[p.path]).map((p) => <Route key={p.path} path={p.path} element={<Only roles={p.roles}><InProgress /></Only>} />)}
-        <Route path="/menu" element={<Only roles={STAFF}><PageHeader title="Menu" /><div className="px-3 pt-3"><StaffMenu /></div></Only>} />
-        <Route path="/coach" element={<Only roles={['coach']}><CoachHome /></Only>} />
-        <Route path="/doctor" element={<Only roles={['doctor']}><DoctorHome /></Only>} />
-        <Route path="/home" element={<Only roles={['member']}><MemberHome /></Only>} />
-        <Route path="/book" element={<Only roles={['member']}><ComingSoon title="Book" note="Booking, moving and cancelling sessions from the app comes with the member app." /></Only>} />
-        <Route path="/plan" element={<Only roles={['member']}><ComingSoon title="Plan" note="Workout and diet plans from your coach come with the member app." /></Only>} />
-        <Route path="/chat" element={<Only roles={['member', 'doctor']}><ComingSoon title="Chat" note="Care chat between members, coaches and doctors comes next, with online status and phone notifications." /></Only>} />
-        <Route path="/more" element={<Only roles={[...STAFF, 'member']}><More /></Only>} />
+      <Route element={<Gate />}>
+        <Route path="/login" element={<SignedOutOnly><Login /></SignedOutOnly>} />
+        <Route path="/join" element={<SignedOutOnly><Join /></SignedOutOnly>} />
+        <Route path="/forgot-password" element={<SignedOutOnly><ForgotPassword /></SignedOutOnly>} />
+        <Route path="/print/invoice/:id" element={<Only roles={DESK}><Print kind="invoice" /></Only>} />
+        <Route path="/print/receipt/:id" element={<Only roles={DESK}><Print kind="receipt" /></Only>} />
+        <Route path="/print/collection" element={<Only roles={DESK}><PrintReport kind="collection" /></Only>} />
+        <Route path="/print/sales" element={<Only roles={DESK}><PrintReport kind="sales" /></Only>} />
+
+        {/* The member app */}
+        <Route path="/app" element={!user ? <Navigate to="/login" replace /> : user.role !== 'member' ? <Navigate to={homeFor(user.role)} replace /> : <MemberShell />}>
+          <Route index element={<MemberHome />} />
+          <Route path="book" element={<ComingSoon title="Book" note="Booking, moving and cancelling sessions from the app comes with the member app." />} />
+          <Route path="plan" element={<ComingSoon title="Plan" note="Workout and diet plans from your coach come with the member app." />} />
+          <Route path="chat" element={<ComingSoon title="Chat" note="Care chat between members, coaches and doctors comes next, with online status and phone notifications." />} />
+          <Route path="profile" element={<More />} />
+        </Route>
+        <Route path="/home" element={<Navigate to="/app" replace />} />
+        <Route path="/book" element={<Navigate to="/app/book" replace />} />
+        <Route path="/plan" element={<Navigate to="/app/plan" replace />} />
+
+        {/* The CRM, and the coach's and doctor's pages */}
+        <Route element={user ? <AppShell /> : <Navigate to="/login" replace />}>
+          {Object.entries(BUILT).map(([path, b]) => <Route key={path} path={path} element={<Only roles={b.roles}>{b.el}</Only>} />)}
+          <Route path="/clients/:id/edit" element={<Only roles={DESK}><EnquiryForm /></Only>} />
+          <Route path="/clients/:id/payments/:subId" element={<Only roles={DESK}><PaymentDetails /></Only>} />
+          <Route path="/clients/:id" element={<Only roles={['owner', 'front_desk', 'coach']}><ClientProfile /></Only>} />
+          <Route path="/clients/:id/:tab" element={<Only roles={['owner', 'front_desk', 'coach']}><ClientProfile /></Only>} />
+          <Route path="/plans/:id/edit" element={<Only roles={DESK} right={['plans', 'edit']}><PlanForm /></Only>} />
+          <Route path="/coupons/:id/edit" element={<Only roles={DESK} right={['coupons', 'on']}><CouponForm /></Only>} />
+          <Route path="/combos/:id/edit" element={<Only roles={DESK} right={['plans', 'add']}><ComboForm /></Only>} />
+          <Route path="/trainers/:id/edit" element={<Only roles={DESK} right={['trainers', 'edit']}><PersonForm kind="trainer" /></Only>} />
+          <Route path="/staff/:id/edit" element={<Only roles={DESK} right={['staff_accounts', 'edit']}><PersonForm kind="staff" /></Only>} />
+          <Route path="/batches/:id/edit" element={<Only roles={DESK} right={['batches', 'edit']}><BatchForm /></Only>} />
+          <Route path="/programs/:id/edit" element={<Only roles={DESK} right={['programs', 'edit']}><ProgramForm /></Only>} />
+          {ALL_PAGES.filter((p) => !BUILT[p.path]).map((p) => <Route key={p.path} path={p.path} element={<Only roles={p.roles}><InProgress /></Only>} />)}
+          <Route path="/menu" element={<Only roles={STAFF}><PageHeader title="Menu" /><div className="px-3 pt-3"><StaffMenu /></div></Only>} />
+          <Route path="/coach" element={<Only roles={['coach']}><CoachHome /></Only>} />
+          <Route path="/doctor" element={<Only roles={['doctor']}><DoctorHome /></Only>} />
+          <Route path="/chat" element={<Only roles={['doctor']}><ComingSoon title="Chat" note="Care chat between members, coaches and doctors comes next, with online status and phone notifications." /></Only>} />
+          <Route path="/more" element={<Only roles={STAFF}><More /></Only>} />
+        </Route>
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
+    </>
   )
 }

@@ -103,4 +103,4 @@ export function useMe(): SessionUser {
 
 export const ROLE_LABEL: Record<Role, string> = { owner: 'Owner', front_desk: 'Front desk', coach: 'Coach', doctor: 'Doctor', member: 'Member' }
 export const homeFor = (role: Role) =>
-  role === 'owner' || role === 'front_desk' ? '/dashboard' : role === 'coach' ? '/coach' : role === 'doctor' ? '/doctor' : '/home'
+  role === 'owner' || role === 'front_desk' ? '/dashboard' : role === 'coach' ? '/coach' : role === 'doctor' ? '/doctor' : '/app'

@@ -15,7 +15,10 @@ create table if not exists auth.users (
   phone text,
   email text,
   raw_user_meta_data jsonb not null default '{}'::jsonb,
-  created_at timestamptz not null default now()
+  created_at timestamptz not null default now(),
+  -- Tests treat a new login as verified unless they say otherwise.
+  email_confirmed_at timestamptz default now(),
+  phone_confirmed_at timestamptz default now()
 );
 
 create or replace function auth.uid()

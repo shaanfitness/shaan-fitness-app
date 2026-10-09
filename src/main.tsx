@@ -8,10 +8,13 @@ import App from './App'
 import { AuthProvider } from './auth'
 import { ThemeProvider } from './theme'
 import { ToastProvider } from './components/toast'
+import { registerServiceWorker } from './lib/install'
 
 const queryClient = new QueryClient({
   defaultOptions: { queries: { staleTime: 30_000, refetchOnWindowFocus: false, retry: 1 } },
 })
+
+registerServiceWorker()
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

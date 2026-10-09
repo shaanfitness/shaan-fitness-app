@@ -331,7 +331,7 @@ function userJson(u) {
   return {
     id: u.id, aud: 'authenticated', role: 'authenticated', email: u.email, phone: u.phone ?? '',
     app_metadata: { provider: 'email', providers: ['email'] }, user_metadata: u.raw_user_meta_data ?? {},
-    created_at: u.created_at, updated_at: u.created_at, email_confirmed_at: u.created_at,
+    created_at: u.created_at, updated_at: u.created_at, email_confirmed_at: u.email_confirmed_at ?? null,
   }
 }
 async function handleAuth(req, url, body) {
@@ -343,6 +343,7 @@ async function handleAuth(req, url, body) {
       const { rows } = await pool.query('select * from auth.users where lower(email) = lower($1) or phone = $2 limit 1', [body?.email ?? '', (body?.phone ?? '').replace(/\D/g, '')])
       user = rows[0]
       if (!user) throw new ApiError(400, { error: 'invalid_grant', error_description: 'Invalid login credentials', message: 'Invalid login credentials', code: 'invalid_credentials' })
+      if (user.email && body?.email && !user.email_confirmed_at) throw new ApiError(400, { message: 'Email not confirmed', code: 'email_not_confirmed' })
     } else if (grant === 'refresh_token') {
       const claims = verifyJwt(body?.refresh_token)
       if (!claims) throw new ApiError(400, { message: 'Invalid Refresh Token', code: 'refresh_token_not_found' })
@@ -358,15 +359,22 @@ async function handleAuth(req, url, body) {
     return { data: userJson(user) }
   }
   if (path === 'logout') return { data: null, status: 204 }
-  // Sign-up as on Supabase with "Confirm email" on: the user is made, no session until confirmed.
+  // Sign-up as on Supabase with "Confirm email" on: the user is made unconfirmed, no session until
+  // they open the emailed link. An email that already has a login gets the same answer with no identities.
   if (path === 'signup') {
     const email = (body?.email ?? '').trim().toLowerCase() || null
     const found = (await pool.query('select * from auth.users where lower(email) = $1', [email])).rows[0]
-    const user = found ?? (await pool.query('insert into auth.users (email, phone, raw_user_meta_data) values ($1, null, $2) returning *',
+    if (found) return { data: { ...userJson(found), identities: [] } }
+    const user = (await pool.query('insert into auth.users (email, phone, raw_user_meta_data, email_confirmed_at, phone_confirmed_at) values ($1, null, $2, null, null) returning *',
       [email, JSON.stringify(body?.data ?? {})])).rows[0]
-    return { data: userJson(user) }
+    return { data: { ...userJson(user), identities: [{ id: user.id, provider: 'email' }] } }
   }
-  if (path === 'recover') return { data: {} }
+  if (path === 'recover' || path === 'resend') return { data: {} }
+  // Local testing only: stands in for clicking the link in the confirmation email.
+  if (path === '_test/confirm') {
+    await pool.query('update auth.users set email_confirmed_at = now() where lower(email) = lower($1)', [body?.email ?? ''])
+    return { data: {} }
+  }
   throw new ApiError(404, { message: `auth endpoint ${path} is not available locally` })
 }
 

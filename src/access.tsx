@@ -42,7 +42,7 @@ export const PAGE_RIGHT: Record<string, [string, string]> = {
   '/centers': ['fitness_center', 'view'], '/centers/settings': ['fitness_center', 'edit'], '/centers/invoice-settings': ['fitness_center', 'edit'],
   '/centers/biometric': ['biometric', 'on'], '/centers/biometric-extended': ['biometric', 'on'], '/centers/rules': ['rules', 'on'], '/centers/feedback': ['feedback', 'on'],
   '/staff/new': ['staff_accounts', 'add'], '/staff': ['staff_accounts', 'view'], '/staff/targets': ['targets', 'view_page'],
-  '/community': ['community', 'on'], '/app/permissions': ['app_settings', 'on'], '/app/services': ['app_settings', 'on'],
+  '/community': ['community', 'on'], '/app-settings/permissions': ['app_settings', 'on'], '/app-settings/services': ['app_settings', 'on'],
 }
 
 /** YDL "Download CSV Access": which list or register may be exported (path → CSV right). */

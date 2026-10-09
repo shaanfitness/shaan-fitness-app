@@ -178,6 +178,7 @@ export const NAV: NavNode[] = [
     p('Currency Setting', '/centers/currency', '/fitness-centers/change-currency/', O),
     p('Feedback', '/centers/feedback', '/fitness-centers/feedback/', D),
     p('Dropdown Lists', '/settings/lists', '(every YDL dropdown, made editable)', O, { built: true, extra: true }),
+    p('Website', '/settings/website', '(public website: words, contact, what it shows)', O, { built: true, extra: true }),
   ], 'settings'),
   g('Staff', [
     p('Add Staff Account', '/staff/new', '/fitness-center/account/basic-information/', D, { built: true }),
@@ -191,26 +192,26 @@ export const NAV: NavNode[] = [
     p('Check-ins Leaderboard', '/attendance/leaderboard', '/merchant/fitness-center/customers/checkins-leaderboard/', DC, { built: true }),
   ], 'qr'),
   g('App Settings', [
-    p('On/Off Permission', '/app/permissions', '/fitness-center/app/permission/', O),
-    p('Services List', '/app/services', '/fitness-center-categories/', O),
+    p('On/Off Permission', '/app-settings/permissions', '/fitness-center/app/permission/', O),
+    p('Services List', '/app-settings/services', '/fitness-center-categories/', O),
     g('Gallery Image', [
-      p('Create Gallery', '/app/gallery/new', '/fitness-center/gallery/basic-information/', D),
-      p('Gallery List', '/app/gallery', '/merchant/gallery/gallery-list/', D),
+      p('Create Gallery', '/app-settings/gallery/new', '/fitness-center/gallery/basic-information/', D),
+      p('Gallery List', '/app-settings/gallery', '/merchant/gallery/gallery-list/', D),
     ]),
     g('Action Item', [
-      p('Create Action', '/app/actions/new', '/fitness-center/action/action-item/', O),
-      p('Action List', '/app/actions', '/merchant/action-item-list/', O),
+      p('Create Action', '/app-settings/actions/new', '/fitness-center/action/action-item/', O),
+      p('Action List', '/app-settings/actions', '/merchant/action-item-list/', O),
     ]),
     g('Quick Action Item', [
-      p('Create Quick Action Item', '/app/quick-actions/new', '/fitness-center/action/quick-action-item/', O),
-      p('Quick Action Item List', '/app/quick-actions', '/merchant/quick-action-item-list/', O),
+      p('Create Quick Action Item', '/app-settings/quick-actions/new', '/fitness-center/action/quick-action-item/', O),
+      p('Quick Action Item List', '/app-settings/quick-actions', '/merchant/quick-action-item-list/', O),
     ]),
     g('Banner Image', [
-      p('Create Banner', '/app/banners/new', '/fitness-center/banner/basic-information/', D),
-      p('Banner List', '/app/banners', '/merchant/banner/banner-list/', D),
+      p('Create Banner', '/app-settings/banners/new', '/fitness-center/banner/basic-information/', D),
+      p('Banner List', '/app-settings/banners', '/merchant/banner/banner-list/', D),
     ]),
-    p('Add Social Links & QR', '/app/social', '/fitness-center/app/social-link/', O),
-    p('Measurement Settings', '/app/measurements', '/fitness-centers/measurement_settings/', O),
+    p('Add Social Links & QR', '/app-settings/social', '/fitness-center/app/social-link/', O),
+    p('Measurement Settings', '/app-settings/measurements', '/fitness-centers/measurement_settings/', O),
     g('Workouts & Diet', [
       g('Workout Plans', [p('My Workout Plans', '/workouts', '/fitness-center/workout-plan/workout-plan-list/', DC)]),
       g('Diet Plans', [
