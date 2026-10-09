@@ -50,6 +50,8 @@ insert into public.staff (id, studio_id, role, first_name, last_name, phone, per
   ('00000000-0000-4000-8000-0000000000c3', :studio, 'doctor', 'Dr', 'Rao', '9000000004', default),
   ('00000000-0000-4000-8000-0000000000c4', :studio, 'front_desk', 'Krupa', 'Mosa', '9000000008',
    '{"only_his_clients": true, "allow_discounting": false}');
+-- YDL employee types: Gangada is a manager (full rights); Krupa stays a front desk executive.
+update public.staff set access_type = 'manager' where id = '00000000-0000-4000-8000-0000000000c1';
 
 insert into auth.users (id, phone, email) values
   ('10000000-0000-4000-8000-000000000001', null, 'ShaanFitnessGym@gmail.com'),  -- Sabir by email

@@ -10,6 +10,7 @@ import { ActionMenu, Checkbox, CheckboxGroup, Field, Notice, RadioGroup, Select,
 import { BulkBar } from '../../components/table'
 import { useToast } from '../../components/toast'
 import { Icon, Loading, PageHeader, Sheet } from '../../components/ui'
+import { CsvOnly } from '../../access-ui'
 
 // YDL "Add Program" (Fitness Center Programs) and "Program List" (Fixed Program Listing):
 // fixed online sessions with a meeting link, for the client groups chosen.
@@ -58,7 +59,7 @@ export function ProgramList() {
     <>
       <PageHeader title="Fixed Program Listing" sub={`${studio?.name ?? ''}${studio?.branch_name ? ` (${studio.branch_name})` : ''}`}
         actions={<>
-          <button type="button" className="btn btn-sm" onClick={exportCsv}><Icon name="download" size={16} />Export to CSV</button>
+          <CsvOnly><button type="button" className="btn btn-sm" onClick={exportCsv}><Icon name="download" size={16} />Export to CSV</button></CsvOnly>
           <Link to="/programs/attendance" className="btn btn-sm">Program Attendance</Link>
           {desk && <Link to="/programs/new" className="btn-gold min-h-10 px-4"><Icon name="plus" size={18} />Add Program</Link>}
         </>} />

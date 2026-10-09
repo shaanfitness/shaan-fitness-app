@@ -1,3 +1,4 @@
+import { useAccess } from '../../access'
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
@@ -52,6 +53,7 @@ function Block({ title, right, children, id }: { title: React.ReactNode; right?:
 }
 
 export default function Dashboard() {
+  const access = useAccess()
   const me = useMe()
   const today = studioToday()
   const { data: studio } = useStudio()
@@ -140,20 +142,20 @@ export default function Dashboard() {
     </div>
   )
 
-  const cards: { label: string; value: string; to?: string }[] = s ? [
-    { label: "Today's collection", value: money(s.today_collection), to: '/registers/receipts' },
-    { label: "Current month's collection", value: money(s.month_collection), to: '/registers/receipts' },
-    { label: "Current year's collection", value: money(s.year_collection), to: '/registers/receipts' },
-    { label: 'Balance amount', value: money(s.balance_amount), to: '/registers/balance-due' },
-    { label: 'Active gym subscriptions', value: String(s.active_gym), to: '/subscriptions' },
-    { label: 'Expired gym subscriptions', value: String(s.expired_gym), to: '/registers/expired' },
-    { label: 'Total open enquiries', value: String(s.open_enquiries), to: '/enquiries' },
-    { label: 'Total active members', value: String(s.active_members), to: '/members' },
-    { label: 'Present check-ins', value: String(s.present_checkins), to: '/checkins/traffic' },
+  const cards: { label: string; value: string; to?: string; right?: string }[] = s ? ([
+    { label: "Today's collection", value: money(s.today_collection), to: '/registers/receipts', right: 'today' },
+    { label: "Current month's collection", value: money(s.month_collection), to: '/registers/receipts', right: 'month' },
+    { label: "Current year's collection", value: money(s.year_collection), to: '/registers/receipts', right: 'year' },
+    { label: 'Balance amount', value: money(s.balance_amount), to: '/registers/balance-due', right: 'balance' },
+    { label: 'Active gym subscriptions', value: String(s.active_gym), to: '/subscriptions', right: 'active_gym' },
+    { label: 'Expired gym subscriptions', value: String(s.expired_gym), to: '/registers/expired', right: 'expired_gym' },
+    { label: 'Total open enquiries', value: String(s.open_enquiries), to: '/enquiries', right: 'open_enquiries' },
+    { label: 'Total active members', value: String(s.active_members), to: '/members', right: 'active_members' },
+    { label: 'Present check-ins', value: String(s.present_checkins), to: '/attendance/clients' },
     { label: 'Live app installs', value: String(s.app_installs), to: '/members' },
-    { label: 'Active PT subscriptions', value: String(s.active_pt), to: '/registers/sessions' },
-    { label: 'Expired PT subscriptions', value: String(s.expired_pt), to: '/registers/expired' },
-  ] : []
+    { label: 'Active PT subscriptions', value: String(s.active_pt), to: '/registers/sessions', right: 'active_pt' },
+    { label: 'Expired PT subscriptions', value: String(s.expired_pt), to: '/registers/expired', right: 'expired_pt' },
+  ] as { label: string; value: string; to?: string; right?: string }[]).filter((c) => !c.right || access.can('dashboard_cards', c.right)) : []
 
   const wish = (name: string, kind: 'birthday' | 'anniversary') =>
     kind === 'birthday' ? `Happy Birthday ${name} from ${studio?.name ?? 'Shaan Fitness'}! Have a great year ahead.` : `Happy anniversary with ${studio?.name ?? 'Shaan Fitness'}, ${name}! Thank you for training with us.`

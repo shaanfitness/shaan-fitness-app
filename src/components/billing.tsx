@@ -13,6 +13,12 @@ import { fmtClock, fmtDay, daysFrom, planEndDate, plusDays, studioToday } from '
 import { Checkbox, Field, MultiSelect, Notice, RadioGroup, Select, TextInput, opts } from './controls'
 import { useToast } from './toast'
 import { Sheet } from './ui'
+import { supabase } from '../lib/supabase'
+
+/** Without "Allow Freeze/Extension" a freeze or extension is a request for the owner (YDL access control). */
+async function changeStatus(table: 'freezes' | 'extensions', id: string) {
+  return ((await supabase.from(table).select('status').eq('id', id).maybeSingle()).data as { status: string } | null)?.status
+}
 
 // YDL "Membership Actions" pop-ups on a client's profile.
 
@@ -348,7 +354,7 @@ function FreezeForm({ target, onDone }: { target: ActionTarget; onDone: () => vo
   const sub = target.subs.find((s) => s.id === subId)
   const m = useMutation({
     mutationFn: () => freezeSubscription({ subscription_id: subId, start_date: start, days: Number(days), fee: Number(fee || 0), mode, note }),
-    onSuccess: () => { invalidate(); toast('Subscription frozen'); onDone() },
+    onSuccess: async (id) => { invalidate(); toast((await changeStatus('freezes', id)) === 'requested' ? 'Freeze request sent to the owner' : 'Subscription frozen'); onDone() },
     onError: (e: Error) => setError(e.message),
   })
   return (
@@ -380,7 +386,7 @@ function ExtendForm({ target, onDone }: { target: ActionTarget; onDone: () => vo
   const sub = target.subs.find((s) => s.id === subId)
   const m = useMutation({
     mutationFn: () => extendSubscription({ subscription_id: subId, days: Number(days), fee: Number(fee || 0), mode, note }),
-    onSuccess: () => { invalidate(); toast('Subscription extended'); onDone() },
+    onSuccess: async (id) => { invalidate(); toast((await changeStatus('extensions', id)) === 'requested' ? 'Extension request sent to the owner' : 'Subscription extended'); onDone() },
     onError: (e: Error) => setError(e.message),
   })
   return (

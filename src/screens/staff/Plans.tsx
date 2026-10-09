@@ -11,6 +11,7 @@ import { ActionMenu, Checkbox, CheckboxGroup, Field, Notice, RadioGroup, Select,
 import { BulkBar } from '../../components/table'
 import { useToast } from '../../components/toast'
 import { Icon, Loading, PageHeader, Sheet } from '../../components/ui'
+import { CsvOnly } from '../../access-ui'
 
 // YDL "Create Membership Plan" and "My Membership Plans" (Active Membership plans Listing).
 
@@ -67,7 +68,7 @@ export function PlanList() {
     <>
       <PageHeader title={deactivated ? 'Deactivated Membership plans' : 'Active Membership plans Listing'} sub={`${studio?.name ?? ''}${studio?.branch_name ? ` (${studio.branch_name})` : ''}`}
         actions={<>
-          <button type="button" className="btn btn-sm" onClick={exportCsv}><Icon name="download" size={16} />Export to CSV</button>
+          <CsvOnly><button type="button" className="btn btn-sm" onClick={exportCsv}><Icon name="download" size={16} />Export to CSV</button></CsvOnly>
           {owner && <Link to="/plans/import" className="btn btn-sm">Import Membership</Link>}
           <button type="button" className="btn btn-sm" onClick={() => { setDeactivated(!deactivated); setSelected(new Set()) }}>{deactivated ? 'Active Plans' : 'Deactivated Plans'}</button>
           {owner && <Link to="/plans/new" className="btn-gold min-h-10 px-4"><Icon name="plus" size={18} />Create Membership</Link>}
@@ -81,7 +82,7 @@ export function PlanList() {
           <Select small ariaLabel="Category" value={category} onChange={setCategory} placeholder="Select Category" options={services.filter((s) => s.active).map((s) => ({ value: s.id, label: s.custom_name ?? s.name }))} className="w-auto" />
         </div>
         <BulkBar count={selected.size} onClear={() => setSelected(new Set())}>
-          <button type="button" className="btn btn-sm" onClick={exportCsv}>Export to CSV</button>
+          <CsvOnly><button type="button" className="btn btn-sm" onClick={exportCsv}>Export to CSV</button></CsvOnly>
           {owner && <button type="button" className="btn btn-sm" onClick={() => setConfirm({ action: deactivated ? 'activate' : 'deactivate', ids: [...selected] })}>{deactivated ? 'Activate' : 'Deactivate'}</button>}
         </BulkBar>
         {isLoading ? <Loading /> : groups.map(([title, list]) => (

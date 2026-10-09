@@ -3,6 +3,7 @@ import { NavLink, Outlet, useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { ROLE_LABEL, useAuth, useMe } from '../auth'
 import { containsPath, navFor, nodeKey, type NavNode } from '../nav'
+import { useAccess } from '../access'
 import type { Role } from '../db/types'
 import { Avatar, BrandMark, Icon } from './ui'
 
@@ -99,7 +100,8 @@ function openTrail(nodes: NavNode[], path: string, trail: string[] = []): string
 export function StaffMenu({ onNavigate }: { onNavigate?: () => void }) {
   const me = useMe()
   const { pathname } = useLocation()
-  const nodes = useMemo(() => navFor(me.role), [me.role])
+  const access = useAccess()
+  const nodes = useMemo(() => navFor(me.role, access.page), [me.role, access.page])
   const [open, setOpen] = useState<Set<string>>(() => new Set(openTrail(nodes, pathname)))
   useEffect(() => { setOpen((o) => new Set([...o, ...openTrail(nodes, pathname)])) }, [nodes, pathname])
   const toggle = (k: string) => setOpen((o) => { const n = new Set(o); if (n.has(k)) n.delete(k); else n.add(k); return n })

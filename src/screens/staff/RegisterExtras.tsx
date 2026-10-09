@@ -11,6 +11,7 @@ import { Field, Notice, Select, TextInput } from '../../components/controls'
 import { useToast } from '../../components/toast'
 import { Icon, Loading, PageHeader, Sheet } from '../../components/ui'
 import { RegisterPage, sessionRegister } from './registers'
+import { CsvOnly } from '../../access-ui'
 
 // Session Register (list, or one PT subscription's sessions) and the Collection Report.
 
@@ -169,7 +170,7 @@ export function CollectionReport() {
           </div>
           {tooLong && <Notice tone="warn">Choose up to 3 months at a time.</Notice>}
           <div className="flex flex-wrap gap-2">
-            <button type="button" className="btn-gold" disabled={busy || tooLong} onClick={run}><Icon name="download" size={16} />{busy ? 'Preparing…' : 'Download report'}</button>
+<CsvOnly><button type="button" className="btn-gold" disabled={busy || tooLong} onClick={run}><Icon name="download" size={16} />{busy ? 'Preparing…' : 'Download report'}</button></CsvOnly>
             <a className={`btn ${tooLong ? 'pointer-events-none opacity-50' : ''}`} href={`/print/collection?from=${from}&to=${to}`} target="_blank" rel="noreferrer">Collection report in PDF</a>
             <a className={`btn ${tooLong ? 'pointer-events-none opacity-50' : ''}`} href={`/print/sales?from=${from}&to=${to}`} target="_blank" rel="noreferrer">Sales report in PDF</a>
           </div>

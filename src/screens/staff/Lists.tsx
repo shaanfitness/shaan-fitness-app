@@ -26,7 +26,7 @@ const LISTS: { key: string; label: string; used: string }[] = [
   { key: 'expense_category', label: 'Expense categories', used: 'Expenses' },
   { key: 'expense_payment_type', label: 'Expense payment types', used: 'Expenses' },
   { key: 'trainer_type', label: 'Trainer types', used: 'Trainer form' },
-  { key: 'staff_type', label: 'Staff types', used: 'Staff account form' },
+  { key: 'staff_designation', label: 'Staff designations', used: 'Staff account form (Designation)' },
   { key: 'document_type', label: 'Document types', used: 'Member documents' },
   { key: 'appointment_purpose', label: 'Appointment purposes', used: 'Appointments' },
   { key: 'holiday_type', label: 'Holiday types', used: 'Holidays and events' },

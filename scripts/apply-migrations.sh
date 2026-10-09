@@ -34,6 +34,7 @@ if [ "$fresh" = "t" ]; then
   echo "Adding the Shaan Fitness starting setup"
   RUN -f supabase/seed.sql
   RUN -f supabase/seed-ydl.sql
+  RUN -f supabase/seed-ydl-offers.sql
 fi
 
 Q "select json_build_object(

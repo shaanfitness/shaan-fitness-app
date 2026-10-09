@@ -12,6 +12,7 @@ import { ActionMenu, CheckboxGroup, Notice, TextInput } from '../../components/c
 import { FollowUpHistory } from '../../components/FollowUp'
 import { DataTable, Pager, type Column } from '../../components/table'
 import { Icon, PageHeader, Sheet } from '../../components/ui'
+import { CsvOnly } from '../../access-ui'
 
 // YDL "Subscriptions" (SubscriptionsListing) with its Subscriptions Filter panel.
 const PAGE = 50
@@ -105,7 +106,7 @@ export default function Subscriptions() {
   return (
     <>
       <PageHeader title="Subscriptions Listing" sub={`${studio?.name ?? ''}${studio?.branch_name ? ` (${studio.branch_name})` : ''}`}
-        actions={<button type="button" className="btn btn-sm" onClick={exportCsv}><Icon name="download" size={16} />Export to CSV</button>} />
+        actions={<CsvOnly><button type="button" className="btn btn-sm" onClick={exportCsv}><Icon name="download" size={16} />Export to CSV</button></CsvOnly>} />
       <div className="flex flex-col gap-3 px-5 pt-5 lg:px-8">
         <div className="flex flex-wrap items-center gap-2">
           <div className="relative min-w-[220px] flex-1">

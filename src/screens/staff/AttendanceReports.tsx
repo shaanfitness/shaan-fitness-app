@@ -17,6 +17,7 @@ import { FollowUpDialog, type FollowUpTarget } from '../../components/FollowUp'
 import { BulkBar, Pager } from '../../components/table'
 import { useToast } from '../../components/toast'
 import { Avatar, Icon, Loading, PageHeader, Sheet } from '../../components/ui'
+import { CsvOnly } from '../../access-ui'
 
 // YDL "Attendance Reports": Staff & Trainer attendance (Report Insights), Client Attendance
 // (Traffic Customer Listing) and the Check-ins Leaderboard.
@@ -101,7 +102,7 @@ export function StaffAttendance() {
           {(report === 'trainer' || report === 'staff') && <>
             <Select small ariaLabel={label} value={person} onChange={setPerson} placeholder={`All ${label === 'Trainer' ? 'Trainers' : 'Staff'}`} className="w-auto" options={options.map((s) => ({ value: s.id, label: `${s.full_name} (${s.staff_code})` }))} />
             <RangePicker value={range} onChange={setRange} />
-            <button type="button" className="btn btn-sm" onClick={exportCsv}><Icon name="download" size={16} />Export to CSV</button>
+            <CsvOnly><button type="button" className="btn btn-sm" onClick={exportCsv}><Icon name="download" size={16} />Export to CSV</button></CsvOnly>
             {person && <button type="button" className="link-btn text-[13px]" onClick={() => setPerson('')}>clear filter</button>}
           </>}
         </div>
@@ -256,7 +257,7 @@ export function ClientTraffic() {
   return (
     <>
       <PageHeader title="Traffic Customer Listing" sub={studioLine(studio)}
-        actions={<button type="button" className="btn btn-sm" onClick={() => exportCsv(rows)}><Icon name="download" size={16} />Export to CSV</button>} />
+        actions={<CsvOnly><button type="button" className="btn btn-sm" onClick={() => exportCsv(rows)}><Icon name="download" size={16} />Export to CSV</button></CsvOnly>} />
       <div className="flex flex-col gap-3 px-5 pt-5 pb-8 lg:px-8">
         <div className="flex flex-wrap items-center gap-2">
           <div className="relative min-w-[220px] flex-1">
@@ -277,7 +278,7 @@ export function ClientTraffic() {
         </div>
         <h2 className="eyebrow">{active ? 'Filters Applied ' : ''}Fetched {memberMode ? 'Members' : 'Members Checkins'}({rows.length})</h2>
         <BulkBar count={selected.size} onClear={() => setSelected(new Set())}>
-          <button type="button" className="btn btn-sm" onClick={() => exportCsv(rows.filter((r) => selected.has(r.key)))}>Export to CSV</button>
+          <CsvOnly><button type="button" className="btn btn-sm" onClick={() => exportCsv(rows.filter((r) => selected.has(r.key)))}>Export to CSV</button></CsvOnly>
         </BulkBar>
         {checkins.isLoading || (memberMode && members.isLoading) ? <Loading /> : !rows.length ? <div className="card px-5 py-10 text-center text-[14px] text-muted">No check-ins for these filters.</div> : (
           <div className="card overflow-x-auto">
@@ -355,9 +356,9 @@ export function CheckinLeaderboard() {
   return (
     <>
       <PageHeader title="Client Check-ins Leaderboard" sub={studioLine(studio)}
-        actions={<button type="button" className="btn btn-sm" onClick={() => downloadCsv(`checkins-leaderboard-${from}-${to}.csv`, rows, [['Customer Name', (r: LeaderRow) => r.member_name],
+        actions={<CsvOnly><button type="button" className="btn btn-sm" onClick={() => downloadCsv(`checkins-leaderboard-${from}-${to}.csv`, rows, [['Customer Name', (r: LeaderRow) => r.member_name],
           ['Customer Code', (r) => r.client_code], ['Mobile', (r) => r.member_phone], ['Total Check-ins', (r) => r.total], ['Latest Check-in', (r) => r.latest_in], ['Latest Check-out', (r) => r.latest_out],
-          ['Subscription Status', (r) => r.live_status]])}><Icon name="download" size={16} />Export to CSV</button>} />
+          ['Subscription Status', (r) => r.live_status]])}><Icon name="download" size={16} />Export to CSV</button></CsvOnly>} />
       <div className="flex flex-col gap-3 px-5 pt-5 pb-8 lg:px-8">
         <div className="flex flex-wrap items-center gap-2">
           <div className="relative min-w-[220px] flex-1">

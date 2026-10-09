@@ -8,6 +8,7 @@ import { fmtDay } from '../../lib/dates'
 import { downloadCsv } from '../../lib/csv'
 import { CheckboxGroup, Notice, TextInput } from '../../components/controls'
 import { Icon, Loading, PageHeader, Sheet } from '../../components/ui'
+import { CsvOnly } from '../../access-ui'
 
 // YDL "Client Referrals List" and "Other Branch Member".
 
@@ -25,7 +26,7 @@ export function ClientReferrals() {
   return (
     <>
       <PageHeader title="Client Referrals List" sub={`${studio?.name ?? ''}${studio?.branch_name ? ` (${studio.branch_name})` : ''}`}
-        actions={<button type="button" className="btn btn-sm" onClick={exportCsv}><Icon name="download" size={16} />Export to CSV</button>} />
+        actions={<CsvOnly><button type="button" className="btn btn-sm" onClick={exportCsv}><Icon name="download" size={16} />Export to CSV</button></CsvOnly>} />
       <div className="flex flex-col gap-3 px-5 pt-5 pb-8 lg:px-8">
         <div className="flex flex-wrap items-center gap-2">
           <div className="relative min-w-[220px] flex-1">

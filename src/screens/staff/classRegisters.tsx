@@ -11,6 +11,7 @@ import type { Column } from '../../components/table'
 import { useToast } from '../../components/toast'
 import { Sheet } from '../../components/ui'
 import { bookingChip } from './Classes'
+import { CsvOnly } from '../../access-ui'
 
 // YDL class registers: Class Attendance, Cancelled and Deleted Class Register, Class Waiting List,
 // Batchwise Attendance List and Program Attendance, as definitions for the shared register engine.
@@ -180,7 +181,7 @@ export const batchwiseAttendance: RegisterDef<CheckinRow> = {
     { key: 'st', header: 'Subscription Status', cell: (r) => subChip(r.subscription_state) },
   ],
   csv: checkinCsv, totals: (rows) => [['Total', String(rows.length)]],
-  bulk: (rows) => <button type="button" className="btn btn-sm" onClick={() => downloadCsv('batch-attendance-selected.csv', rows, checkinCsv())}>Export to CSV</button>,
+  bulk: (rows) => <CsvOnly><button type="button" className="btn btn-sm" onClick={() => downloadCsv('batch-attendance-selected.csv', rows, checkinCsv())}>Export to CSV</button></CsvOnly>,
 }
 
 // ---------------------------------------------------------------------------

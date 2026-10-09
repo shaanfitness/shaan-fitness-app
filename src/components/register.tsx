@@ -10,6 +10,7 @@ import { downloadCsv } from '../lib/csv'
 import { CheckboxGroup, Notice, Select, TextInput, type Option } from './controls'
 import { BulkBar, DataTable, Pager, type Column } from './table'
 import { Icon, PageHeader, Sheet } from './ui'
+import { CsvOnly } from '../access-ui'
 
 // One engine for YDL's registers: a date range with YDL's presets, dropdown filters,
 // the shared "Filters" panel (gender, subscription status, payment status), search,
@@ -173,7 +174,7 @@ export function Register<T extends { id?: string }>({ def }: { def: RegisterDef<
       <PageHeader title={def.title} sub={`${ctx.studio?.name ?? ''}${ctx.studio?.branch_name ? ` (${ctx.studio.branch_name})` : ''}`}
         actions={<>
           {def.actions?.(ctx, all)}
-          {def.csv && <button type="button" className="btn btn-sm" onClick={exportCsv}><Icon name="download" size={16} />Export to CSV</button>}
+          {def.csv && <CsvOnly><button type="button" className="btn btn-sm" onClick={exportCsv}><Icon name="download" size={16} />Export to CSV</button></CsvOnly>}
         </>} />
       <div className="flex flex-col gap-3 px-5 pt-5 pb-8 lg:px-8">
         {def.notice}

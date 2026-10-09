@@ -1,9 +1,10 @@
-import { Navigate, Route, Routes } from 'react-router-dom'
+import { Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import type { ReactNode } from 'react'
 import { AppShell, StaffMenu } from './components/AppShell'
 import { homeFor, useAuth } from './auth'
 import type { Role } from './db/types'
-import { ALL_PAGES } from './nav'
+import { ALL_PAGES, pageFor } from './nav'
+import { useAccess } from './access'
 import Login from './screens/Login'
 import Dashboard from './screens/staff/Dashboard'
 import Enquiries from './screens/staff/Enquiries'
@@ -27,6 +28,12 @@ import { ProgramForm, ProgramList } from './screens/staff/Programs'
 import { DailyAppointments } from './screens/staff/Appointments'
 import ClassFeedback from './screens/staff/ClassFeedback'
 import * as CR from './screens/staff/classRegisters'
+import { ComboForm, ComboList, CouponForm, CouponList } from './screens/staff/Offers'
+import { PeopleList, PersonForm } from './screens/staff/People'
+import { AccessControl, LeaveRequests, Targets, Transformations } from './screens/staff/TeamExtras'
+import { PayrollCalculator, PayrollRegister } from './screens/staff/Payroll'
+import { ExpenseList, VendorList } from './screens/staff/Expenses'
+import ResetPassword from './screens/ResetPassword'
 import { CheckinLeaderboard, ClientTraffic, StaffAttendance } from './screens/staff/AttendanceReports'
 import MemberHome from './screens/member/Home'
 import CoachHome from './screens/coach/Home'
@@ -40,11 +47,27 @@ const STAFF: Role[] = ['owner', 'front_desk', 'coach', 'doctor']
 const DESK: Role[] = ['owner', 'front_desk']
 const DC: Role[] = ['owner', 'front_desk', 'coach']
 
-function Only({ roles, children }: { roles: Role[]; children: ReactNode }) {
+function Only({ roles, children, right }: { roles: Role[]; children: ReactNode; right?: [string, string] }) {
   const { user } = useAuth()
   if (!user) return <Navigate to="/login" replace />
   if (!roles.includes(user.role)) return <Navigate to={homeFor(user.role)} replace />
-  return <>{children}</>
+  return <Rights right={right}>{children}</Rights>
+}
+
+// Front-desk staff also need the right YDL's access control gives their employee type.
+function Rights({ right, children }: { right?: [string, string]; children: ReactNode }) {
+  const { pathname } = useLocation()
+  const access = useAccess()
+  const page = pageFor(pathname)
+  if (!access.ready) return null
+  const ok = right ? access.can(right[0], right[1]) : !page || access.page(page)
+  if (ok) return <>{children}</>
+  return (
+    <>
+      <PageHeader title={page?.label ?? 'No access'} />
+      <div className="px-5 pt-5 lg:px-8"><Notice>Your account doesn’t have access to this page. The owner can change it in Staff › Staff Access Control.</Notice></div>
+    </>
+  )
 }
 
 // The pages that are live; every other menu page shows what's being built.
@@ -61,7 +84,7 @@ const BUILT: Record<string, { el: ReactNode; roles: Role[] }> = {
   '/clients/referrals': { el: <ClientReferrals />, roles: DESK },
   '/members/birthdays': { el: <ClientList key="birthdays" variant="birthdays" />, roles: DESK },
   '/members/other-branches': { el: <OtherBranchMembers />, roles: DESK },
-  '/plans/new': { el: <PlanForm key="new" />, roles: ['owner'] },
+  '/plans/new': { el: <PlanForm key="new" />, roles: DESK },
   '/plans': { el: <PlanList />, roles: DESK },
   '/subscriptions': { el: <Subscriptions />, roles: DESK },
   '/quick-billing': { el: <QuickBilling />, roles: DESK },
@@ -109,6 +132,25 @@ const BUILT: Record<string, { el: ReactNode; roles: Role[] }> = {
   '/attendance/staff': { el: <StaffAttendance />, roles: DESK },
   '/attendance/clients': { el: <ClientTraffic />, roles: DC },
   '/attendance/leaderboard': { el: <CheckinLeaderboard />, roles: DC },
+  // Memberships › Coupon and Combo Offer
+  '/coupons/new': { el: <CouponForm key="new" />, roles: DESK },
+  '/coupons': { el: <CouponList />, roles: DESK },
+  '/combos/new': { el: <ComboForm key="new" />, roles: DESK },
+  '/combos': { el: <ComboList />, roles: DESK },
+  // Trainers and Staff
+  '/trainers/new': { el: <PersonForm key="trainer-new" kind="trainer" />, roles: DESK },
+  '/trainers': { el: <PeopleList key="trainers" kind="trainer" />, roles: DESK },
+  '/trainers/transformations': { el: <Transformations />, roles: DC },
+  '/trainers/leave': { el: <LeaveRequests />, roles: DC },
+  '/staff/new': { el: <PersonForm key="staff-new" kind="staff" />, roles: DESK },
+  '/staff': { el: <PeopleList key="staff" kind="staff" />, roles: DESK },
+  '/staff/access': { el: <AccessControl />, roles: ['owner'] },
+  '/staff/targets': { el: <Targets />, roles: DESK },
+  // Accounts › Payroll and Expense
+  '/payroll': { el: <PayrollCalculator />, roles: DESK },
+  '/payroll/register': { el: <PayrollRegister />, roles: DESK },
+  '/expenses': { el: <ExpenseList />, roles: ['owner'] },
+  '/vendors': { el: <VendorList />, roles: ['owner'] },
 }
 
 function Splash() {
@@ -136,6 +178,7 @@ export default function App() {
   if (session && !user) return <Splash />
   return (
     <Routes>
+      <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/login" element={user ? <Navigate to={homeFor(user.role)} replace /> : <Login />} />
       <Route path="/print/invoice/:id" element={<Only roles={DESK}><Print kind="invoice" /></Only>} />
       <Route path="/print/receipt/:id" element={<Only roles={DESK}><Print kind="receipt" /></Only>} />
@@ -148,9 +191,13 @@ export default function App() {
         <Route path="/clients/:id/payments/:subId" element={<Only roles={DESK}><PaymentDetails /></Only>} />
         <Route path="/clients/:id" element={<Only roles={['owner', 'front_desk', 'coach']}><ClientProfile /></Only>} />
         <Route path="/clients/:id/:tab" element={<Only roles={['owner', 'front_desk', 'coach']}><ClientProfile /></Only>} />
-        <Route path="/plans/:id/edit" element={<Only roles={['owner']}><PlanForm /></Only>} />
-        <Route path="/batches/:id/edit" element={<Only roles={DESK}><BatchForm /></Only>} />
-        <Route path="/programs/:id/edit" element={<Only roles={DESK}><ProgramForm /></Only>} />
+        <Route path="/plans/:id/edit" element={<Only roles={DESK} right={['plans', 'edit']}><PlanForm /></Only>} />
+        <Route path="/coupons/:id/edit" element={<Only roles={DESK} right={['coupons', 'on']}><CouponForm /></Only>} />
+        <Route path="/combos/:id/edit" element={<Only roles={DESK} right={['plans', 'add']}><ComboForm /></Only>} />
+        <Route path="/trainers/:id/edit" element={<Only roles={DESK} right={['trainers', 'edit']}><PersonForm kind="trainer" /></Only>} />
+        <Route path="/staff/:id/edit" element={<Only roles={DESK} right={['staff_accounts', 'edit']}><PersonForm kind="staff" /></Only>} />
+        <Route path="/batches/:id/edit" element={<Only roles={DESK} right={['batches', 'edit']}><BatchForm /></Only>} />
+        <Route path="/programs/:id/edit" element={<Only roles={DESK} right={['programs', 'edit']}><ProgramForm /></Only>} />
         {ALL_PAGES.filter((p) => !BUILT[p.path]).map((p) => <Route key={p.path} path={p.path} element={<Only roles={p.roles}><InProgress /></Only>} />)}
         <Route path="/menu" element={<Only roles={STAFF}><PageHeader title="Menu" /><div className="px-3 pt-3"><StaffMenu /></div></Only>} />
         <Route path="/coach" element={<Only roles={['coach']}><CoachHome /></Only>} />

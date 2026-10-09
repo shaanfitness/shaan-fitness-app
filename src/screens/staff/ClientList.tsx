@@ -15,6 +15,7 @@ import { BulkBar, DataTable, Pager, type Column } from '../../components/table'
 import { useToast } from '../../components/toast'
 import { Icon, PageHeader, Sheet } from '../../components/ui'
 import { NotifyDialog } from './ClientProfile'
+import { CsvOnly } from '../../access-ui'
 
 // YDL client lists: My Members, Client DataBase and Members Birthday Listing.
 // Same filters panel, dropdown filters, columns, row actions and bulk actions as YDL.
@@ -242,7 +243,7 @@ export default function ClientList({ variant }: { variant: ClientListVariant }) 
           {variant !== 'birthdays' && <Link to="/members/import" className="btn btn-sm">Import Members</Link>}
           {variant !== 'birthdays' && <button type="button" className="btn btn-sm" onClick={() => setUi((x) => ({ ...x, statusChecks: x.statusChecks.includes('incorrect') ? x.statusChecks.filter((s) => s !== 'incorrect') : [...x.statusChecks, 'incorrect'] }))}>Incorrect Entries</button>}
           {variant === 'members' && <button type="button" className="btn btn-sm" onClick={() => { setDeactivated(!deactivated); setPage(0); setSelected(new Set()) }}>{deactivated ? 'Active Members' : 'Deactivated Members'}</button>}
-          <button type="button" className="btn btn-sm" onClick={exportCsv}><Icon name="download" size={16} />Export to CSV</button>
+          <CsvOnly><button type="button" className="btn btn-sm" onClick={exportCsv}><Icon name="download" size={16} />Export to CSV</button></CsvOnly>
           {variant === 'members' && <Link to="/analysis/members" className="btn btn-sm">View Analysis</Link>}
           {isDesk && variant !== 'birthdays' && <Link to="/members/new" className="btn-gold min-h-10 px-4"><Icon name="plus" size={18} />Add Member</Link>}
         </>} />
@@ -275,7 +276,7 @@ export default function ClientList({ variant }: { variant: ClientListVariant }) 
           <button type="button" className="btn btn-sm" onClick={() => setBulkWa(chosen())}>{variant === 'birthdays' ? 'Send SMS' : 'Send Customized WhatsApp'}</button>
           {variant === 'members' && <a className="btn btn-sm" href={`mailto:?bcc=${encodeURIComponent(chosen().map((r) => r.email).filter(Boolean).join(','))}`}>Send Email</a>}
           {variant === 'database' && isDesk && <button type="button" className="btn btn-sm" onClick={() => setTransfer([...selected])}>Transfer Client</button>}
-          <button type="button" className="btn btn-sm" onClick={exportCsv}>Export to CSV</button>
+          <CsvOnly><button type="button" className="btn btn-sm" onClick={exportCsv}>Export to CSV</button></CsvOnly>
           {isDesk && variant !== 'database' && <button type="button" className="btn btn-sm" onClick={() => setConfirm({ action: deactivated ? 'activate' : 'deactivate', ids: [...selected] })}>{deactivated ? 'Activate' : 'Deactivate'}</button>}
           {isOwner && <button type="button" className="btn btn-sm btn-danger" onClick={() => setConfirm({ action: 'delete', ids: [...selected] })}>Delete</button>}
         </BulkBar>

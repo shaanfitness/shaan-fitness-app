@@ -68,17 +68,17 @@ export const NAV: NavNode[] = [
   ], 'chart'),
   g('Memberships', [
     g('Membership Plans', [
-      p('Create Membership Plan', '/plans/new', '/fitness-center/membership-plan/basic-information/', O, { built: true }),
+      p('Create Membership Plan', '/plans/new', '/fitness-center/membership-plan/basic-information/', D, { built: true }),
       p('My Membership Plans', '/plans', '/merchant/fitness-center/membership-plan/', D, { built: true }),
     ]),
     p('Subscriptions', '/subscriptions', '/merchant/fitness-center/customers/subscriptions/', D, { built: true }),
     g('Coupon', [
-      p('Create Coupon', '/coupons/new', '/fitness-center/customer/coupon-basic-information/', O),
-      p('My Coupons', '/coupons', '/fitness-center/customer/coupons-list/', D),
+      p('Create Coupon', '/coupons/new', '/fitness-center/customer/coupon-basic-information/', D, { built: true }),
+      p('My Coupons', '/coupons', '/fitness-center/customer/coupons-list/', D, { built: true }),
     ]),
     g('Combo Offer', [
-      p('Add Combo Offer', '/combos/new', '/merchant/fitness-center/create-combo-offer/', O),
-      p('Combo Offer List', '/combos', '/merchant/fitness-center/combo-offer-list/', D),
+      p('Add Combo Offer', '/combos/new', '/merchant/fitness-center/create-combo-offer/', D, { built: true }),
+      p('Combo Offer List', '/combos', '/merchant/fitness-center/combo-offer-list/', D, { built: true }),
     ]),
   ], 'receipt'),
   g('Batches & Classes', [
@@ -130,12 +130,12 @@ export const NAV: NavNode[] = [
       p('Recurring Payments Register', '/registers/recurring', '/merchant/fitness-center/customers/recurring-subs-register/', D, { built: true }),
     ]),
     g('Payroll', [
-      p('Payroll Calculator', '/payroll', '/fitness-center/staff/payroll-sales/', O),
-      p('Payroll Register', '/payroll/register', '/fitness-center/staff/payroll-register/', O),
+      p('Payroll Calculator', '/payroll', '/fitness-center/staff/payroll-sales/', D, { built: true }),
+      p('Payroll Register', '/payroll/register', '/fitness-center/staff/payroll-register/', D, { built: true }),
     ]),
     g('Expense', [
-      p('Expense List', '/expenses', '/fitness-centers/expense/', O),
-      p('Vendor List', '/vendors', '/fitness-centers/vendor-list/', O),
+      p('Expense List', '/expenses', '/fitness-centers/expense/', O, { built: true }),
+      p('Vendor List', '/vendors', '/fitness-centers/vendor-list/', O, { built: true }),
     ]),
   ], 'doc'),
   g('Notification & WhatsApp', [
@@ -156,10 +156,10 @@ export const NAV: NavNode[] = [
     p('Email', '/email', '/merchant/fitness-center/customers/customer-message-listing/', D),
   ], 'chat'),
   g('Trainers', [
-    p('Add Trainer', '/trainers/new', '/fitness-center/trainer/basic-information/', O),
-    p('My Trainers', '/trainers', '/merchant/fitness-centers/trainers/', D),
-    p('Manage Client Transformations', '/trainers/transformations', '/fitness-center/trainer/client-transformations/', DC),
-    p('Trainer Leave Requests', '/trainers/leave', '/fitness-center/trainer/leave-requests/', DC),
+    p('Add Trainer', '/trainers/new', '/fitness-center/trainer/basic-information/', D, { built: true }),
+    p('My Trainers', '/trainers', '/merchant/fitness-centers/trainers/', D, { built: true }),
+    p('Manage Client Transformations', '/trainers/transformations', '/fitness-center/trainer/client-transformations/', DC, { built: true }),
+    p('Trainer Leave Requests', '/trainers/leave', '/fitness-center/trainer/leave-requests/', DC, { built: true }),
   ], 'dumbbell'),
   g('Fitness Center', [
     p('My Fitness Centers', '/centers', '/merchant/fitness-centers/', O),
@@ -180,10 +180,10 @@ export const NAV: NavNode[] = [
     p('Dropdown Lists', '/settings/lists', '(every YDL dropdown, made editable)', O, { built: true, extra: true }),
   ], 'settings'),
   g('Staff', [
-    p('Add Staff Account', '/staff/new', '/fitness-center/account/basic-information/', O),
-    p('Staff List', '/staff', '/merchant/fitness-centers/accounts/', O),
-    p('Staff Access Control', '/staff/access', '/merchant/fitness-centers/accounts-access-control/', O),
-    p('Staff/Trainer Target', '/staff/targets', '/merchant/fitness-centers/staff-trainer-target/', O),
+    p('Add Staff Account', '/staff/new', '/fitness-center/account/basic-information/', D, { built: true }),
+    p('Staff List', '/staff', '/merchant/fitness-centers/accounts/', D, { built: true }),
+    p('Staff Access Control', '/staff/access', '/merchant/fitness-centers/accounts-access-control/', O, { built: true }),
+    p('Staff/Trainer Target', '/staff/targets', '/merchant/fitness-centers/staff-trainer-target/', D, { built: true }),
   ], 'person'),
   g('Attendance Reports', [
     p('Staff & Trainer attendance', '/attendance/staff', '/gym-members-report-data/', D, { built: true }),

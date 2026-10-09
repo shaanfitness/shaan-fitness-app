@@ -12,6 +12,7 @@ on:
       - 'supabase/migrations/**'
       - 'supabase/seed.sql'
       - 'supabase/seed-ydl.sql'
+      - 'supabase/seed-ydl-offers.sql'
       - 'supabase/rebuild-from-wave1.sql'
       - 'scripts/apply-migrations.sh'
       - '.github/workflows/database.yml'

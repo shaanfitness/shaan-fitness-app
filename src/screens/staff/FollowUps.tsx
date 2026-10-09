@@ -14,6 +14,7 @@ import { FollowUpDialog, FollowUpHistory, statusChip, type FollowUpTarget } from
 import { BulkBar, DataTable, Pager, type Column } from '../../components/table'
 import { useToast } from '../../components/toast'
 import { Icon, PageHeader, Sheet } from '../../components/ui'
+import { CsvOnly } from '../../access-ui'
 
 // YDL "Follow Up Dashboard": what would you like to do (missed / due, done, expected),
 // filters, transfer follow-ups between staff, delete, export, staff insights.
@@ -150,7 +151,7 @@ export default function FollowUps() {
       <PageHeader title="Follow up dashboard" sub={`Welcome, ${me.name.split(' ')[0]} · ${studio?.name ?? ''}`}
         actions={<>
           {isDesk && <button type="button" className="btn btn-sm" onClick={() => setTransfer(true)}>Transfer follow ups</button>}
-          <button type="button" className="btn btn-sm" onClick={exportCsv}><Icon name="download" size={16} />Export to CSV</button>
+          <CsvOnly><button type="button" className="btn btn-sm" onClick={exportCsv}><Icon name="download" size={16} />Export to CSV</button></CsvOnly>
           <Link to="/reports/follow-ups" className="btn btn-sm">View analysis</Link>
         </>} />
 

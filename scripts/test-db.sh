@@ -29,6 +29,8 @@ PSQL2=("${RUN_AS[@]}" psql -h /tmp -p "$PORT" -U postgres -d ydlcheck -v ON_ERRO
 for f in "$ROOT"/supabase/migrations/*.sql; do "${PSQL2[@]}" -f "$f" >/dev/null; done
 "${PSQL2[@]}" -f "$ROOT/supabase/seed.sql" >/dev/null
 "${PSQL2[@]}" -f "$ROOT/supabase/seed-ydl.sql" >/dev/null
-"${PSQL2[@]}" -c "select format('YDL setup: %s plans (%s active, %s personal training), %s batches, every batch has services: %s',
+"${PSQL2[@]}" -f "$ROOT/supabase/seed-ydl-offers.sql" >/dev/null
+"${PSQL2[@]}" -c "select format('YDL setup: %s plans (%s active, %s personal training), %s batches, every batch has services: %s, %s coupons (%s active), %s combo offer',
   (select count(*) from public.plans), (select count(*) from public.plans where active), (select count(*) from public.plans where kind = 'pt'),
-  (select count(*) from public.batches), (select bool_and(cardinality(service_ids) > 0) from public.batches))"
+  (select count(*) from public.batches), (select bool_and(cardinality(service_ids) > 0) from public.batches),
+  (select count(*) from public.coupons), (select count(*) from public.coupons where active and service_id is not null), (select count(*) from public.combo_offers where cardinality(plan_ids) = 2))"

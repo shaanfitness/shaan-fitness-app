@@ -1,0 +1,80 @@
+[
+ {
+  "name": "333 Offer",
+  "code": "March333",
+  "type": "percentage",
+  "discount": 33,
+  "service": "Strength Training",
+  "plan": "3 Months Signature",
+  "who": "both",
+  "min_order": 3999,
+  "max_order": 6499,
+  "max_discount": null,
+  "active": false
+ },
+ {
+  "name": "April",
+  "code": "SHAAN50",
+  "type": "percentage",
+  "discount": 50,
+  "service": "Weight Training",
+  "plan": "1 Year Strengthening (Incl. Cardio)",
+  "who": "both",
+  "min_order": 7499,
+  "max_order": 17999,
+  "max_discount": null,
+  "active": false
+ },
+ {
+  "name": "Student Offer",
+  "code": "STUDENT20",
+  "type": "percentage",
+  "discount": 20,
+  "service": "Strength Training",
+  "plan": null,
+  "who": "both",
+  "min_order": 1500,
+  "max_order": 18000,
+  "max_discount": null,
+  "active": true
+ },
+ {
+  "name": "Female ONE PLUS ONE",
+  "code": "FEM11",
+  "type": "percentage",
+  "discount": 50,
+  "service": "Strength Training",
+  "plan": null,
+  "who": "both",
+  "min_order": 1500,
+  "max_order": 18000,
+  "max_discount": null,
+  "active": true
+ },
+ {
+  "name": "Membership ONE PLUS ONE",
+  "code": "MEM50",
+  "type": "percentage",
+  "discount": 50,
+  "service": "Strength Training",
+  "plan": null,
+  "who": "existing",
+  "min_order": null,
+  "max_order": 18000,
+  "max_discount": 1500,
+  "active": true
+ },
+ {
+  "name": "Welcome Offer",
+  "code": "WELCOME10",
+  "type": "percentage",
+  "discount": 10,
+  "service": "Strength Training",
+  "plan": null,
+  "who": "new",
+  "min_order": 1500,
+  "max_order": 18000,
+  "max_discount": null,
+  "active": true
+ }
+]

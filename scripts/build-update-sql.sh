@@ -16,6 +16,7 @@ LATEST="$(basename "${NEW[-1]}" .sql)"
 extra_for() {
   case "$1" in
     20261008000008_registers) cat "$ROOT/supabase/replace-starter-plans.sql" "$ROOT/supabase/seed-ydl.sql" ;;
+    20261009000010_team) cat "$ROOT/supabase/seed-ydl-offers.sql" ;;
   esac
 }
 {

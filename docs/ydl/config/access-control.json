@@ -1,0 +1,2030 @@
+{
+ "types": [
+  {
+   "key": "manager",
+   "label": "Manager/General Manager"
+  },
+  {
+   "key": "floor_manager",
+   "label": "Floor Manager/Fitness Manager"
+  },
+  {
+   "key": "front_desk_exec",
+   "label": "Front Desk Executive"
+  },
+  {
+   "key": "sales",
+   "label": "Sales"
+  },
+  {
+   "key": "helper",
+   "label": "Helper"
+  },
+  {
+   "key": "sales_manager",
+   "label": "Sales Manager"
+  },
+  {
+   "key": "admin",
+   "label": "Admin"
+  },
+  {
+   "key": "hr",
+   "label": "HR"
+  }
+ ],
+ "rows": [
+  {
+   "key": "enquiry",
+   "label": "Enquiry & Follow Ups",
+   "subs": [
+    [
+     "add",
+     "Add"
+    ],
+    [
+     "edit",
+     "Edit"
+    ],
+    [
+     "delete",
+     "Delete"
+    ],
+    [
+     "change",
+     "Change"
+    ],
+    [
+     "view",
+     "View"
+    ]
+   ],
+   "default": {
+    "manager": [
+     "add",
+     "edit",
+     "delete",
+     "change",
+     "view"
+    ],
+    "floor_manager": [
+     "add",
+     "view"
+    ],
+    "front_desk_exec": [
+     "add",
+     "view"
+    ],
+    "sales": [
+     "add",
+     "view"
+    ],
+    "helper": [
+     "add",
+     "view"
+    ],
+    "sales_manager": [
+     "add",
+     "view"
+    ],
+    "admin": [
+     "add",
+     "edit",
+     "delete",
+     "change",
+     "view"
+    ],
+    "hr": [
+     "add",
+     "edit",
+     "delete",
+     "change",
+     "view"
+    ]
+   }
+  },
+  {
+   "key": "members",
+   "label": "Members",
+   "subs": [
+    [
+     "add",
+     "Add"
+    ],
+    [
+     "edit",
+     "Edit"
+    ],
+    [
+     "delete",
+     "Delete"
+    ],
+    [
+     "change",
+     "Change"
+    ],
+    [
+     "view",
+     "View"
+    ]
+   ],
+   "default": {
+    "manager": [
+     "add",
+     "edit",
+     "delete",
+     "change",
+     "view"
+    ],
+    "floor_manager": [
+     "add",
+     "edit",
+     "change",
+     "view"
+    ],
+    "front_desk_exec": [
+     "add",
+     "edit",
+     "change",
+     "view"
+    ],
+    "sales": [
+     "add",
+     "edit",
+     "change",
+     "view"
+    ],
+    "helper": [
+     "add",
+     "edit",
+     "change",
+     "view"
+    ],
+    "sales_manager": [
+     "add",
+     "edit",
+     "change",
+     "view"
+    ],
+    "admin": [
+     "add",
+     "edit",
+     "delete",
+     "change",
+     "view"
+    ],
+    "hr": [
+     "add",
+     "edit",
+     "delete",
+     "change",
+     "view"
+    ]
+   }
+  },
+  {
+   "key": "change_client_rep",
+   "label": "Change Client Representative",
+   "subs": [
+    [
+     "on",
+     ""
+    ]
+   ],
+   "default": {
+    "manager": [],
+    "floor_manager": [],
+    "front_desk_exec": [],
+    "sales": [],
+    "helper": [],
+    "sales_manager": [],
+    "admin": [],
+    "hr": []
+   }
+  },
+  {
+   "key": "traffic_insight",
+   "label": "Traffic Insight",
+   "subs": [
+    [
+     "on",
+     ""
+    ]
+   ],
+   "default": {
+    "manager": [
+     "on"
+    ],
+    "floor_manager": [
+     "on"
+    ],
+    "front_desk_exec": [
+     "on"
+    ],
+    "sales": [
+     "on"
+    ],
+    "helper": [
+     "on"
+    ],
+    "sales_manager": [
+     "on"
+    ],
+    "admin": [
+     "on"
+    ],
+    "hr": [
+     "on"
+    ]
+   }
+  },
+  {
+   "key": "members_insight",
+   "label": "Members Insight",
+   "subs": [
+    [
+     "on",
+     ""
+    ]
+   ],
+   "default": {
+    "manager": [
+     "on"
+    ],
+    "floor_manager": [
+     "on"
+    ],
+    "front_desk_exec": [
+     "on"
+    ],
+    "sales": [
+     "on"
+    ],
+    "helper": [
+     "on"
+    ],
+    "sales_manager": [
+     "on"
+    ],
+    "admin": [
+     "on"
+    ],
+    "hr": [
+     "on"
+    ]
+   }
+  },
+  {
+   "key": "subscription_insight",
+   "label": "Subscription Insight",
+   "subs": [
+    [
+     "on",
+     ""
+    ]
+   ],
+   "default": {
+    "manager": [
+     "on"
+    ],
+    "floor_manager": [
+     "on"
+    ],
+    "front_desk_exec": [
+     "on"
+    ],
+    "sales": [
+     "on"
+    ],
+    "helper": [
+     "on"
+    ],
+    "sales_manager": [
+     "on"
+    ],
+    "admin": [
+     "on"
+    ],
+    "hr": [
+     "on"
+    ]
+   }
+  },
+  {
+   "key": "bounced_insight",
+   "label": "Bounced Insight",
+   "subs": [
+    [
+     "on",
+     ""
+    ]
+   ],
+   "default": {
+    "manager": [
+     "on"
+    ],
+    "floor_manager": [
+     "on"
+    ],
+    "front_desk_exec": [
+     "on"
+    ],
+    "sales": [
+     "on"
+    ],
+    "helper": [
+     "on"
+    ],
+    "sales_manager": [
+     "on"
+    ],
+    "admin": [
+     "on"
+    ],
+    "hr": [
+     "on"
+    ]
+   }
+  },
+  {
+   "key": "notices",
+   "label": "Notices (Add/Edit/View/Send Notification)",
+   "subs": [
+    [
+     "on",
+     ""
+    ]
+   ],
+   "default": {
+    "manager": [
+     "on"
+    ],
+    "floor_manager": [],
+    "front_desk_exec": [],
+    "sales": [],
+    "helper": [],
+    "sales_manager": [],
+    "admin": [
+     "on"
+    ],
+    "hr": [
+     "on"
+    ]
+   }
+  },
+  {
+   "key": "plans",
+   "label": "Membership Plans & Packages (Create/Edit/View)",
+   "subs": [
+    [
+     "add",
+     "Add"
+    ],
+    [
+     "edit",
+     "Edit"
+    ],
+    [
+     "delete",
+     "Delete"
+    ]
+   ],
+   "default": {
+    "manager": [
+     "add",
+     "edit",
+     "delete"
+    ],
+    "floor_manager": [],
+    "front_desk_exec": [],
+    "sales": [],
+    "helper": [],
+    "sales_manager": [],
+    "admin": [
+     "add",
+     "edit",
+     "delete"
+    ],
+    "hr": [
+     "add",
+     "edit",
+     "delete"
+    ]
+   }
+  },
+  {
+   "key": "payroll",
+   "label": "Payroll Section",
+   "subs": [
+    [
+     "view_calculator",
+     "View Payroll Calculator"
+    ],
+    [
+     "view_register",
+     "View Payroll Register"
+    ],
+    [
+     "recalculate",
+     "Recalculate"
+    ],
+    [
+     "add",
+     "Add to Register"
+    ],
+    [
+     "view_settings",
+     "View Settings"
+    ],
+    [
+     "edit_settings",
+     "Edit Settings"
+    ],
+    [
+     "delete",
+     "Delete"
+    ]
+   ],
+   "default": {
+    "manager": [],
+    "floor_manager": [],
+    "front_desk_exec": [],
+    "sales": [],
+    "helper": [],
+    "sales_manager": [],
+    "admin": [],
+    "hr": []
+   }
+  },
+  {
+   "key": "batches",
+   "label": "Batch/Class (Create/Edit/View/Delete)",
+   "subs": [
+    [
+     "add",
+     "Add"
+    ],
+    [
+     "edit",
+     "Edit"
+    ],
+    [
+     "delete",
+     "Delete"
+    ],
+    [
+     "view",
+     "View Batch Listing"
+    ],
+    [
+     "activate",
+     "Activate & Deactivate"
+    ]
+   ],
+   "default": {
+    "manager": [
+     "add",
+     "edit",
+     "delete",
+     "view",
+     "activate"
+    ],
+    "floor_manager": [
+     "add",
+     "edit",
+     "delete",
+     "view",
+     "activate"
+    ],
+    "front_desk_exec": [
+     "add",
+     "edit",
+     "delete",
+     "view",
+     "activate"
+    ],
+    "sales": [
+     "add",
+     "edit",
+     "delete",
+     "view",
+     "activate"
+    ],
+    "helper": [
+     "add",
+     "edit",
+     "delete",
+     "view",
+     "activate"
+    ],
+    "sales_manager": [
+     "add",
+     "edit",
+     "delete",
+     "view",
+     "activate"
+    ],
+    "admin": [
+     "add",
+     "edit",
+     "delete",
+     "view",
+     "activate"
+    ],
+    "hr": [
+     "add",
+     "edit",
+     "delete",
+     "view",
+     "activate"
+    ]
+   }
+  },
+  {
+   "key": "programs",
+   "label": "Program (Create/Edit/View/Delete)",
+   "subs": [
+    [
+     "add",
+     "Add"
+    ],
+    [
+     "edit",
+     "Edit"
+    ],
+    [
+     "delete",
+     "Delete"
+    ],
+    [
+     "view",
+     "View"
+    ]
+   ],
+   "default": {
+    "manager": [
+     "add",
+     "edit",
+     "delete",
+     "view"
+    ],
+    "floor_manager": [
+     "add",
+     "edit",
+     "delete",
+     "view"
+    ],
+    "front_desk_exec": [
+     "add",
+     "edit",
+     "delete",
+     "view"
+    ],
+    "sales": [
+     "add",
+     "edit",
+     "delete",
+     "view"
+    ],
+    "helper": [
+     "add",
+     "edit",
+     "delete",
+     "view"
+    ],
+    "sales_manager": [
+     "add",
+     "edit",
+     "delete",
+     "view"
+    ],
+    "admin": [
+     "add",
+     "edit",
+     "delete",
+     "view"
+    ],
+    "hr": [
+     "add",
+     "edit",
+     "delete",
+     "view"
+    ]
+   }
+  },
+  {
+   "key": "program_attendance",
+   "label": "Program Attendance",
+   "subs": [
+    [
+     "view",
+     "View"
+    ]
+   ],
+   "default": {
+    "manager": [
+     "view"
+    ],
+    "floor_manager": [
+     "view"
+    ],
+    "front_desk_exec": [
+     "view"
+    ],
+    "sales": [
+     "view"
+    ],
+    "helper": [
+     "view"
+    ],
+    "sales_manager": [
+     "view"
+    ],
+    "admin": [
+     "view"
+    ],
+    "hr": [
+     "view"
+    ]
+   }
+  },
+  {
+   "key": "batch_attendance",
+   "label": "Batch Attendance",
+   "subs": [
+    [
+     "view",
+     "View"
+    ]
+   ],
+   "default": {
+    "manager": [
+     "view"
+    ],
+    "floor_manager": [
+     "view"
+    ],
+    "front_desk_exec": [
+     "view"
+    ],
+    "sales": [
+     "view"
+    ],
+    "helper": [
+     "view"
+    ],
+    "sales_manager": [
+     "view"
+    ],
+    "admin": [
+     "view"
+    ],
+    "hr": [
+     "view"
+    ]
+   }
+  },
+  {
+   "key": "class_attendance",
+   "label": "Class Attendance",
+   "subs": [
+    [
+     "view",
+     "View"
+    ]
+   ],
+   "default": {
+    "manager": [
+     "view"
+    ],
+    "floor_manager": [
+     "view"
+    ],
+    "front_desk_exec": [
+     "view"
+    ],
+    "sales": [
+     "view"
+    ],
+    "helper": [
+     "view"
+    ],
+    "sales_manager": [
+     "view"
+    ],
+    "admin": [
+     "view"
+    ],
+    "hr": [
+     "view"
+    ]
+   }
+  },
+  {
+   "key": "class_capacity",
+   "label": "Class Capacity Info",
+   "subs": [
+    [
+     "view",
+     "View"
+    ]
+   ],
+   "default": {
+    "manager": [
+     "view"
+    ],
+    "floor_manager": [
+     "view"
+    ],
+    "front_desk_exec": [
+     "view"
+    ],
+    "sales": [
+     "view"
+    ],
+    "helper": [
+     "view"
+    ],
+    "sales_manager": [
+     "view"
+    ],
+    "admin": [
+     "view"
+    ],
+    "hr": [
+     "view"
+    ]
+   }
+  },
+  {
+   "key": "class_calendar",
+   "label": "Class Calendar",
+   "subs": [
+    [
+     "view",
+     "View"
+    ]
+   ],
+   "default": {
+    "manager": [
+     "view"
+    ],
+    "floor_manager": [
+     "view"
+    ],
+    "front_desk_exec": [
+     "view"
+    ],
+    "sales": [
+     "view"
+    ],
+    "helper": [
+     "view"
+    ],
+    "sales_manager": [
+     "view"
+    ],
+    "admin": [
+     "view"
+    ],
+    "hr": [
+     "view"
+    ]
+   }
+  },
+  {
+   "key": "customer_attendance",
+   "label": "Customer Attendance",
+   "subs": [
+    [
+     "delete",
+     "Delete"
+    ]
+   ],
+   "default": {
+    "manager": [
+     "delete"
+    ],
+    "floor_manager": [
+     "delete"
+    ],
+    "front_desk_exec": [
+     "delete"
+    ],
+    "sales": [
+     "delete"
+    ],
+    "helper": [
+     "delete"
+    ],
+    "sales_manager": [
+     "delete"
+    ],
+    "admin": [
+     "delete"
+    ],
+    "hr": [
+     "delete"
+    ]
+   }
+  },
+  {
+   "key": "subscriptions",
+   "label": "Subscriptions & Payments (Create/Edit/View)",
+   "subs": [
+    [
+     "add",
+     "Add"
+    ],
+    [
+     "edit_date",
+     "Edit Subscription Date"
+    ],
+    [
+     "edit",
+     "Edit"
+    ],
+    [
+     "delete",
+     "Delete"
+    ],
+    [
+     "upgrade",
+     "Upgrade"
+    ],
+    [
+     "transfer",
+     "Transfer"
+    ],
+    [
+     "freeze",
+     "Freeze"
+    ],
+    [
+     "extend",
+     "Extend"
+    ],
+    [
+     "downgrade",
+     "Downgrade"
+    ],
+    [
+     "edit_bill",
+     "Edit Bill Amount"
+    ],
+    [
+     "billing_screen",
+     "Billing Screen"
+    ],
+    [
+     "cancel_payments",
+     "Cancel Payments"
+    ],
+    [
+     "receipt_date",
+     "Can change receipt date"
+    ],
+    [
+     "receipt_price",
+     "Can change receipt price"
+    ],
+    [
+     "bill_rep",
+     "Can change Bill Rep"
+    ],
+    [
+     "upgrade_amount",
+     "Can modify amount in upgrade"
+    ]
+   ],
+   "default": {
+    "manager": [
+     "add",
+     "edit_date",
+     "edit",
+     "delete",
+     "upgrade",
+     "transfer",
+     "freeze",
+     "extend",
+     "downgrade",
+     "edit_bill",
+     "billing_screen",
+     "cancel_payments",
+     "receipt_date",
+     "receipt_price",
+     "bill_rep",
+     "upgrade_amount"
+    ],
+    "floor_manager": [
+     "add",
+     "edit",
+     "upgrade",
+     "freeze",
+     "downgrade",
+     "billing_screen",
+     "cancel_payments",
+     "receipt_price",
+     "upgrade_amount"
+    ],
+    "front_desk_exec": [
+     "add",
+     "edit_date",
+     "edit",
+     "upgrade",
+     "freeze",
+     "billing_screen",
+     "receipt_date",
+     "receipt_price",
+     "upgrade_amount"
+    ],
+    "sales": [
+     "add",
+     "edit",
+     "upgrade",
+     "freeze",
+     "downgrade",
+     "billing_screen",
+     "cancel_payments",
+     "receipt_price",
+     "upgrade_amount"
+    ],
+    "helper": [
+     "add",
+     "edit",
+     "upgrade",
+     "freeze",
+     "downgrade",
+     "billing_screen",
+     "cancel_payments",
+     "receipt_price",
+     "upgrade_amount"
+    ],
+    "sales_manager": [
+     "add",
+     "edit",
+     "upgrade",
+     "freeze",
+     "downgrade",
+     "billing_screen",
+     "cancel_payments",
+     "receipt_price",
+     "upgrade_amount"
+    ],
+    "admin": [
+     "add",
+     "edit_date",
+     "edit",
+     "delete",
+     "upgrade",
+     "transfer",
+     "freeze",
+     "extend",
+     "downgrade",
+     "edit_bill",
+     "billing_screen",
+     "cancel_payments",
+     "receipt_date",
+     "receipt_price",
+     "upgrade_amount"
+    ],
+    "hr": [
+     "add",
+     "edit_date",
+     "edit",
+     "delete",
+     "upgrade",
+     "transfer",
+     "freeze",
+     "extend",
+     "downgrade",
+     "edit_bill",
+     "billing_screen",
+     "cancel_payments",
+     "receipt_date",
+     "receipt_price",
+     "upgrade_amount"
+    ]
+   }
+  },
+  {
+   "key": "allow_edit_subscription",
+   "label": "Allow Edit Subscription (Allow direct editing; others will send requests.)",
+   "subs": [
+    [
+     "on",
+     ""
+    ]
+   ],
+   "default": {
+    "manager": [
+     "on"
+    ],
+    "floor_manager": [
+     "on"
+    ],
+    "front_desk_exec": [
+     "on"
+    ],
+    "sales": [
+     "on"
+    ],
+    "helper": [
+     "on"
+    ],
+    "sales_manager": [
+     "on"
+    ],
+    "admin": [
+     "on"
+    ],
+    "hr": [
+     "on"
+    ]
+   }
+  },
+  {
+   "key": "allow_extend",
+   "label": "Allow Extension Subscription (Allow direct extend; others will send requests.)",
+   "subs": [
+    [
+     "on",
+     ""
+    ]
+   ],
+   "default": {
+    "manager": [
+     "on"
+    ],
+    "floor_manager": [
+     "on"
+    ],
+    "front_desk_exec": [
+     "on"
+    ],
+    "sales": [
+     "on"
+    ],
+    "helper": [
+     "on"
+    ],
+    "sales_manager": [
+     "on"
+    ],
+    "admin": [
+     "on"
+    ],
+    "hr": [
+     "on"
+    ]
+   }
+  },
+  {
+   "key": "allow_freeze",
+   "label": "Allow Freeze (Allow direct freezing; others will send requests with the amount restricted to 0.)",
+   "subs": [
+    [
+     "on",
+     ""
+    ]
+   ],
+   "default": {
+    "manager": [
+     "on"
+    ],
+    "floor_manager": [
+     "on"
+    ],
+    "front_desk_exec": [
+     "on"
+    ],
+    "sales": [
+     "on"
+    ],
+    "helper": [
+     "on"
+    ],
+    "sales_manager": [
+     "on"
+    ],
+    "admin": [
+     "on"
+    ],
+    "hr": [
+     "on"
+    ]
+   }
+  },
+  {
+   "key": "coupons",
+   "label": "Coupon (Create/Edit/View)",
+   "subs": [
+    [
+     "on",
+     ""
+    ]
+   ],
+   "default": {
+    "manager": [
+     "on"
+    ],
+    "floor_manager": [
+     "on"
+    ],
+    "front_desk_exec": [],
+    "sales": [
+     "on"
+    ],
+    "helper": [
+     "on"
+    ],
+    "sales_manager": [
+     "on"
+    ],
+    "admin": [
+     "on"
+    ],
+    "hr": [
+     "on"
+    ]
+   }
+  },
+  {
+   "key": "broadcast",
+   "label": "Broadcast SMS & Whatsapp (Create/Edit/View/Broadcast & Whatsapp Messages)",
+   "subs": [
+    [
+     "on",
+     ""
+    ]
+   ],
+   "default": {
+    "manager": [
+     "on"
+    ],
+    "floor_manager": [],
+    "front_desk_exec": [],
+    "sales": [],
+    "helper": [],
+    "sales_manager": [],
+    "admin": [
+     "on"
+    ],
+    "hr": [
+     "on"
+    ]
+   }
+  },
+  {
+   "key": "transformations",
+   "label": "Transformations (Create/Edit/View)",
+   "subs": [
+    [
+     "on",
+     ""
+    ]
+   ],
+   "default": {
+    "manager": [
+     "on"
+    ],
+    "floor_manager": [],
+    "front_desk_exec": [],
+    "sales": [],
+    "helper": [],
+    "sales_manager": [],
+    "admin": [
+     "on"
+    ],
+    "hr": [
+     "on"
+    ]
+   }
+  },
+  {
+   "key": "community",
+   "label": "Community (Accept/Decline/Delete)",
+   "subs": [
+    [
+     "on",
+     ""
+    ]
+   ],
+   "default": {
+    "manager": [
+     "on"
+    ],
+    "floor_manager": [],
+    "front_desk_exec": [],
+    "sales": [],
+    "helper": [],
+    "sales_manager": [],
+    "admin": [
+     "on"
+    ],
+    "hr": [
+     "on"
+    ]
+   }
+  },
+  {
+   "key": "trainers",
+   "label": "Trainer (Add/Edit/View/Mark Attendance)",
+   "subs": [
+    [
+     "add",
+     "Add"
+    ],
+    [
+     "edit",
+     "Edit"
+    ],
+    [
+     "view",
+     "View/Mark Attendance"
+    ],
+    [
+     "leave",
+     "Trainer Leave Request"
+    ]
+   ],
+   "default": {
+    "manager": [
+     "add",
+     "edit",
+     "view",
+     "leave"
+    ],
+    "floor_manager": [
+     "add",
+     "view",
+     "leave"
+    ],
+    "front_desk_exec": [
+     "add",
+     "view",
+     "leave"
+    ],
+    "sales": [
+     "add",
+     "view",
+     "leave"
+    ],
+    "helper": [
+     "add",
+     "view",
+     "leave"
+    ],
+    "sales_manager": [
+     "add",
+     "view",
+     "leave"
+    ],
+    "admin": [
+     "add",
+     "edit",
+     "view",
+     "leave"
+    ],
+    "hr": [
+     "add",
+     "edit",
+     "view",
+     "leave"
+    ]
+   }
+  },
+  {
+   "key": "fitness_center",
+   "label": "Fitness Center (Add/Edit/View)",
+   "subs": [
+    [
+     "add",
+     "Add"
+    ],
+    [
+     "edit",
+     "Edit"
+    ],
+    [
+     "view",
+     "View"
+    ]
+   ],
+   "default": {
+    "manager": [
+     "add",
+     "edit",
+     "view"
+    ],
+    "floor_manager": [
+     "edit",
+     "view"
+    ],
+    "front_desk_exec": [
+     "edit",
+     "view"
+    ],
+    "sales": [
+     "edit",
+     "view"
+    ],
+    "helper": [
+     "edit",
+     "view"
+    ],
+    "sales_manager": [
+     "edit",
+     "view"
+    ],
+    "admin": [
+     "add",
+     "edit",
+     "view"
+    ],
+    "hr": [
+     "add",
+     "edit",
+     "view"
+    ]
+   }
+  },
+  {
+   "key": "staff_accounts",
+   "label": "Staff Accounts (Add/Edit/View/Mark Attendance)",
+   "subs": [
+    [
+     "add",
+     "Add"
+    ],
+    [
+     "edit",
+     "Edit"
+    ],
+    [
+     "view",
+     "View/Mark Attendance"
+    ]
+   ],
+   "default": {
+    "manager": [
+     "add",
+     "edit",
+     "view"
+    ],
+    "floor_manager": [
+     "edit",
+     "view"
+    ],
+    "front_desk_exec": [
+     "edit",
+     "view"
+    ],
+    "sales": [
+     "edit",
+     "view"
+    ],
+    "helper": [
+     "edit",
+     "view"
+    ],
+    "sales_manager": [
+     "edit",
+     "view"
+    ],
+    "admin": [
+     "add",
+     "edit",
+     "view"
+    ],
+    "hr": [
+     "add",
+     "edit",
+     "view"
+    ]
+   }
+  },
+  {
+   "key": "targets",
+   "label": "Staff/Trainer Target (Add/Edit/View/Delete)",
+   "subs": [
+    [
+     "add",
+     "Add"
+    ],
+    [
+     "edit",
+     "Edit"
+    ],
+    [
+     "delete",
+     "Delete"
+    ],
+    [
+     "view_listing",
+     "View Listing"
+    ],
+    [
+     "view_page",
+     "View Page"
+    ]
+   ],
+   "default": {
+    "manager": [
+     "add",
+     "edit",
+     "delete",
+     "view_listing",
+     "view_page"
+    ],
+    "floor_manager": [
+     "add",
+     "edit",
+     "delete",
+     "view_listing",
+     "view_page"
+    ],
+    "front_desk_exec": [
+     "add",
+     "edit",
+     "delete",
+     "view_listing",
+     "view_page"
+    ],
+    "sales": [
+     "add",
+     "edit",
+     "delete",
+     "view_listing",
+     "view_page"
+    ],
+    "helper": [
+     "add",
+     "edit",
+     "delete",
+     "view_listing",
+     "view_page"
+    ],
+    "sales_manager": [
+     "add",
+     "edit",
+     "delete",
+     "view_listing",
+     "view_page"
+    ],
+    "admin": [
+     "add",
+     "edit",
+     "delete",
+     "view_listing",
+     "view_page"
+    ],
+    "hr": [
+     "add",
+     "edit",
+     "delete",
+     "view_listing",
+     "view_page"
+    ]
+   }
+  },
+  {
+   "key": "rules",
+   "label": "Rules (Add/Edit/View)",
+   "subs": [
+    [
+     "on",
+     ""
+    ]
+   ],
+   "default": {
+    "manager": [
+     "on"
+    ],
+    "floor_manager": [],
+    "front_desk_exec": [],
+    "sales": [],
+    "helper": [],
+    "sales_manager": [],
+    "admin": [
+     "on"
+    ],
+    "hr": [
+     "on"
+    ]
+   }
+  },
+  {
+   "key": "feedback",
+   "label": "Feedback",
+   "subs": [
+    [
+     "on",
+     ""
+    ]
+   ],
+   "default": {
+    "manager": [
+     "on"
+    ],
+    "floor_manager": [],
+    "front_desk_exec": [],
+    "sales": [],
+    "helper": [],
+    "sales_manager": [],
+    "admin": [
+     "on"
+    ],
+    "hr": [
+     "on"
+    ]
+   }
+  },
+  {
+   "key": "app_settings",
+   "label": "App Settings",
+   "subs": [
+    [
+     "on",
+     ""
+    ]
+   ],
+   "default": {
+    "manager": [],
+    "floor_manager": [],
+    "front_desk_exec": [],
+    "sales": [],
+    "helper": [],
+    "sales_manager": [],
+    "admin": [],
+    "hr": []
+   }
+  },
+  {
+   "key": "transfer_client",
+   "label": "Transfer Client",
+   "subs": [
+    [
+     "on",
+     ""
+    ]
+   ],
+   "default": {
+    "manager": [
+     "on"
+    ],
+    "floor_manager": [],
+    "front_desk_exec": [],
+    "sales": [],
+    "helper": [],
+    "sales_manager": [],
+    "admin": [
+     "on"
+    ],
+    "hr": [
+     "on"
+    ]
+   }
+  },
+  {
+   "key": "biometric",
+   "label": "Biometric Device Operation",
+   "subs": [
+    [
+     "on",
+     ""
+    ]
+   ],
+   "default": {
+    "manager": [
+     "on"
+    ],
+    "floor_manager": [
+     "on"
+    ],
+    "front_desk_exec": [],
+    "sales": [],
+    "helper": [],
+    "sales_manager": [],
+    "admin": [
+     "on"
+    ],
+    "hr": [
+     "on"
+    ]
+   }
+  },
+  {
+   "key": "dashboard_cards",
+   "label": "Dashboard Homepage Cards",
+   "subs": [
+    [
+     "today",
+     "Today's Collection"
+    ],
+    [
+     "month",
+     "Current Month's Collection"
+    ],
+    [
+     "year",
+     "Current Year's Collection"
+    ],
+    [
+     "balance",
+     "Balance Amount"
+    ],
+    [
+     "active_gym",
+     "Active Gym Subscriptions"
+    ],
+    [
+     "active_pt",
+     "Active PT Subscriptions"
+    ],
+    [
+     "expired_gym",
+     "Expired Gym Subscriptions"
+    ],
+    [
+     "expired_pt",
+     "Expired PT Subscriptions"
+    ],
+    [
+     "open_enquiries",
+     "Total Open Enquiries"
+    ],
+    [
+     "active_members",
+     "Total Active Members"
+    ]
+   ],
+   "default": {
+    "manager": [
+     "today",
+     "month",
+     "year",
+     "balance",
+     "active_gym",
+     "active_pt",
+     "expired_gym",
+     "expired_pt",
+     "open_enquiries",
+     "active_members"
+    ],
+    "floor_manager": [
+     "today",
+     "month",
+     "year",
+     "balance",
+     "active_gym",
+     "active_pt",
+     "expired_gym",
+     "expired_pt",
+     "open_enquiries",
+     "active_members"
+    ],
+    "front_desk_exec": [
+     "today",
+     "month",
+     "year",
+     "balance",
+     "active_gym",
+     "active_pt",
+     "expired_gym",
+     "expired_pt",
+     "open_enquiries",
+     "active_members"
+    ],
+    "sales": [
+     "today",
+     "month",
+     "year",
+     "balance",
+     "active_gym",
+     "active_pt",
+     "expired_gym",
+     "expired_pt",
+     "open_enquiries",
+     "active_members"
+    ],
+    "helper": [
+     "today",
+     "month",
+     "year",
+     "balance",
+     "active_gym",
+     "active_pt",
+     "expired_gym",
+     "expired_pt",
+     "open_enquiries",
+     "active_members"
+    ],
+    "sales_manager": [
+     "today",
+     "month",
+     "year",
+     "balance",
+     "active_gym",
+     "active_pt",
+     "expired_gym",
+     "expired_pt",
+     "open_enquiries",
+     "active_members"
+    ],
+    "admin": [
+     "today",
+     "month",
+     "year",
+     "balance",
+     "active_gym",
+     "active_pt",
+     "expired_gym",
+     "expired_pt",
+     "open_enquiries",
+     "active_members"
+    ],
+    "hr": [
+     "today",
+     "month",
+     "year",
+     "balance",
+     "active_gym",
+     "active_pt",
+     "expired_gym",
+     "expired_pt",
+     "open_enquiries",
+     "active_members"
+    ]
+   }
+  },
+  {
+   "key": "csv",
+   "label": "Download CSV Access",
+   "subs": [
+    [
+     "collection_register",
+     "Collection Register"
+    ],
+    [
+     "receipt_register",
+     "Receipt Register"
+    ],
+    [
+     "receipt_register_log",
+     "Receipt Register Log"
+    ],
+    [
+     "subscription_register",
+     "Subscription Register"
+    ],
+    [
+     "session_register",
+     "Session Register"
+    ],
+    [
+     "expiry_register",
+     "Expiry Register"
+    ],
+    [
+     "tax_register",
+     "Tax Register"
+    ],
+    [
+     "upgrade_register",
+     "Upgrade Register"
+    ],
+    [
+     "balance_due_register",
+     "Balance Due Register"
+    ],
+    [
+     "recorded_session_register",
+     "Recorded Session Register"
+    ],
+    [
+     "deleted_subscription_register",
+     "Deleted Subscription Register"
+    ],
+    [
+     "transfer_subscription_register",
+     "Transfer Subscription Register"
+    ],
+    [
+     "extend_subscription_register",
+     "Extend Subscription Register"
+    ],
+    [
+     "downgrade_subscription_register",
+     "DownGrade Subscription Register"
+    ],
+    [
+     "trial_register",
+     "Trial Register"
+    ],
+    [
+     "cancel_subscription_register",
+     "Cancel Subscription Register"
+    ],
+    [
+     "weight_loss_analysis",
+     "Weight Loss Analysis"
+    ],
+    [
+     "lead_source_analysis",
+     "Lead Source Analysis"
+    ],
+    [
+     "payroll_register",
+     "Payroll Register"
+    ],
+    [
+     "my_members_page",
+     "My Members Page"
+    ],
+    [
+     "enquiry_list_page",
+     "Enquiry List Page"
+    ],
+    [
+     "follow_up_page",
+     "Follow up Page"
+    ],
+    [
+     "client_database_page",
+     "Client Database Page"
+    ],
+    [
+     "members_birthday_page",
+     "Members Birthday Page"
+    ],
+    [
+     "customer_attendance_listing_page",
+     "Customer Attendance Listing Page"
+    ],
+    [
+     "batch_wise_attendance_listing_page",
+     "Batch Wise Attendance Listing Page"
+    ],
+    [
+     "membership_list_page",
+     "Membership List Page"
+    ]
+   ],
+   "default": {
+    "manager": [],
+    "floor_manager": [],
+    "front_desk_exec": [],
+    "sales": [],
+    "helper": [],
+    "sales_manager": [],
+    "admin": [],
+    "hr": []
+   }
+  }
+ ],
+ "nav_menu": [
+  "Traffic Analysis",
+  "Members Analysis",
+  "Enquiry FollowUp Stage Analysis",
+  "Collection Analysis",
+  "Subscriptions Analysis",
+  "Renewal Analysis",
+  "Follow up Analysis",
+  "Conversion Analysis",
+  "Enquiry Analysis",
+  "Enquiry Conversion Report",
+  "Expense Analysis",
+  "Profit & Loss Analysis",
+  "Billing Analysis",
+  "Sales Leaderboard",
+  "Daily Collection Analysis",
+  "PT Analysis",
+  "Leaderboard",
+  "Revenue Forecast",
+  "Weight Loss Analysis",
+  "Lead Source Analysis",
+  "Collection Report",
+  "Receipt Register",
+  "Subscriptions Register",
+  "Cash Register",
+  "Session Register",
+  "Recorded Session Register",
+  "Deleted Session Register",
+  "Coupon Code Register",
+  "Expired Membership Register",
+  "Expired Session Register",
+  "Balance Due Register",
+  "TAX Register",
+  "Write Off Register",
+  "Deleted Subscription Register",
+  "Trial Register",
+  "Cancel Subscription Register",
+  "Transfer Register",
+  "Freeze Register",
+  "Upgrade Register",
+  "Extension Register",
+  "Downgrade Register",
+  "Course Orders",
+  "Receipt Register Log",
+  "Recurring Payments Register",
+  "Classes Point deduction on Booking"
+ ],
+ "nav_off_default": {
+  "admin": [
+   "Traffic Analysis",
+   "Members Analysis",
+   "Enquiry FollowUp Stage Analysis",
+   "Collection Analysis",
+   "Subscriptions Analysis",
+   "Renewal Analysis",
+   "Follow up Analysis",
+   "Conversion Analysis",
+   "Enquiry Analysis",
+   "Enquiry Conversion Report",
+   "Expense Analysis",
+   "Profit & Loss Analysis",
+   "Billing Analysis",
+   "Sales Leaderboard",
+   "Daily Collection Analysis",
+   "PT Analysis",
+   "Leaderboard",
+   "Revenue Forecast",
+   "Weight Loss Analysis",
+   "Lead Source Analysis",
+   "Collection Report",
+   "Receipt Register",
+   "Subscriptions Register",
+   "Cash Register",
+   "Session Register",
+   "Recorded Session Register",
+   "Deleted Session Register",
+   "Coupon Code Register",
+   "Expired Membership Register",
+   "Expired Session Register",
+   "Balance Due Register",
+   "TAX Register",
+   "Write Off Register",
+   "Deleted Subscription Register",
+   "Trial Register",
+   "Cancel Subscription Register",
+   "Transfer Register",
+   "Freeze Register",
+   "Upgrade Register",
+   "Extension Register",
+   "Downgrade Register",
+   "Course Orders",
+   "Receipt Register Log",
+   "Recurring Payments Register",
+   "Classes Point deduction on Booking"
+  ],
+  "hr": [
+   "Traffic Analysis",
+   "Members Analysis",
+   "Enquiry FollowUp Stage Analysis",
+   "Collection Analysis",
+   "Subscriptions Analysis",
+   "Renewal Analysis",
+   "Follow up Analysis",
+   "Conversion Analysis",
+   "Enquiry Analysis",
+   "Enquiry Conversion Report",
+   "Expense Analysis",
+   "Profit & Loss Analysis",
+   "Billing Analysis",
+   "Sales Leaderboard",
+   "Daily Collection Analysis",
+   "PT Analysis",
+   "Leaderboard",
+   "Revenue Forecast",
+   "Weight Loss Analysis",
+   "Lead Source Analysis",
+   "Collection Report",
+   "Receipt Register",
+   "Subscriptions Register",
+   "Cash Register",
+   "Session Register",
+   "Recorded Session Register",
+   "Deleted Session Register",
+   "Coupon Code Register",
+   "Expired Membership Register",
+   "Expired Session Register",
+   "Balance Due Register",
+   "TAX Register",
+   "Write Off Register",
+   "Deleted Subscription Register",
+   "Trial Register",
+   "Cancel Subscription Register",
+   "Transfer Register",
+   "Freeze Register",
+   "Upgrade Register",
+   "Extension Register",
+   "Downgrade Register",
+   "Course Orders",
+   "Receipt Register Log",
+   "Recurring Payments Register",
+   "Classes Point deduction on Booking"
+  ]
+ },
+ "source": "YDL Staff Accounts Access Control, Shaan Fitness settings read on 9 Oct 2026"
+}

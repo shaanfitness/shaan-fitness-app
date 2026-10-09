@@ -11,6 +11,7 @@ import { ActionMenu, Checkbox, CheckboxGroup, Field, MultiSelect, Notice, RadioG
 import { BulkBar } from '../../components/table'
 import { useToast } from '../../components/toast'
 import { Icon, Loading, PageHeader, Sheet } from '../../components/ui'
+import { CsvOnly } from '../../access-ui'
 
 // YDL "Add Batch" (New Batch Basic Information) and "Batch List" (Batch Listing).
 
@@ -68,7 +69,7 @@ export function BatchList() {
     <>
       <PageHeader title={deactivated ? 'Deactivated Batches' : 'Batch Listing'} sub={`${studio?.name ?? ''}${studio?.branch_name ? ` (${studio.branch_name})` : ''}`}
         actions={<>
-          <button type="button" className="btn btn-sm" onClick={exportCsv}><Icon name="download" size={16} />Export to CSV</button>
+          <CsvOnly><button type="button" className="btn btn-sm" onClick={exportCsv}><Icon name="download" size={16} />Export to CSV</button></CsvOnly>
           <Link to={desk ? '/clients' : '/members'} className="btn btn-sm">View Batchwise Members</Link>
           <Link to="/batches/attendance" className="btn btn-sm">Batchwise Attendance List</Link>
           {desk && <Link to="/batches/import" className="btn btn-sm">Import Batches</Link>}
@@ -88,7 +89,7 @@ export function BatchList() {
         </div>
         {desk && (
           <BulkBar count={selected.size} onClear={() => setSelected(new Set())}>
-            <button type="button" className="btn btn-sm" onClick={exportCsv}>Export to CSV</button>
+            <CsvOnly><button type="button" className="btn btn-sm" onClick={exportCsv}>Export to CSV</button></CsvOnly>
             <button type="button" className="btn btn-sm" onClick={() => setConfirm({ action: deactivated ? 'activate' : 'deactivate', ids: [...selected] })}>{deactivated ? 'Activate' : 'Deactivate'}</button>
             <button type="button" className="btn btn-sm btn-danger" onClick={() => setConfirm({ action: 'delete', ids: [...selected] })}>Delete</button>
           </BulkBar>

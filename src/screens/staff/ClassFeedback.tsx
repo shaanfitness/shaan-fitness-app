@@ -10,6 +10,7 @@ import { ClientCell } from '../../components/client'
 import { Checkbox, Select, TextInput } from '../../components/controls'
 import { Pager } from '../../components/table'
 import { Icon, Loading, PageHeader } from '../../components/ui'
+import { CsvOnly } from '../../access-ui'
 
 // YDL "Class Feedbacks" (Class Feedback Listing): ratings clients give after a class,
 // with "Group by Class" and the top trainers by rating.
@@ -65,7 +66,7 @@ export default function ClassFeedback() {
   return (
     <>
       <PageHeader title="Class Feedback Listing" sub={`${studio?.name ?? ''}${studio?.branch_name ? ` (${studio.branch_name})` : ''}`}
-        actions={<button type="button" className="btn btn-sm" onClick={exportCsv}><Icon name="download" size={16} />Export to CSV</button>} />
+        actions={<CsvOnly><button type="button" className="btn btn-sm" onClick={exportCsv}><Icon name="download" size={16} />Export to CSV</button></CsvOnly>} />
       <div className="flex flex-col gap-3 px-5 pt-5 pb-8 lg:px-8">
         <div className="flex flex-wrap items-center gap-2">
           <span className="text-[12px] text-muted">From</span><TextInput small type="date" value={from} onChange={(v) => { setFrom(v); setPage(0) }} className="w-auto" />

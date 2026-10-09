@@ -1,3 +1,7 @@
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useToast } from '../../components/toast'
+import { decideRequest } from '../../db/team'
+import { CsvOnly } from '../../access-ui'
 import { Link } from 'react-router-dom'
 import type { ReactNode } from 'react'
 import { amt, stateChip, STATE_LABEL, type Receipt, type Sub, type SubState } from '../../db/billing'
@@ -379,13 +383,14 @@ type F = { id: string; member_id: string; member_name: string; client_code: stri
 export const freezeRegister: RegisterDef<F> = {
   title: 'Freezed Subscriptions', view: 'freeze_overview', dateCol: 'start_date', search: ['member_name', 'plan_name'], panel: { gender: 'member_gender' },
   filters: (ctx) => [fStaff(ctx, 'rep', 'client_rep_id', 'Client Rep'), fStaff(ctx, 'by', 'created_by', 'Freezed By'),
-    { key: 'status', placeholder: 'All freezes', options: [{ value: 'requested', label: 'Freeze Requests (from the app)' }, { value: 'approved', label: 'Approved' }, { value: 'rejected', label: 'Rejected' }], apply: (q, v) => q.eq('status', v) }],
-  columns: () => [
+    { key: 'status', placeholder: 'All freezes', options: [{ value: 'requested', label: 'Freeze Requests' }, { value: 'approved', label: 'Approved' }, { value: 'rejected', label: 'Rejected' }], apply: (q, v) => q.eq('status', v) }],
+  columns: (ctx) => [
     { key: 'name', header: 'Customer Name', cell: (r) => clientLink(r.member_id, r.member_name, r.client_code) }, { key: 'pkg', header: 'Package Name', cell: (r) => r.plan_name },
     { key: 'days', header: 'Freeze Days', className: 'num', cell: (r) => r.days }, { key: 'dates', header: 'Freeze Dates', className: 'nowrap', cell: (r) => `${day(r.start_date)} – ${day(r.end_date)}` },
     { key: 'by', header: 'Freezed By', cell: (r) => r.created_by_name ?? '—' }, { key: 'note', header: 'Notes', cell: (r) => r.note ?? '—' },
     { key: 'rep', header: 'Client Rep', cell: (r) => r.client_rep_name ?? '—' }, { key: 'fee', header: 'Freeze Fees', className: 'num', cell: (r) => amt(r.fee) },
     { key: 'st', header: 'Status', cell: (r) => (r.status === 'approved' ? <span className="chip chip-green">Approved</span> : r.status === 'requested' ? <span className="chip chip-amber">Requested</span> : <span className="chip chip-red">Rejected</span>) },
+    { key: 'act', header: 'Action', cell: (r) => <RequestActions kind="freeze" id={r.id} status={r.status} owner={ctx.role === 'owner'} /> },
   ],
   csv: () => [['Customer', (r) => r.member_name], ['Package', (r) => r.plan_name], ['Days', (r) => r.days], ['From', (r) => r.start_date], ['To', (r) => r.end_date], ['By', (r) => r.created_by_name], ['Notes', (r) => r.note], ['Client Rep', (r) => r.client_rep_name], ['Fee', (r) => r.fee], ['Status', (r) => r.status]],
   order: [['start_date', false]], totals: (rows) => [['Freeze Fees', sum(rows, (r) => r.fee)]],
@@ -393,12 +398,14 @@ export const freezeRegister: RegisterDef<F> = {
 export const extensionRegister: RegisterDef<F> = {
   title: 'Extension Register', view: 'extension_overview', dateCol: 'created_at', dateLabel: 'Start Date', search: ['member_name', 'plan_name'], panel: { gender: 'member_gender' },
   filters: (ctx) => [fStaff(ctx, 'rep', 'client_rep_id', 'Client Rep'), fStaff(ctx, 'by', 'created_by', 'Extended By'),
-    { key: 'status', placeholder: 'All extensions', options: [{ value: 'requested', label: 'Extension Requests (from the app)' }, { value: 'approved', label: 'Approved' }], apply: (q, v) => q.eq('status', v) }],
-  columns: () => [
+    { key: 'status', placeholder: 'All extensions', options: [{ value: 'requested', label: 'Extension Requests' }, { value: 'approved', label: 'Approved' }, { value: 'rejected', label: 'Rejected' }], apply: (q, v) => q.eq('status', v) }],
+  columns: (ctx) => [
     { key: 'name', header: 'Customer Name', cell: (r) => clientLink(r.member_id, r.member_name, r.client_code) }, { key: 'sub', header: 'Subscription Name', cell: (r) => r.plan_name },
     { key: 'by', header: 'Extension Done by', cell: (r) => r.created_by_name ?? '—' }, { key: 'days', header: 'No. of Days Added', className: 'num', cell: (r) => r.days },
     { key: 'on', header: 'Extension Date', className: 'nowrap', cell: (r) => fmtDateTime(r.created_at) }, { key: 'note', header: 'Notes', cell: (r) => r.note ?? '—' },
     { key: 'rep', header: 'Client Rep.', cell: (r) => r.client_rep_name ?? '—' }, { key: 'fee', header: 'Extension Fees', className: 'num', cell: (r) => amt(r.fee) },
+    { key: 'st', header: 'Status', cell: (r) => (r.status === 'approved' ? <span className="chip chip-green">Approved</span> : r.status === 'requested' ? <span className="chip chip-amber">Requested</span> : <span className="chip chip-red">Rejected</span>) },
+    { key: 'act', header: 'Action', cell: (r) => <RequestActions kind="extension" id={r.id} status={r.status} owner={ctx.role === 'owner'} /> },
   ],
   csv: () => [['Customer', (r) => r.member_name], ['Subscription', (r) => r.plan_name], ['By', (r) => r.created_by_name], ['Days', (r) => r.days], ['On', (r) => r.created_at], ['Notes', (r) => r.note], ['Client Rep', (r) => r.client_rep_name], ['Fee', (r) => r.fee]],
   order: [['created_at', false]], totals: (rows) => [['Extension Fees', sum(rows, (r) => r.fee)]],
@@ -422,7 +429,7 @@ export const recordedSessions: RegisterDef<A> = {
   ],
   csv: () => [['Record Date', (r) => r.check_in], ['Customer', (r) => r.member_name], ['Trainer', (r) => r.trainer_name], ['Action Taken By', (r) => r.marked_by_name], ['Activity', (r) => r.activity], ['Show', (r) => r.status], ['Plan', (r) => r.plan_name]],
   order: [['check_in', false]],
-  actions: (_ctx, rows) => <button type="button" className="btn btn-sm" onClick={() => incentivesCsv(rows)}>Export Incentives CSV</button>,
+  actions: (_ctx, rows) => <CsvOnly><button type="button" className="btn btn-sm" onClick={() => incentivesCsv(rows)}>Export Incentives CSV</button></CsvOnly>,
 }
 function incentivesCsv(rows: A[]) {
   const by = new Map<string, { trainer: string; show: number; noShow: number }>()
@@ -469,4 +476,19 @@ export const courseOrders: RegisterDef<O> = {
 
 export function RegisterPage<T extends { id?: string }>({ def }: { def: RegisterDef<T> }) {
   return <Register key={def.title} def={def} />
+}
+
+/** The owner approves or rejects a freeze or extension request (staff without "Allow Freeze/Extension"). */
+function RequestActions({ kind, id, status, owner }: { kind: 'freeze' | 'extension'; id: string; status: string; owner: boolean }) {
+  const qc = useQueryClient()
+  const toast = useToast()
+  const run = useMutation({
+    mutationFn: (approve: boolean) => decideRequest(kind, id, approve),
+    onSuccess: (_d, approve) => { qc.invalidateQueries({ queryKey: ['registers'] }); qc.invalidateQueries({ queryKey: ['subs'] }); toast(approve ? 'Approved' : 'Rejected') },
+    onError: (e: Error) => toast(e.message),
+  })
+  if (status !== 'requested') return <span className="text-muted">—</span>
+  if (!owner) return <span className="text-[12px] text-muted">Waiting for the owner</span>
+  return <div className="flex gap-1.5"><button type="button" className="btn btn-sm" disabled={run.isPending} onClick={() => run.mutate(true)}>Approve</button>
+    <button type="button" className="btn btn-sm" disabled={run.isPending} onClick={() => run.mutate(false)}>Reject</button></div>
 }

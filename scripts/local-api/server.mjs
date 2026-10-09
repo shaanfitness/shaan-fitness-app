@@ -1,3 +1,5 @@
+import fs from 'node:fs'
+import path from 'node:path'
 // Local stand-in for Supabase's API (PostgREST + the bits of Auth the app uses),
 // for testing on a laptop or in CI against a throwaway Postgres. Never deployed.
 //
@@ -356,6 +358,15 @@ async function handleAuth(req, url, body) {
     return { data: userJson(user) }
   }
   if (path === 'logout') return { data: null, status: 204 }
+  // Sign-up as on Supabase with "Confirm email" on: the user is made, no session until confirmed.
+  if (path === 'signup') {
+    const email = (body?.email ?? '').trim().toLowerCase() || null
+    const found = (await pool.query('select * from auth.users where lower(email) = $1', [email])).rows[0]
+    const user = found ?? (await pool.query('insert into auth.users (email, phone, raw_user_meta_data) values ($1, null, $2) returning *',
+      [email, JSON.stringify(body?.data ?? {})])).rows[0]
+    return { data: userJson(user) }
+  }
+  if (path === 'recover') return { data: {} }
   throw new ApiError(404, { message: `auth endpoint ${path} is not available locally` })
 }
 
@@ -365,15 +376,51 @@ async function handleAuth(req, url, body) {
 const CORS = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Methods': 'GET,POST,PATCH,PUT,DELETE,HEAD,OPTIONS',
-  'Access-Control-Allow-Headers': 'authorization,apikey,content-type,prefer,accept,accept-profile,content-profile,range,x-client-info,x-supabase-api-version',
+  'Access-Control-Allow-Headers': 'authorization,apikey,content-type,prefer,accept,accept-profile,content-profile,range,x-client-info,x-supabase-api-version,x-upsert,cache-control,duplex',
   'Access-Control-Expose-Headers': 'content-range',
+}
+
+// A tiny stand-in for Supabase Storage: uploads go to .local-stack/storage, public files are served back.
+// (Bucket access rules are not checked locally; the real project's storage policies are.)
+const STORE = path.join(path.dirname(new URL(import.meta.url).pathname), '../../.local-stack/storage')
+function fileFromMultipart(type, buf) {
+  const b = type.match(/boundary=(.+)$/)?.[1]
+  if (!type.startsWith('multipart/form-data') || !b) return buf
+  const sep = Buffer.from(`--${b}`)
+  let at = buf.indexOf(sep)
+  while (at >= 0) {
+    const next = buf.indexOf(sep, at + sep.length)
+    if (next < 0) break
+    const part = buf.subarray(at + sep.length + 2, next - 2)
+    const head = part.indexOf('\r\n\r\n')
+    const headers = part.subarray(0, head).toString()
+    if (/content-type/i.test(headers) && !/name="cacheControl"/.test(headers)) return part.subarray(head + 4)
+    at = next
+  }
+  return buf
+}
+function storage(req, res, url, buf) {
+  const m = url.pathname.match(/^\/storage\/v1\/object\/(public\/|sign\/)?([^/]+)\/(.+)$/)
+  if (!m) { res.writeHead(404, CORS); return res.end() }
+  const file = path.join(STORE, m[2], decodeURIComponent(m[3]))
+  if (!file.startsWith(STORE)) { res.writeHead(400, CORS); return res.end() }
+  if (req.method === 'POST' || req.method === 'PUT') {
+    fs.mkdirSync(path.dirname(file), { recursive: true })
+    fs.writeFileSync(file, fileFromMultipart(req.headers['content-type'] ?? '', buf))
+    res.writeHead(200, { ...CORS, 'Content-Type': 'application/json' })
+    return res.end(JSON.stringify({ Key: `${m[2]}/${m[3]}`, Id: m[3] }))
+  }
+  if (req.method === 'GET' && fs.existsSync(file)) { res.writeHead(200, { ...CORS, 'Content-Type': 'application/octet-stream' }); return res.end(fs.readFileSync(file)) }
+  res.writeHead(404, { ...CORS, 'Content-Type': 'application/json' }); return res.end(JSON.stringify({ message: 'Object not found' }))
 }
 
 http.createServer(async (req, res) => {
   if (req.method === 'OPTIONS') { res.writeHead(204, CORS); return res.end() }
   const url = new URL(req.url, `http://${req.headers.host}`)
-  let raw = ''
-  for await (const chunk of req) raw += chunk
+  const chunks = []
+  for await (const chunk of req) chunks.push(chunk)
+  if (url.pathname.startsWith('/storage/v1/')) return storage(req, res, url, Buffer.concat(chunks))
+  const raw = Buffer.concat(chunks).toString('utf8')
   const body = raw ? JSON.parse(raw) : undefined
   try {
     let out

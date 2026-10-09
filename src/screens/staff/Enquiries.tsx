@@ -14,6 +14,7 @@ import { FollowUpDialog, FollowUpHistory, type FollowUpTarget } from '../../comp
 import { BulkBar, DataTable, Pager, type Column } from '../../components/table'
 import { useToast } from '../../components/toast'
 import { Icon, PageHeader, Sheet } from '../../components/ui'
+import { CsvOnly } from '../../access-ui'
 
 // YDL "Enquiries List": filters panel, dropdown filters, staff summary, the list,
 // row actions and bulk actions.
@@ -197,7 +198,7 @@ export default function Enquiries() {
       <PageHeader title={deactivated ? 'Deactivated enquiries' : 'Enquiries'} sub={`${studio?.name ?? ''}${studio?.branch_name ? ` (${studio.branch_name})` : ''}`}
         actions={<>
           <button type="button" className="btn btn-sm" onClick={() => { setDeactivated(!deactivated); setPage(0); setSelected(new Set()) }}>{deactivated ? 'Open enquiries' : 'Deactivated enquiries'}</button>
-          <button type="button" className="btn btn-sm" onClick={exportCsv}><Icon name="download" size={16} />Export to CSV</button>
+          <CsvOnly><button type="button" className="btn btn-sm" onClick={exportCsv}><Icon name="download" size={16} />Export to CSV</button></CsvOnly>
           <Link to="/reports/enquiries" className="btn btn-sm">View analysis</Link>
           <Link to="/enquiries/new" className="btn-gold min-h-10 px-4"><Icon name="plus" size={18} />Add enquiry</Link>
         </>} />
@@ -259,7 +260,7 @@ export default function Enquiries() {
         <BulkBar count={selected.size} onClear={() => setSelected(new Set())}>
           <button type="button" className="btn btn-sm" onClick={() => bulk.mutate({ action: 'tapped', ids: [...selected] })}>Mark as tapped</button>
           <button type="button" className="btn btn-sm" onClick={() => setNotify([...selected])}>Send notification</button>
-          <button type="button" className="btn btn-sm" onClick={exportCsv}>Export to CSV</button>
+          <CsvOnly><button type="button" className="btn btn-sm" onClick={exportCsv}>Export to CSV</button></CsvOnly>
           <button type="button" className="btn btn-sm" onClick={() => setConfirm({ action: deactivated ? 'activate' : 'deactivate', ids: [...selected] })}>{deactivated ? 'Activate' : 'Deactivate'}</button>
           {isOwner && <button type="button" className="btn btn-sm btn-danger" onClick={() => setConfirm({ action: 'delete', ids: [...selected] })}>Delete</button>}
         </BulkBar>
