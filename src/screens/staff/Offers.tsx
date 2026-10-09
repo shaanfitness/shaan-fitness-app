@@ -234,7 +234,7 @@ export function CouponForm() {
               <Field label="Duration" required id="cdur"><Select id="cdur" value={f.installment_unit} onChange={set('installment_unit')} options={[{ value: 'month', label: 'Month' }, { value: 'week', label: 'Week' }, { value: 'year', label: 'Year' }]} /></Field>
               <Field label="Interest Rate(% p.a)" required id="crate"><TextInput id="crate" type="number" value={f.interest_rate} onChange={set('interest_rate')} /></Field>
             </div>
-            <p className="m-0 text-[12px] text-muted">The bill is split into {f.installments} payments, every {f.installment_interval} {f.installment_unit}{Number(f.installment_interval) > 1 ? 's' : ''}; each balance gets a due-date follow-up.</p>
+            <p className="m-0 text-[12px] text-muted">Saved with the coupon: {f.installments} payments, every {f.installment_interval} {f.installment_unit}{Number(f.installment_interval) > 1 ? 's' : ''}. Automatic installment billing comes with autopay; until then take part payments with a next due date.</p>
           </section>
         )}
         {error && <Notice tone="error">{error}</Notice>}
