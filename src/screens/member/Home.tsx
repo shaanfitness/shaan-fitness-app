@@ -64,8 +64,8 @@ export default function MemberHome() {
   const props = { c, first, next, t: t as T, onCheckIn: () => setQr(true) }
   return (
     <div className="pb-6 lg:mx-auto lg:max-w-[720px] lg:pt-4">
-      <header className="flex items-center justify-between px-5 pt-6 lg:hidden">
-        <BrandMark />
+      <header className="flex items-center justify-between gap-3 px-5 pt-6 lg:hidden">
+        <BrandMark logo={look === 'clinic'} />
         <div className="flex items-center gap-2.5">
           <LangToggle />
           <span className="me-avatar" aria-hidden="true">{initials(me.name)}</span>

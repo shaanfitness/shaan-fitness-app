@@ -68,10 +68,10 @@ export function Avatar({ name, size = 44, gold = false }: { name: string; size?:
 }
 
 // The Shaan Fitness logo on its dark tile, with the name beside it.
-export function BrandMark({ suffix, size = 32 }: { suffix?: string; size?: number }) {
+export function BrandMark({ suffix, size = 32, logo = true }: { suffix?: string; size?: number; logo?: boolean }) {
   return (
     <div className="flex min-w-0 items-center gap-2.5">
-      <img src="/icon-192.png" alt="" width={size} height={size} className="flex-none rounded-[9px]" style={{ width: size, height: size }} />
+      {logo && <img src="/icon-192.png" alt="" width={size} height={size} className="flex-none rounded-[9px]" style={{ width: size, height: size }} />}
       <span className="brand truncate">Shaan <span className="brand-2">Fitness</span>{suffix ? ` · ${suffix}` : ''}</span>
     </div>
   )
