@@ -34,46 +34,48 @@
   --color-av3: #E4C2D2;
   --color-av4: #B8D8B0;
   --color-av5: #E9C08B;
+  --color-stripe: #D6B878;
   --font-display: "Bodoni Moda", "Didot", Georgia, serif;
   --font-sans: "Manrope", "Noto Sans Telugu", system-ui, -apple-system, "Segoe UI", sans-serif;
 }
 
-/* Club: black with the logo's red and blue. */
+/* Club sport (Look B): deep navy, the logo's red, coral and a gold stripe. */
 :root[data-theme="club"] {
-  --color-ground: #0A0A0C;
-  --color-surface: #151518;
-  --color-surface-2: #1B1B1F;
-  --color-surface-3: #1F1F24;
-  --color-nav: #0F0F12;
-  --color-field: #0F0F12;
-  --color-line: #2A2A30;
-  --color-line-soft: #232328;
-  --color-line-strong: #3A3A42;
-  --color-ink: #F5F5F7;
-  --color-ink-soft: #D4D4DA;
-  --color-muted: #A8A8B3;
-  --color-faint: #7A7A85;
-  --color-gold: #E01020;
-  --color-gold-hover: #C80E1C;
-  --color-gold-light: #FF6B6B;
+  --color-ground: #0A1020;
+  --color-surface: #111A2E;
+  --color-surface-2: #16213A;
+  --color-surface-3: #1A2540;
+  --color-nav: #0D1426;
+  --color-field: #0D1426;
+  --color-line: #22304D;
+  --color-line-soft: #1B2740;
+  --color-line-strong: #33456B;
+  --color-ink: #F2F4F8;
+  --color-ink-soft: #D3D9E4;
+  --color-muted: #A3AEC2;
+  --color-faint: #6F7C94;
+  --color-gold: #D92D3A;
+  --color-gold-hover: #C42633;
+  --color-gold-light: #FF7A70;
   --color-on-gold: #FFFFFF;
-  --color-accent-tint: #1F0D10;
-  --color-accent-line: #4A1E22;
-  --color-chip: #1F1F24;
-  --color-red: #FF6B6B;
-  --color-amber: #FFB347;
+  --color-accent-tint: #2A1625;
+  --color-accent-line: #5A2333;
+  --color-chip: #1A2540;
+  --color-red: #FF7A70;
+  --color-amber: #E6B957;
   --color-green: #5FD39B;
-  --color-info: #2DB7F5;
-  --color-av1: #FF8A8A;
-  --color-av2: #7FD3FA;
+  --color-info: #7FB2FF;
+  --color-av1: #FF7A70;
+  --color-av2: #7FB2FF;
   --color-av3: #F5B8D0;
   --color-av4: #9BE0B8;
-  --color-av5: #FFC98A;
+  --color-av5: #E6B957;
+  --color-stripe: #E6B957;
   --font-display: "Barlow Condensed", "Arial Narrow", sans-serif;
   --font-sans: "Barlow", "Noto Sans Telugu", system-ui, -apple-system, "Segoe UI", sans-serif;
 }
 
-/* Clinic: white and blue, calm and easy to read. */
+/* Clinic light (Look C): white and blue, calm and easy to read. */
 :root[data-theme="clinic"] {
   --color-ground: #F4F6F8;
   --color-surface: #FFFFFF;
@@ -88,22 +90,23 @@
   --color-ink-soft: #2E3B4E;
   --color-muted: #566375;
   --color-faint: #8A94A3;
-  --color-gold: #0B63B5;
-  --color-gold-hover: #0A579F;
-  --color-gold-light: #0A4F91;
+  --color-gold: #2248B5;
+  --color-gold-hover: #1B3C9C;
+  --color-gold-light: #16348A;
   --color-on-gold: #FFFFFF;
-  --color-accent-tint: #E7F0FA;
-  --color-accent-line: #C9DBF0;
+  --color-accent-tint: #E8EEFB;
+  --color-accent-line: #D3DDF3;
   --color-chip: #EEF2F6;
   --color-red: #C0352B;
   --color-amber: #A65F00;
   --color-green: #1E7A55;
-  --color-info: #1D5FA8;
+  --color-info: #2248B5;
   --color-av1: #8A5A00;
-  --color-av2: #1D5FA8;
+  --color-av2: #2248B5;
   --color-av3: #9C2F5E;
   --color-av4: #1E7A55;
   --color-av5: #A14A12;
+  --color-stripe: #2248B5;
   --font-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
   --font-sans: "Hanken Grotesk", "Noto Sans Telugu", system-ui, -apple-system, "Segoe UI", sans-serif;
 }
@@ -127,8 +130,10 @@
   .eyebrow { margin: 0; font-size: 11px; letter-spacing: .18em; text-transform: uppercase; font-weight: 700; color: var(--color-gold); }
   .brand { font-size: 11px; letter-spacing: .22em; text-transform: uppercase; font-weight: 700; color: var(--color-gold); }
   .title { margin: 0; font-family: var(--font-display); font-weight: 500; letter-spacing: -.01em; }
-  :root[data-theme="club"] .title { font-weight: 700; letter-spacing: 0; }
-  :root[data-theme="clinic"] .title { font-weight: 600; letter-spacing: -.02em; }
+  /* Big headlines on the website and sign-in pages, drawn in each look's own voice. */
+  .headline { margin: 0; font-family: var(--font-display); font-weight: 500; letter-spacing: -.01em; line-height: 1; }
+  .brand-2 { color: inherit; }
+  .wordmark { font-size: 21px; letter-spacing: .04em; text-transform: uppercase; }
   .chip { display: inline-flex; align-items: center; gap: 6px; height: 24px; padding: 0 10px; border-radius: 999px; font-size: 11px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; white-space: nowrap; }
   .chip-gold { background: color-mix(in srgb, var(--color-gold) 14%, transparent); color: var(--color-gold-light); }
   .chip-red { background: color-mix(in srgb, var(--color-red) 14%, transparent); color: var(--color-red); }
@@ -185,4 +190,55 @@
   .menu button:hover, .menu a:hover { background: var(--color-surface-2); color: var(--color-ink); }
   .menu .danger { color: var(--color-red); }
   .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  /* Bottom tab bars (member app and phone CRM). */
+  .tab { display: flex; min-height: 54px; flex-direction: column; align-items: center; justify-content: center; gap: 4px; font-size: 11px; font-weight: 600; color: var(--color-muted); text-decoration: none; }
+  .tab:hover { color: var(--color-ink); }
+  .tab.active { color: var(--color-gold); }
+  .tab-icon { display: flex; height: 30px; align-items: center; justify-content: center; }
+  .lang-switch { display: flex; flex: none; padding: 3px; border-radius: 12px; border: 1px solid var(--color-line); }
+  .lang-switch button { min-height: 36px; padding: 0 12px; border-radius: 10px; border: 0; background: transparent; color: var(--color-muted); font-size: 12px; font-weight: 600; cursor: pointer; }
+  .lang-switch button[aria-pressed="true"] { background: var(--color-ink); color: var(--color-ground); }
+  .me-avatar { display: inline-flex; width: 44px; height: 44px; flex: none; align-items: center; justify-content: center; border-radius: 50%; border: 1px solid var(--color-gold); font-family: var(--font-display); color: var(--color-gold-light); font-size: 15px; text-decoration: none; }
+  .stripes { display: flex; gap: 10px; }
+  .stripes span { display: block; width: 16px; height: 104px; background: var(--color-gold); transform: skewX(-20deg); }
+  .stripes span:nth-child(2) { opacity: .45; }
+  .stripes span:nth-child(3) { width: 6px; background: var(--color-stripe); }
+
+  /* Look B · Club sport: condensed italic capitals, squarer corners, uppercase buttons. */
+  :root[data-theme="club"] .title { font-weight: 800; font-style: italic; text-transform: uppercase; letter-spacing: 0; line-height: .95; }
+  :root[data-theme="club"] .headline { font-weight: 800; font-style: italic; text-transform: uppercase; letter-spacing: 0; line-height: .92; }
+  :root[data-theme="club"] .wordmark { font-size: 20px; letter-spacing: .08em; }
+  :root[data-theme="club"] .card { border-radius: 14px; }
+  :root[data-theme="club"] .eyebrow { font-size: 12px; letter-spacing: .16em; color: var(--color-muted); }
+  :root[data-theme="club"] .brand { font-family: var(--font-display); font-size: 17px; font-weight: 800; font-style: italic; letter-spacing: .06em; color: var(--color-ink); }
+  :root[data-theme="club"] .brand-2 { color: var(--color-gold-light); }
+  :root[data-theme="club"] .btn, :root[data-theme="club"] .btn-gold { min-height: 50px; padding: 0 14px; border-radius: 10px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
+  :root[data-theme="club"] .btn { background: transparent; }
+  :root[data-theme="club"] .btn:hover { border-color: var(--color-muted); }
+  :root[data-theme="club"] .btn-sm { min-height: 38px; font-size: 12px; }
+  :root[data-theme="club"] .chip { border-radius: 6px; }
+  :root[data-theme="club"] .tab { font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+  :root[data-theme="club"] .tab.active { color: var(--color-gold-light); }
+  :root[data-theme="club"] .lang-switch { border-radius: 10px; }
+  :root[data-theme="club"] .lang-switch button { border-radius: 8px; }
+  :root[data-theme="club"] .me-avatar { border-radius: 12px; border-color: var(--color-line-strong); background: var(--color-surface-2); color: var(--color-ink); font-size: 18px; font-weight: 700; }
+
+  /* Look C · Clinic light: rounded pills, sentence-case labels, soft blue tiles. */
+  :root[data-theme="clinic"] .title { font-weight: 600; letter-spacing: -.01em; }
+  :root[data-theme="clinic"] .headline { font-weight: 600; letter-spacing: -.02em; line-height: 1.08; }
+  :root[data-theme="clinic"] .wordmark { font-size: 19px; letter-spacing: 0; text-transform: none; }
+  :root[data-theme="clinic"] .card { border-radius: 20px; }
+  :root[data-theme="clinic"] .eyebrow { font-size: 14px; font-weight: 600; letter-spacing: 0; text-transform: none; color: var(--color-muted); }
+  :root[data-theme="clinic"] .brand { font-family: var(--font-display); font-size: 18px; font-weight: 600; letter-spacing: 0; text-transform: none; color: var(--color-ink); }
+  :root[data-theme="clinic"] .btn, :root[data-theme="clinic"] .btn-gold { min-height: 50px; padding: 0 18px; border-radius: 999px; font-size: 15px; font-weight: 600; }
+  :root[data-theme="clinic"] .btn { background: var(--color-surface); }
+  :root[data-theme="clinic"] .btn:hover { border-color: var(--color-muted); }
+  :root[data-theme="clinic"] .btn-sm { min-height: 38px; padding: 0 14px; font-size: 13px; }
+  :root[data-theme="clinic"] .chip { letter-spacing: 0; text-transform: none; font-size: 12px; font-weight: 600; }
+  :root[data-theme="clinic"] .tab { font-size: 12px; }
+  :root[data-theme="clinic"] .tab.active { color: var(--color-ink); font-weight: 700; }
+  :root[data-theme="clinic"] .tab.active .tab-icon { width: 56px; border-radius: 999px; background: var(--color-accent-tint); color: var(--color-gold); }
+  :root[data-theme="clinic"] .lang-switch { border-radius: 999px; background: var(--color-surface); }
+  :root[data-theme="clinic"] .lang-switch button { border-radius: 999px; font-size: 13px; }
+  :root[data-theme="clinic"] .me-avatar { border: 0; background: var(--color-accent-tint); color: var(--color-gold); font-family: var(--font-sans); font-size: 14px; font-weight: 700; }
 }

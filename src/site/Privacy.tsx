@@ -20,7 +20,7 @@ export default function Privacy() {
       <article className="mx-auto flex max-w-[760px] flex-col gap-6 px-4 py-12 text-[16px] leading-relaxed text-ink-soft lg:px-8 lg:py-16">
         <header className="flex flex-col gap-3">
           <p className="eyebrow">Last updated 9 October 2026</p>
-          <h1 className="m-0 font-display text-[48px] leading-[.95] font-extrabold text-ink uppercase">Privacy notice</h1>
+          <h1 className="headline text-[48px] text-ink">Privacy notice</h1>
           {i18n.language === 'te' && <p className="m-0 text-[14px] text-muted">ఈ నోటీసు ప్రస్తుతం ఇంగ్లీష్‌లో మాత్రమే ఉంది. సందేహాలుంటే ఫ్రంట్ డెస్క్‌ను అడగండి.</p>}
           <p className="m-0">
             {name} (“we”) runs this website, the member and coach app, and the system our staff use. This notice explains what

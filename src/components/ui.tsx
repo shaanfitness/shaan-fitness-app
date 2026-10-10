@@ -72,7 +72,7 @@ export function BrandMark({ suffix, size = 32 }: { suffix?: string; size?: numbe
   return (
     <div className="flex min-w-0 items-center gap-2.5">
       <img src="/icon-192.png" alt="" width={size} height={size} className="flex-none rounded-[9px]" style={{ width: size, height: size }} />
-      <span className="brand truncate">Shaan Fitness{suffix ? ` · ${suffix}` : ''}</span>
+      <span className="brand truncate">Shaan <span className="brand-2">Fitness</span>{suffix ? ` · ${suffix}` : ''}</span>
     </div>
   )
 }

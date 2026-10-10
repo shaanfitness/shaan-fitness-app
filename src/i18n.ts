@@ -14,6 +14,10 @@ const en = {
     workout: 'Lower body strength', workoutMeta: '6 exercises · about 45 minutes', meals: 'Meals', mealsMeta: '4 meals · 1,650 kcal · 2 logged',
     offers: 'Offers', swipe: 'Swipe for more', viewOffer: 'View offer', posterImage: 'Poster image', noSlot: 'No session booked yet',
     chatPreview: 'Great squats on Monday. Keep the same weight today.',
+    greeting: 'Greeting', ready: 'Ready, {{name}}?', goodMorning: 'Good morning, {{name}}', goodAfternoon: 'Good afternoon, {{name}}', goodEvening: 'Good evening, {{name}}',
+    sessionsDone: 'of {{total}} sessions done', cycleEnds: 'Cycle ends', sessionsLeft: 'Sessions left', daysLeftLabel: 'Days left', renewal: 'Renewal',
+    cycleEndsOn: 'Your cycle ends {{date}}', renewKeep: 'Your {{plan}} plan ends {{date}}. Renew to keep your slot.', renewPlain: 'Renew {{plan}} to keep your slot.',
+    renewSent: 'Done. The front desk will call you to renew {{plan}}.', checkInShort: 'Check in', yourCode: 'Your member code', showAtDesk: 'Show this at the front desk to check in.',
   },
   common: { signOut: 'Sign out', language: 'Language', comingSoon: 'Coming soon' },
   site: {
@@ -86,6 +90,10 @@ const te: typeof en = {
     workout: 'లోయర్ బాడీ స్ట్రెంత్', workoutMeta: '6 వ్యాయామాలు · సుమారు 45 నిమిషాలు', meals: 'భోజనాలు', mealsMeta: '4 భోజనాలు · 1,650 కేలరీలు · 2 నమోదయ్యాయి',
     offers: 'ఆఫర్లు', swipe: 'మరిన్నింటి కోసం స్వైప్ చేయండి', viewOffer: 'ఆఫర్ చూడండి', posterImage: 'పోస్టర్ చిత్రం', noSlot: 'ఇంకా సెషన్ బుక్ చేయలేదు',
     chatPreview: 'సోమవారం స్క్వాట్స్ బాగా చేశారు. ఈరోజు కూడా అదే బరువు వాడండి.',
+    greeting: 'పలకరింపు', ready: 'సిద్ధమా, {{name}}?', goodMorning: 'శుభోదయం, {{name}}', goodAfternoon: 'శుభ మధ్యాహ్నం, {{name}}', goodEvening: 'శుభ సాయంత్రం, {{name}}',
+    sessionsDone: '{{total}} సెషన్లలో పూర్తయినవి', cycleEnds: 'సైకిల్ ముగింపు', sessionsLeft: 'మిగిలిన సెషన్లు', daysLeftLabel: 'మిగిలిన రోజులు', renewal: 'రెన్యూవల్',
+    cycleEndsOn: 'మీ సైకిల్ {{date}} న ముగుస్తుంది', renewKeep: 'మీ {{plan}} ప్లాన్ {{date}} న ముగుస్తుంది. మీ స్లాట్ కొనసాగించడానికి రెన్యూ చేయండి.', renewPlain: 'మీ స్లాట్ కొనసాగించడానికి {{plan}} రెన్యూ చేయండి.',
+    renewSent: 'సరే. {{plan}} రెన్యూ చేయడానికి ఫ్రంట్ డెస్క్ మీకు కాల్ చేస్తుంది.', checkInShort: 'చెక్ ఇన్', yourCode: 'మీ మెంబర్ కోడ్', showAtDesk: 'చెక్-ఇన్ కోసం దీన్ని ఫ్రంట్ డెస్క్‌లో చూపించండి.',
   },
   common: { signOut: 'సైన్ అవుట్', language: 'భాష', comingSoon: 'త్వరలో' },
   site: {

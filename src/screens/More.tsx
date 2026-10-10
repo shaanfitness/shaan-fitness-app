@@ -70,8 +70,8 @@ export default function More() {
               <button key={id} type="button" role="radio" aria-checked={on} onClick={() => save(setPersonal(id), 'Look saved')}
                 className={`flex flex-col overflow-hidden rounded-2xl border-2 text-left ${on ? 'border-gold' : 'border-line'}`}>
                 <span aria-hidden="true" className="flex h-[92px] flex-col justify-between p-2.5" style={{ background: th.ground }}>
-                  <span className="text-[19px] leading-none" style={{ fontFamily: th.font, color: th.ink, fontWeight: id === 'club' ? 700 : 500 }}>Aa</span>
-                  <span className="flex flex-col gap-1.5 rounded-lg p-1.5" style={{ background: th.surface, border: `1px solid ${id === 'clinic' ? '#E1E6EB' : '#2A2A30'}` }}>
+                  <span className="text-[19px] leading-none" style={{ fontFamily: th.font, color: th.ink, fontWeight: id === 'club' ? 800 : id === 'clinic' ? 600 : 500, fontStyle: id === 'club' ? 'italic' : undefined }}>Aa</span>
+                  <span className="flex flex-col gap-1.5 rounded-lg p-1.5" style={{ background: th.surface, border: `1px solid ${id === 'clinic' ? '#E1E6EB' : id === 'club' ? '#22304D' : '#26262C'}` }}>
                     <span className="h-1.5 w-3/5 rounded-full" style={{ background: th.ink, opacity: 0.5 }} />
                     <span className="h-3 rounded-[5px]" style={{ background: th.accent }} />
                   </span>

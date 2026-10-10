@@ -10,9 +10,9 @@ export type ThemeId = 'noir' | 'club' | 'clinic'
 export type ThemeGroup = 'staff' | 'member' | 'doctor'
 
 export const THEMES: Record<ThemeId, { name: string; note: string; ground: string; surface: string; accent: string; ink: string; font: string }> = {
-  noir: { name: 'Black and gold', note: 'Quiet and premium', ground: '#0B0B0D', surface: '#141417', accent: '#D6B878', ink: '#F3EFE6', font: '"Bodoni Moda", Georgia, serif' },
-  club: { name: 'Red and black', note: 'Bold, from the logo', ground: '#0A0A0C', surface: '#151518', accent: '#E01020', ink: '#F5F5F7', font: '"Barlow Condensed", "Arial Narrow", sans-serif' },
-  clinic: { name: 'White and blue', note: 'Light and easy to read', ground: '#F4F6F8', surface: '#FFFFFF', accent: '#0B63B5', ink: '#0E1A2B', font: '"Bricolage Grotesque", system-ui, sans-serif' },
+  noir: { name: 'Noir and gold', note: 'Look A · quiet and premium', ground: '#0B0B0D', surface: '#141417', accent: '#D6B878', ink: '#F3EFE6', font: '"Bodoni Moda", Georgia, serif' },
+  club: { name: 'Club sport', note: 'Look B · bold, from the logo', ground: '#0A1020', surface: '#111A2E', accent: '#D92D3A', ink: '#F2F4F8', font: '"Barlow Condensed", "Arial Narrow", sans-serif' },
+  clinic: { name: 'Clinic light', note: 'Look C · light and easy to read', ground: '#F4F6F8', surface: '#FFFFFF', accent: '#2248B5', ink: '#0E1A2B', font: '"Bricolage Grotesque", system-ui, sans-serif' },
 }
 
 export const GROUP_LABEL: Record<ThemeGroup, string> = { staff: 'Owner, front desk and coaches', member: 'Members', doctor: 'Doctors' }

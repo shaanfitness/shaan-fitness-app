@@ -180,8 +180,8 @@ export function AppShell() {
         style={{ gridTemplateColumns: `repeat(${items.length}, minmax(0, 1fr))` }}>
         {items.map((it) => (
           <NavLink key={it.to} to={it.to}
-            className={({ isActive }) => `flex min-h-[54px] flex-col items-center justify-center gap-1 text-[11px] font-semibold no-underline ${isActive ? 'text-gold' : 'text-muted hover:text-ink'}`}>
-            <Icon name={it.icon} />{it.label}
+            className={({ isActive }) => `tab ${isActive ? 'active' : ''}`}>
+            <span className="tab-icon"><Icon name={it.icon} /></span>{it.label}
           </NavLink>
         ))}
       </nav>

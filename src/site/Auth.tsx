@@ -36,7 +36,7 @@ export function AuthFrame({ title, sub, children }: { title: string; sub?: React
           style={{ background: 'radial-gradient(60% 55% at 30% 60%, color-mix(in srgb, var(--color-gold) 24%, transparent), transparent 72%)' }} />
         <div className="relative"><Wordmark /></div>
         <div className="relative flex flex-col gap-6">
-          <p className="m-0 font-display text-[76px] leading-[.9] font-extrabold uppercase">{t('login.tagline')}</p>
+          <p className="headline text-[76px]">{t('login.tagline')}</p>
           <p className="m-0 text-[18px] font-semibold text-ink">{t('auth.sideTitle')}</p>
           <ul className="m-0 flex list-none flex-col gap-3 p-0 text-[15px] text-ink-soft">
             {(['side1', 'side2', 'side3'] as const).map((k) => (
@@ -56,7 +56,7 @@ export function AuthFrame({ title, sub, children }: { title: string; sub?: React
         <div className="mx-auto my-auto flex w-full max-w-[420px] flex-col gap-6 py-8">
           <img src="/icon-192.png" alt="Shaan Fitness" width="64" height="64" className="h-16 w-16 rounded-[16px] border border-line lg:hidden" />
           <div className="flex flex-col gap-2.5">
-            <h1 className="m-0 font-display text-[44px] leading-[.95] font-extrabold uppercase">{title}</h1>
+            <h1 className="headline text-[44px]">{title}</h1>
             {sub && <div className="text-[15px] leading-normal text-muted">{sub}</div>}
           </div>
           {children}

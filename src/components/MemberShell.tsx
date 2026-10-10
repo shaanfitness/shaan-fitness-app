@@ -44,8 +44,8 @@ export function MemberShell() {
       <nav aria-label="App" className="fixed inset-x-0 bottom-0 z-40 grid grid-cols-5 border-t border-line bg-nav/95 px-2 pt-2 pb-[calc(10px+env(safe-area-inset-bottom))] backdrop-blur lg:hidden">
         {items.map((it) => (
           <NavLink key={it.to} to={it.to} end={it.end}
-            className={({ isActive }) => `flex min-h-[54px] flex-col items-center justify-center gap-1 text-[11px] font-semibold no-underline ${isActive ? 'text-gold' : 'text-muted hover:text-ink'}`}>
-            <Icon name={it.icon} />{it.label}
+            className={({ isActive }) => `tab ${isActive ? 'active' : ''}`}>
+            <span className="tab-icon"><Icon name={it.icon} /></span>{it.label}
           </NavLink>
         ))}
       </nav>

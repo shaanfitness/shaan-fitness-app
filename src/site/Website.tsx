@@ -49,7 +49,7 @@ function Block({ id, title, sub, children, tone }: { id?: string; title: string;
     <section id={id} aria-labelledby={id ? `${id}-h` : undefined} className={`scroll-mt-16 border-b border-line ${tone === 'alt' ? 'bg-surface/40' : ''}`}>
       <div className="mx-auto flex max-w-[1200px] flex-col gap-8 px-4 py-14 lg:px-8 lg:py-20">
         <div className="flex max-w-[720px] flex-col gap-3">
-          <h2 id={id ? `${id}-h` : undefined} className="m-0 font-display text-[40px] leading-[.95] font-extrabold uppercase lg:text-[56px]">{title}</h2>
+          <h2 id={id ? `${id}-h` : undefined} className="headline text-[40px] lg:text-[56px]">{title}</h2>
           {sub && <div className="m-0 text-[16px] leading-relaxed text-muted">{sub}</div>}
         </div>
         {children}
@@ -77,7 +77,7 @@ function Hero({ site }: { site?: SiteInfo | null }) {
       <div className="relative mx-auto grid max-w-[1200px] items-center gap-10 px-4 pt-12 pb-14 lg:grid-cols-[1.2fr_.8fr] lg:px-8 lg:pt-20 lg:pb-24">
         <div className="flex flex-col gap-6">
           <p className="eyebrow">{[s?.name ?? 'Shaan Fitness', s?.branch, s?.city].filter(Boolean).join(' · ')}</p>
-          <h1 className="m-0 font-display text-[54px] leading-[.9] font-extrabold uppercase sm:text-[76px] lg:text-[100px]">{title}</h1>
+          <h1 className="headline text-[54px] sm:text-[76px] lg:text-[100px]">{title}</h1>
           <p className="m-0 max-w-[560px] text-[17px] leading-relaxed text-ink-soft">{text}</p>
           <div className="flex flex-wrap gap-3">
             {user?.role === 'member'
@@ -346,7 +346,7 @@ function Cta({ site }: { site: SiteInfo }) {
     <section className="bg-gold text-on-gold">
       <div className="mx-auto flex max-w-[1200px] flex-col gap-6 px-4 py-14 lg:flex-row lg:items-center lg:justify-between lg:px-8">
         <div className="flex max-w-[640px] flex-col gap-3">
-          <h2 className="m-0 font-display text-[44px] leading-[.95] font-extrabold uppercase lg:text-[60px]">{t('site.ctaTitle')}</h2>
+          <h2 className="headline text-[44px] lg:text-[60px]">{t('site.ctaTitle')}</h2>
           <p className="m-0 text-[16px] leading-relaxed opacity-90">{t('site.ctaText')}</p>
         </div>
         <div className="flex flex-wrap gap-3">

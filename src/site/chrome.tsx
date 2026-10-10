@@ -18,10 +18,9 @@ export function useSiteLook() {
 export function LangToggle({ compact }: { compact?: boolean }) {
   const { t, i18n } = useTranslation()
   return (
-    <div role="group" aria-label={t('common.language')} className="flex flex-none rounded-xl border border-line p-[3px]">
+    <div role="group" aria-label={t('common.language')} className="lang-switch">
       {(['en', 'te'] as const).map((l) => (
-        <button key={l} type="button" aria-pressed={i18n.language === l} onClick={() => setLanguage(l)}
-          className={`${compact ? 'min-h-8 px-2.5 text-[11px]' : 'min-h-9 px-3 text-[12px]'} rounded-[10px] font-semibold ${i18n.language === l ? 'bg-ink text-ground' : 'text-muted hover:text-ink'}`}>
+        <button key={l} type="button" aria-pressed={i18n.language === l} onClick={() => setLanguage(l)} style={compact ? { minHeight: 32 } : undefined}>
           {l === 'en' ? 'EN' : 'తెలుగు'}
         </button>
       ))}
@@ -33,7 +32,7 @@ export function Wordmark({ size = 34 }: { size?: number }) {
   return (
     <Link to="/" className="flex min-w-0 items-center gap-2.5 text-ink no-underline hover:text-ink">
       <img src="/icon-192.png" alt="" width={size} height={size} className="flex-none rounded-[9px]" style={{ width: size, height: size }} />
-      <span className="font-display text-[19px] leading-none font-bold tracking-[.04em] whitespace-nowrap uppercase">Shaan Fitness</span>
+      <span className="headline wordmark whitespace-nowrap">Shaan <span className="brand-2">Fitness</span></span>
     </Link>
   )
 }
