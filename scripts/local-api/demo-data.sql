@@ -47,6 +47,13 @@ begin
       plan = case when i % 3 = 0 then '00000000-0000-4000-8000-0000000000b1'::uuid when i % 3 = 1 then '00000000-0000-4000-8000-0000000000b2'::uuid else '00000000-0000-4000-8000-0000000000b3'::uuid end;
       price = case when i % 3 = 0 then 4999 when i % 3 = 1 then 7999 else 14999 end;
       start = d - ((i * 5) % 45);
+      -- The first eight are renewing: an earlier plan two months before.
+      if i <= 8 then
+        insert into public.subscriptions (studio_id, member_id, plan_id, start_date, base_price, selling_price, invoice_date, created_by, bill_rep_id)
+        values (st, m, plan, start - 70, price, price, start - 70, staff_ids[1 + i % 2], staff_ids[1 + i % 2]) returning id into s;
+        insert into public.payments (studio_id, member_id, subscription_id, amount, mode, receipt_date, added_by)
+        values (st, m, s, price, case when i % 2 = 0 then 'CASH' else 'ONLINE' end, start - 70, staff_ids[1 + i % 2]);
+      end if;
       insert into public.subscriptions (studio_id, member_id, plan_id, start_date, base_price, selling_price, invoice_date, created_by, bill_rep_id)
       values (st, m, plan, start, price, price, start, staff_ids[1 + i % 2], staff_ids[1 + i % 2]) returning id into s;
       insert into public.payments (studio_id, member_id, subscription_id, amount, mode, receipt_date, added_by)
@@ -74,8 +81,37 @@ begin
     end if;
   end loop;
 
+  -- History for the analysis pages: six weeks of check-ins in each member's batch while their plan ran,
+  -- a few expenses and salaries, and a target for a coach.
+  insert into public.attendance (studio_id, member_id, batch_id, date, check_in, check_out, source)
+  select st, bm.member_id, bm.batch_id, d - k,
+    ((d - k) + b.start_time) at time zone 'Asia/Kolkata' + (abs(hashtext(bm.member_id::text || k::text)) % 20) * interval '1 minute',
+    ((d - k) + b.start_time) at time zone 'Asia/Kolkata' + interval '75 minutes', 'manual'
+  from public.batch_members bm join public.batches b on b.id = bm.batch_id cross join generate_series(1, 45) k
+  where bm.studio_id = st and abs(hashtext(bm.member_id::text || k::text)) % 5 < 3 and extract(isodow from d - k) <> 7
+    and exists (select 1 from public.subscriptions x where x.member_id = bm.member_id and x.deleted_at is null and d - k between x.start_date and x.end_date);
+  insert into public.vendors (id, studio_id, name, contact_name, phone1) values
+    ('00000000-0000-4000-8000-0000000000e9', st, 'APEPDCL', 'Billing desk', '1912'),
+    ('00000000-0000-4000-8000-0000000000ea', st, 'Fit Supplies', 'Naresh', '9100000099')
+  on conflict do nothing;
+  insert into public.expenses (studio_id, title, vendor_id, category, expense_date, payment_type, amount, final_amount) values
+    (st, 'Electricity', '00000000-0000-4000-8000-0000000000e9', 'Electricity Bills', d - 35, 'ONLINE', 6400, 6400),
+    (st, 'Electricity', '00000000-0000-4000-8000-0000000000e9', 'Electricity Bills', d - 5, 'ONLINE', 7100, 7100),
+    (st, 'Rent', null, 'Rent', d - 40, 'NEFT', 35000, 35000),
+    (st, 'Rent', null, 'Rent', d - 10, 'NEFT', 35000, 35000),
+    (st, 'Resistance bands', '00000000-0000-4000-8000-0000000000ea', 'Assets Purchased', d - 18, 'UPI', 4200, 4200),
+    (st, 'Cleaning supplies', null, 'Housekeeping', d - 3, 'CASH', 1800, 1800);
+  insert into public.payroll_entries (studio_id, staff_id, from_date, to_date, paid_date, paid_days, present_days, basic_salary, payable, mode) values
+    (st, coach1, d - 60, d - 31, d - 30, 26, 26, 18000, 18000, 'NEFT'),
+    (st, coach2, d - 60, d - 31, d - 30, 25, 25, 15000, 15000, 'NEFT'),
+    (st, desk, d - 60, d - 31, d - 30, 26, 26, 12000, 12000, 'NEFT');
+  insert into public.staff_targets (studio_id, staff_id, year, month, target_type, commission_type, tiers)
+  values (st, coach1, extract(year from d), extract(month from d), null, 'percentage',
+          '[{"target": 20000, "commission": 5}, {"target": 40000, "commission": 8}, {"target": 60000, "commission": 10}]')
+  on conflict do nothing;
+
   -- A few members renewing soon and one expired last week.
-  update public.subscriptions set base_end_date = d + 3 where id in (select id from public.subscriptions order by start_date limit 2);
+  update public.subscriptions set base_end_date = d + 3 where id in (select id from public.subscriptions where start_date > d - 50 order by start_date limit 2);
   update public.members set lead_status = 'not_interested' where kind = 'enquiry' and first_name in ('Ramya', 'Ganesh');
   perform app.relink_existing_users();
 end $$;

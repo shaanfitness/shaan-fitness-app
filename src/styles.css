@@ -35,6 +35,9 @@
   --color-av4: #B8D8B0;
   --color-av5: #E9C08B;
   --color-stripe: #D6B878;
+  /* Chart series, checked for colour-blind separation and contrast on this surface. */
+  --color-series-1: #C08A1E;
+  --color-series-2: #3987E5;
   --font-display: "Bodoni Moda", "Didot", Georgia, serif;
   --font-sans: "Manrope", "Noto Sans Telugu", system-ui, -apple-system, "Segoe UI", sans-serif;
 }
@@ -71,6 +74,8 @@
   --color-av4: #9BE0B8;
   --color-av5: #E6B957;
   --color-stripe: #E6B957;
+  --color-series-1: #D92D3A;
+  --color-series-2: #3987E5;
   --font-display: "Barlow Condensed", "Arial Narrow", sans-serif;
   --font-sans: "Barlow", "Noto Sans Telugu", system-ui, -apple-system, "Segoe UI", sans-serif;
 }
@@ -107,6 +112,8 @@
   --color-av4: #1E7A55;
   --color-av5: #A14A12;
   --color-stripe: #2248B5;
+  --color-series-1: #2248B5;
+  --color-series-2: #EB6834;
   --font-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
   --font-sans: "Hanken Grotesk", "Noto Sans Telugu", system-ui, -apple-system, "Segoe UI", sans-serif;
 }

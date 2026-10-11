@@ -1,5 +1,5 @@
 import { Link, Navigate, Outlet, Route, Routes, useLocation } from 'react-router-dom'
-import { useEffect, type ReactNode } from 'react'
+import { Suspense, lazy, useEffect, type ComponentType, type ReactNode } from 'react'
 import { AppShell, StaffMenu } from './components/AppShell'
 import { homeFor, useAuth } from './auth'
 import type { Role } from './db/types'
@@ -52,6 +52,24 @@ import { AppCoaches, AppContact, AppFeedback, AppNotices, AppPlans, AppResults }
 import { prettyPhone, telLink, useSite } from './db/site'
 import { Notice } from './components/controls'
 
+// The analysis reports load on first visit, so the member app and other pages stay light.
+const people = () => import('./screens/staff/analysis/People')
+const money = () => import('./screens/staff/analysis/Money')
+type Mod = Record<string, ComponentType>
+const page = (load: () => Promise<unknown>, name: string) => lazy(() => load().then((m) => ({ default: (m as Mod)[name] })))
+const AN = {
+  traffic: page(people, 'TrafficAnalysis'), members: page(people, 'MembersAnalysis'), stages: page(people, 'EnquiryStageAnalysis'),
+  followUps: page(people, 'FollowUpAnalysis'), conversion: page(people, 'ConversionAnalysis'), enquiries: page(people, 'EnquiryAnalysis'),
+  enquiryConversion: page(people, 'EnquiryConversionReport'), leadSources: page(people, 'LeadSourceAnalysis'), weightLoss: page(people, 'WeightLossAnalysis'),
+  collection: page(money, 'CollectionAnalysis'), subscriptions: page(money, 'SubscriptionsAnalysis'), expenses: page(money, 'ExpenseAnalysis'),
+  profitLoss: page(money, 'ProfitLossAnalysis'), billing: page(money, 'BillingAnalysis'), sales: page(money, 'SalesLeaderboard'),
+  daily: page(money, 'DailyCollectionAnalysis'), pt: page(money, 'PtAnalysis'), leaderboard: page(money, 'Leaderboard'),
+  forecast: page(money, 'RevenueForecast'), branches: page(money, 'BranchAnalysis'),
+}
+function Lazy({ c: C }: { c: ComponentType }) {
+  return <Suspense fallback={<div className="px-5 py-10 text-center text-[14px] text-muted lg:px-8" role="status">Loading…</div>}><C /></Suspense>
+}
+
 const STAFF: Role[] = ['owner', 'front_desk', 'coach', 'doctor']
 const DESK: Role[] = ['owner', 'front_desk']
 const DC: Role[] = ['owner', 'front_desk', 'coach']
@@ -97,6 +115,26 @@ const BUILT: Record<string, { el: ReactNode; roles: Role[] }> = {
   '/plans': { el: <PlanList />, roles: DESK },
   '/subscriptions': { el: <Subscriptions />, roles: DESK },
   '/quick-billing': { el: <QuickBilling />, roles: DESK },
+  '/analysis/traffic': { el: <Lazy c={AN.traffic} />, roles: DESK },
+  '/analysis/members': { el: <Lazy c={AN.members} />, roles: DESK },
+  '/analysis/enquiry-stages': { el: <Lazy c={AN.stages} />, roles: DESK },
+  '/analysis/collection': { el: <Lazy c={AN.collection} />, roles: ['owner'] },
+  '/analysis/subscriptions': { el: <Lazy c={AN.subscriptions} />, roles: ['owner'] },
+  '/analysis/follow-ups': { el: <Lazy c={AN.followUps} />, roles: DESK },
+  '/analysis/conversion': { el: <Lazy c={AN.conversion} />, roles: DESK },
+  '/analysis/enquiries': { el: <Lazy c={AN.enquiries} />, roles: DESK },
+  '/analysis/enquiry-conversion': { el: <Lazy c={AN.enquiryConversion} />, roles: ['owner'] },
+  '/analysis/expenses': { el: <Lazy c={AN.expenses} />, roles: ['owner'] },
+  '/analysis/profit-loss': { el: <Lazy c={AN.profitLoss} />, roles: ['owner'] },
+  '/analysis/billing': { el: <Lazy c={AN.billing} />, roles: ['owner'] },
+  '/analysis/sales-leaderboard': { el: <Lazy c={AN.sales} />, roles: ['owner'] },
+  '/analysis/daily-collection': { el: <Lazy c={AN.daily} />, roles: DESK },
+  '/analysis/pt': { el: <Lazy c={AN.pt} />, roles: ['owner'] },
+  '/analysis/leaderboard': { el: <Lazy c={AN.leaderboard} />, roles: ['owner'] },
+  '/analysis/revenue-forecast': { el: <Lazy c={AN.forecast} />, roles: ['owner'] },
+  '/analysis/weight-loss': { el: <Lazy c={AN.weightLoss} />, roles: DC },
+  '/analysis/lead-sources': { el: <Lazy c={AN.leadSources} />, roles: ['owner'] },
+  '/analysis/branches': { el: <Lazy c={AN.branches} />, roles: ['owner'] },
   '/registers/collection': { el: <CollectionReport />, roles: DESK },
   '/registers/receipts': { el: <R.RegisterPage def={R.receiptRegister} />, roles: DESK },
   '/registers/subscriptions': { el: <R.RegisterPage def={R.subscriptionsRegister} />, roles: DESK },
