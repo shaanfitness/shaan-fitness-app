@@ -1,7 +1,9 @@
 import { useState } from 'react'
 import { addDays, format, parseISO } from 'date-fns'
 import { useMe } from '../../../auth'
-import { useList, useTeam } from '../../../db/studio'
+import { weightLoss, type WeightLossRow } from '../../../db/training'
+import { ClientCell } from '../../../components/client'
+import { useBatches, useList, useTeam } from '../../../db/studio'
 import {
   report, type ConversionSide, type ConversionYear, type EnquirySide, type EnquiryStages, type EnquiryYear, type FollowUpInsight,
   type LeadSourceRow, type LeadSources, type MembersInsight, type StaffConversion, type Traffic,
@@ -523,13 +525,37 @@ export function LeadSourceAnalysis() {
 // Weight Loss Analysis (YDL "Client Weight Loss List")
 // ---------------------------------------------------------------------------------------------
 export function WeightLossAnalysis() {
+  const { studioId } = useMe()
   const team = useTeam()
   const sources = useList('source_promotion')
   const employment = useList('employment_status')
   const [range, setRange] = useState<RangeValue>(() => rangeFor('this_month'))
   const [search, setSearch] = useState('')
-  const [f, setF] = useState({ source: '', employment: '', lead: '', rep: '', gender: '', type: '', coach: '' })
+  const { data: batches = [] } = useBatches()
+  const [f, setF] = useState({ source: '', employment: '', lead: '', rep: '', batch: '', gender: '', type: '', coach: '' })
   const set = (k: keyof typeof f) => (v: string) => setF({ ...f, [k]: v })
+  const [panel, setPanel] = useState(false)
+  const [more, setMore] = useState({ ages: [] as string[], status: [] as string[] })
+  const [draft, setDraft] = useState(more)
+  const on = more.ages.length + more.status.length
+  const filter = { source: f.source, employment: f.employment, lead: f.lead, rep: f.rep, batch: f.batch, gender: f.gender, client_type: f.type, coach: f.coach,
+    ages: more.ages, lead_status: more.status }
+  const q = useReport('weight-loss', [range.from, range.to, JSON.stringify(filter)], () => weightLoss(studioId, range.from, range.to, filter))
+  const s = search.trim().toLowerCase()
+  const rows = (q.data ?? []).filter((r) => !s || `${r.name} ${r.phone ?? ''} ${r.email ?? ''} ${r.code ?? ''}`.toLowerCase().includes(s))
+  const cols: Col<WeightLossRow>[] = [
+    { key: 'name', header: 'Client Name', cell: (r) => <ClientCell id={r.member_id} name={r.name} code={r.code} />, csv: (r) => r.name },
+    { key: 'phone', header: 'Mobile', nowrap: true, cell: (r) => r.phone ?? '-', csv: (r) => r.phone },
+    { key: 'coach', header: 'Assigned Coach', cell: (r) => r.coach ?? '-', csv: (r) => r.coach },
+    { key: 'n', header: 'Entries', num: true, cell: (r) => count(r.count), csv: (r) => r.count },
+    { key: 'first', header: 'First Weight', num: true, cell: (r) => <>{dec(r.first_weight)} kg <span className="block text-[11px] text-faint">{format(parseISO(r.first_date), 'dd-MMM-yyyy')}</span></>, csv: (r) => `${r.first_weight} (${r.first_date})` },
+    { key: 'last', header: 'Latest Weight', num: true, cell: (r) => <>{dec(r.last_weight)} kg <span className="block text-[11px] text-faint">{format(parseISO(r.last_date), 'dd-MMM-yyyy')}</span></>, csv: (r) => `${r.last_weight} (${r.last_date})` },
+    { key: 'lost', header: 'Weight Lost', num: true, cell: (r) => <b className={num(r.lost) > 0 ? 'text-green' : num(r.lost) < 0 ? 'text-red' : ''}>{dec(r.lost)} kg</b>, csv: (r) => r.lost },
+    { key: 'pct', header: 'Lost %', num: true, cell: (r) => (r.lost_pct == null ? '-' : `${dec(r.lost_pct, 1)}%`), csv: (r) => r.lost_pct },
+    { key: 'waist', header: 'Waist Lost', num: true, cell: (r) => (r.waist_lost == null ? '-' : `${dec(r.waist_lost)} in`), csv: (r) => r.waist_lost },
+  ]
+  const losers = rows.filter((r) => num(r.lost) > 0)
+  const totalLost = losers.reduce((t, r) => t + num(r.lost), 0)
   return (
     <AnalysisPage title="Weight Loss Analysis" filters={<>
       <RangeControl value={range} onChange={setRange} label="Created Date" />
@@ -537,20 +563,42 @@ export function WeightLossAnalysis() {
       <PickControl label="Employment Type" value={f.employment} onChange={set('employment')} options={employment.map((s) => ({ value: s.label, label: s.label }))} />
       <PickControl label="Lead Type" value={f.lead} onChange={set('lead')} placeholder="All Convertibility" options={['Hot', 'Warm', 'Cold', 'Expected'].map((l) => ({ value: l, label: l }))} />
       <PickControl label="Client Rep" value={f.rep} onChange={set('rep')} options={staffOptions(team)} />
+      <PickControl label="Batch List" value={f.batch} onChange={set('batch')} options={batches.map((b) => ({ value: b.id, label: b.name }))} />
       <PickControl label="Gender" value={f.gender} onChange={set('gender')} options={[{ value: 'male', label: 'Male' }, { value: 'female', label: 'Female' }, { value: 'other', label: 'Other' }]} />
       <PickControl label="Client Type" value={f.type} onChange={set('type')} placeholder="All Clients" options={[{ value: 'enquiry', label: 'Enquiry' }, { value: 'member', label: 'Member' }]} />
       <PickControl label="Assigned Coach" value={f.coach} onChange={set('coach')} options={team.trainers.map((s) => ({ value: s.id, label: s.full_name }))} />
+      <button type="button" className="btn btn-sm self-end" onClick={() => { setDraft(more); setPanel(true) }}><Icon name="filter" size={16} />Filters{on ? ` (${on})` : ''}</button>
       <div className="relative min-w-[220px] flex-1">
         <Icon name="search" size={18} className="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-muted" />
-        <TextInput small value={search} onChange={setSearch} placeholder="Search by Mobile Number or Email Address" className="pl-9" />
+        <TextInput small value={search} onChange={setSearch} placeholder="Search by Mobile Number or Email Address" className="pl-9" ariaLabel="Search by Mobile Number or Email Address" />
       </div>
-    </>}>
-      <Block title="Client Weight Loss List" sub={rangeTitle(range)}>
-        <div className="card px-5 py-10 text-center text-[14px] text-muted">
-          No body measurements are recorded yet. When coaches record clients’ weight, everyone who lost weight in these dates is listed here with
-          their first and latest weight, ready to export.
+    </>} actions={q.data ? <CsvOnly><CsvButton filename={`weight-loss-${range.from}-${range.to}.csv`} rows={rows} cols={cols} /></CsvOnly> : null}>
+      <ReportBody q={q}>{() => <>
+        <div className="px-5 lg:px-8">
+          <Tiles items={[
+            { label: 'Clients weighed', value: count(rows.length), hint: 'two or more entries show a change' },
+            { label: 'Lost weight', value: count(losers.length), hint: pct(losers.length, rows.length) },
+            { label: 'Total lost', value: `${dec(totalLost, 1)} kg` },
+            { label: 'Average lost', value: losers.length ? `${dec(totalLost / losers.length, 1)} kg` : '—', hint: 'among those who lost' },
+          ]} />
         </div>
-      </Block>
+        <Block title="Client Weight Loss List" sub={`${rangeTitle(range)} · first and latest weight recorded in these dates`}>
+          <Table caption="Client weight loss" rowKey={(r) => r.member_id} rows={rows} cols={cols} wrapHeaders
+            empty="No weights recorded in these dates. When coaches or clients record weight, everyone is listed here with their first and latest weight." />
+        </Block>
+      </>}</ReportBody>
+      <Sheet open={panel} onClose={() => setPanel(false)} title="Filters">
+        <div className="flex flex-col gap-4">
+          <CheckboxGroup legend="Lead Status" values={draft.status} onChange={(v) => setDraft({ ...draft, status: v })}
+            options={[{ value: 'open', label: 'Open Enquiry' }, { value: 'not_interested', label: 'Not Interested' }]} />
+          <CheckboxGroup legend="Members by Age" values={draft.ages} onChange={(v) => setDraft({ ...draft, ages: v })}
+            options={AGE_GROUPS.map((a) => ({ value: a, label: `Age ${a}` }))} />
+          <div className="flex justify-end gap-2">
+            <button type="button" className="btn" onClick={() => setPanel(false)}>Close</button>
+            <button type="button" className="btn-gold" onClick={() => { setMore(draft); setPanel(false) }}>Apply</button>
+          </div>
+        </div>
+      </Sheet>
     </AnalysisPage>
   )
 }

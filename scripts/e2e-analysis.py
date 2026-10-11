@@ -148,7 +148,7 @@ with sync_playwright() as p:
     expect(page.get_by_text("Expected in the next 12 months")).to_be_visible()
     shot(page, "revenue-forecast")
     open_page(page, "weight-loss", "Weight Loss Analysis")
-    expect(page.get_by_text("No body measurements are recorded yet")).to_be_visible()
+    expect(page.get_by_role("row").filter(has_text="Rohit Sharma")).to_contain_text("kg")
     open_page(page, "lead-sources", "Lead Source Analysis")
     csv(page)
     open_page(page, "branches", "Branch Analysis")

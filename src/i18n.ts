@@ -77,6 +77,22 @@ const en = {
     feedbackSend: 'Send', feedbackSent: 'Thank you. Your feedback reached the team.', yourFeedback: 'Your feedback', coaches: 'Our coaches', contact: 'Contact us',
     results: 'Results', noNotices: 'No notices right now.', noRules: 'No rules posted yet.', back: 'Back', soon: 'This opens in the app soon.',
   },
+  plan: {
+    workout: 'Workout', diet: 'Diet', progress: 'Progress', noMember: 'Your plan shows here once the gym links your membership to this login.',
+    noWorkout: 'Your coach hasn’t given you a workout plan yet.', noDiet: 'Your coach hasn’t given you a diet plan yet.',
+    yourDays: 'Your days: {{days}}', today: 'Today', day: 'Day {{n}}', restDay: 'Today is a rest day. Here is the rest of your plan.', rest: 'Rest, or nothing planned for this day.',
+    ticked: '{{done}} of {{total}} done today', onlyToday: 'You can tick off exercises on the day you do them.', markDone: 'Done',
+    sets: '{{n}} sets', reps: '{{n}} reps', pdf: 'Download PDF', target: 'Target: {{kcal}} kcal a day', noMeals: 'No meals for this day.',
+    macros: '{{kcal}} kcal · Protein {{p}} g · Carbs {{c}} g · Fats {{f}} g',
+    wd1: 'Mon', wd2: 'Tue', wd3: 'Wed', wd4: 'Thu', wd5: 'Fri', wd6: 'Sat', wd7: 'Sun',
+    addMeasurement: 'Add measurement', weightChart: 'Weight', weight: 'Weight', history: 'Measurement history', photosTitle: 'Progress photos',
+    saved: 'Measurement saved', badDate: 'Choose a date up to today.', badNumber: 'Enter a number for {{what}}.', enterOne: 'Enter at least one measurement or add a photo.',
+    badPhoto: 'Photos should be pictures under 8 MB.', date: 'Date', moreMeasurements: 'More measurements', note: 'Note', photos: 'Progress photos',
+    photosHint: 'Up to 3. Only you, your coach or doctor, and the owner can see them.', close: 'Close', saving: 'Saving…', save: 'Save',
+    chartLater: 'The chart appears after two weight entries.', sinceFirst: 'since first', deleted: 'Measurement deleted', noMeasurements: 'No measurements yet.',
+    more: 'Others', byGym: 'by the gym', bySelf: 'by you', showMore: 'Show {{count}}', confirmDelete: 'Delete this measurement?', delete: 'Delete',
+    noPhotos: 'No progress photos yet.', photoOf: 'Progress photo, {{date}}',
+  },
 }
 
 const te: typeof en = {
@@ -152,6 +168,22 @@ const te: typeof en = {
     notices: 'నోటీసులు', rules: 'నియమాలు', feedback: 'అభిప్రాయం పంపండి', feedbackHint: 'ఏది బాగుంది, ఏది మెరుగుపరచాలో చెప్పండి. జిమ్ టీమ్ మాత్రమే చదువుతుంది.',
     feedbackSend: 'పంపండి', feedbackSent: 'ధన్యవాదాలు. మీ అభిప్రాయం టీమ్‌కు చేరింది.', yourFeedback: 'మీ అభిప్రాయం', coaches: 'మా కోచ్‌లు', contact: 'సంప్రదించండి',
     results: 'ఫలితాలు', noNotices: 'ప్రస్తుతం నోటీసులు లేవు.', noRules: 'ఇంకా నియమాలు పెట్టలేదు.', back: 'వెనక్కి', soon: 'ఇది త్వరలో యాప్‌లో తెరుచుకుంటుంది.',
+  },
+  plan: {
+    workout: 'వర్కౌట్', diet: 'డైట్', progress: 'ప్రోగ్రెస్', noMember: 'జిమ్ మీ మెంబర్‌షిప్‌ను ఈ లాగిన్‌కు జత చేసిన తర్వాత మీ ప్లాన్ ఇక్కడ కనిపిస్తుంది.',
+    noWorkout: 'మీ కోచ్ ఇంకా వర్కౌట్ ప్లాన్ ఇవ్వలేదు.', noDiet: 'మీ కోచ్ ఇంకా డైట్ ప్లాన్ ఇవ్వలేదు.',
+    yourDays: 'మీ రోజులు: {{days}}', today: 'ఈరోజు', day: 'రోజు {{n}}', restDay: 'ఈరోజు విశ్రాంతి రోజు. మీ మిగతా ప్లాన్ ఇదిగో.', rest: 'విశ్రాంతి, లేదా ఈ రోజుకి ఏమీ లేదు.',
+    ticked: 'ఈరోజు {{total}} లో {{done}} పూర్తయ్యాయి', onlyToday: 'వ్యాయామం చేసిన రోజునే టిక్ చేయవచ్చు.', markDone: 'పూర్తయింది',
+    sets: '{{n}} సెట్లు', reps: '{{n}} రెప్స్', pdf: 'PDF డౌన్‌లోడ్ చేయండి', target: 'లక్ష్యం: రోజుకు {{kcal}} కేలరీలు', noMeals: 'ఈ రోజుకి భోజనాలు లేవు.',
+    macros: '{{kcal}} కేలరీలు · ప్రోటీన్ {{p}} గ్రా · కార్బ్స్ {{c}} గ్రా · ఫ్యాట్స్ {{f}} గ్రా',
+    wd1: 'సోమ', wd2: 'మంగళ', wd3: 'బుధ', wd4: 'గురు', wd5: 'శుక్ర', wd6: 'శని', wd7: 'ఆది',
+    addMeasurement: 'కొలతలు జోడించండి', weightChart: 'బరువు', weight: 'బరువు', history: 'కొలతల చరిత్ర', photosTitle: 'ప్రోగ్రెస్ ఫోటోలు',
+    saved: 'కొలతలు సేవ్ అయ్యాయి', badDate: 'ఈరోజు వరకు ఉన్న తేదీ ఎంచుకోండి.', badNumber: '{{what}} కోసం సంఖ్య ఇవ్వండి.', enterOne: 'కనీసం ఒక కొలత ఇవ్వండి లేదా ఫోటో జోడించండి.',
+    badPhoto: 'ఫోటోలు 8 MB లోపు ఉండాలి.', date: 'తేదీ', moreMeasurements: 'మరిన్ని కొలతలు', note: 'గమనిక', photos: 'ప్రోగ్రెస్ ఫోటోలు',
+    photosHint: 'గరిష్టంగా 3. మీరు, మీ కోచ్ లేదా డాక్టర్, యజమాని మాత్రమే చూడగలరు.', close: 'మూసివేయండి', saving: 'సేవ్ అవుతోంది…', save: 'సేవ్ చేయండి',
+    chartLater: 'రెండు సార్లు బరువు నమోదు చేసిన తర్వాత చార్ట్ కనిపిస్తుంది.', sinceFirst: 'మొదటి నుండి', deleted: 'కొలత తొలగించబడింది', noMeasurements: 'ఇంకా కొలతలు లేవు.',
+    more: 'ఇతరాలు', byGym: 'జిమ్ నమోదు', bySelf: 'మీ నమోదు', showMore: '{{count}} చూపించు', confirmDelete: 'ఈ కొలతను తొలగించాలా?', delete: 'తొలగించండి',
+    noPhotos: 'ఇంకా ప్రోగ్రెస్ ఫోటోలు లేవు.', photoOf: 'ప్రోగ్రెస్ ఫోటో, {{date}}',
   },
 }
 

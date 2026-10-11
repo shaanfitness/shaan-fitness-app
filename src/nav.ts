@@ -213,14 +213,14 @@ export const NAV: NavNode[] = [
     p('Add Social Links & QR', '/app-settings/social', '/fitness-center/app/social-link/', D, { built: true }),
     p('Measurement Settings', '/app-settings/measurements', '/fitness-centers/measurement_settings/', D, { built: true }),
     g('Workouts & Diet', [
-      g('Workout Plans', [p('My Workout Plans', '/workouts', '/fitness-center/workout-plan/workout-plan-list/', DC)]),
+      g('Workout Plans', [p('My Workout Plans', '/workouts', '/fitness-center/workout-plan/workout-plan-list/', DC, { built: true })]),
       g('Diet Plans', [
-        p('My Diet Plans', '/diets', '/fitness-center/workout-plan/diet-plan-list/', DC),
-        p('Verify Diet Food Listing', '/diets/foods', '/diet/master-diet-item/', DC),
-        p('Verify Diet Recipe Listing', '/recipes/verify', '/fitness-center/workout/client-recipe-list/', DC),
-        p('Recipe Listing', '/recipes', '/fitness-center/workout/recipe-list/', DC),
+        p('My Diet Plans', '/diets', '/fitness-center/workout-plan/diet-plan-list/', DC, { built: true }),
+        p('Verify Diet Food Listing', '/diets/foods', '/diet/master-diet-item/', DC, { built: true }),
+        p('Verify Diet Recipe Listing', '/recipes/verify', '/fitness-center/workout/client-recipe-list/', DC, { built: true }),
+        p('Recipe Listing', '/recipes', '/fitness-center/workout/recipe-list/', DC, { built: true }),
       ]),
-      g('Exercises', [p('Exercise List', '/exercises', '/fitness-center/exercise/exercise-list/', DC)]),
+      g('Exercises', [p('Exercise List', '/exercises', '/fitness-center/exercise/exercise-list/', DC, { built: true })]),
     ]),
     p('Community', '/community', '/community/pending-home-page/', D),
     g('Challenges', [

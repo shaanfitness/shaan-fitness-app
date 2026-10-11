@@ -376,6 +376,8 @@ interface ChartProps {
   format?: (n: number) => string
   height?: number
   caption: string
+  /** Line charts: start the axis near the lowest value instead of 0 (e.g. body weight). */
+  fit?: boolean
 }
 
 function useActive(n: number) {
@@ -444,18 +446,25 @@ export function ColumnChart({ labels, titles, series, format = (n) => count(n), 
 }
 
 /** A line over time with a crosshair that snaps to the nearest point. One series gets a light wash below it. */
-export function LineChart({ labels, titles, series, format = (n) => count(n), height = 220, caption }: ChartProps) {
+export function LineChart({ labels, titles, series, format = (n) => count(n), height = 220, caption, fit }: ChartProps) {
   const [ref, width] = useWidth<HTMLDivElement>()
   const n = labels.length
   const { active, setActive, keys } = useActive(n)
-  const max = Math.max(0, ...series.flatMap((s) => s.values))
-  const { top, step } = niceScale(max)
+  const all = series.flatMap((s) => s.values)
+  const max = Math.max(0, ...all)
+  let base = 0
+  if (fit && all.length) {
+    const lo = Math.min(...all)
+    const st = niceScale(Math.max(1, max - lo)).step
+    base = Math.max(0, Math.floor((lo - st / 2) / st) * st)
+  }
+  const { top, step } = niceScale(max - base)
   const plotW = Math.max(0, width - AXIS_W - 12)
   const plotH = height - AXIS_H - TOP
   const x = (i: number) => AXIS_W + 6 + (n > 1 ? (i / (n - 1)) * plotW : plotW / 2)
-  const y = (v: number) => TOP + plotH - (v / top) * plotH
+  const y = (v: number) => TOP + plotH - ((v - base) / top) * plotH
   const every = Math.max(1, Math.ceil(n / Math.max(1, Math.floor(plotW / 56))))
-  const ticks = Array.from({ length: Math.round(top / step) + 1 }, (_, i) => i * step)
+  const ticks = Array.from({ length: Math.round(top / step) + 1 }, (_, i) => base + i * step)
   const onMove = (e: React.MouseEvent<SVGSVGElement>) => {
     const r = e.currentTarget.getBoundingClientRect()
     const px = e.clientX - r.left
@@ -476,17 +485,17 @@ export function LineChart({ labels, titles, series, format = (n) => count(n), he
             ))}
             {labels.map((l, i) => (i % every === 0 ? <text key={l + i} x={x(i)} y={height - 8} textAnchor={x(i) > width - 28 ? 'end' : 'middle'} fontSize={11} fill="var(--color-muted)">{l}</text> : null))}
             {series.length === 1 && (
-              <path d={`M${x(0)},${y(0)} ${series[0].values.map((v, i) => `L${x(i)},${y(v)}`).join(' ')} L${x(n - 1)},${y(0)} Z`} fill={colorOf(series[0], 0)} opacity={0.1} />
+              <path d={`M${x(0)},${y(base)} ${series[0].values.map((v, i) => `L${x(i)},${y(v)}`).join(' ')} L${x(n - 1)},${y(base)} Z`} fill={colorOf(series[0], 0)} opacity={0.1} />
             )}
             {series.map((s, si) => (
               <path key={s.name} d={s.values.map((v, i) => `${i ? 'L' : 'M'}${x(i)},${y(v)}`).join(' ')} fill="none" stroke={colorOf(s, si)} strokeWidth={2} strokeLinejoin="round" strokeLinecap="round" />
             ))}
-            {active !== null && <line x1={x(active)} x2={x(active)} y1={TOP} y2={y(0)} stroke="var(--color-line-strong)" strokeWidth={1} />}
+            {active !== null && <line x1={x(active)} x2={x(active)} y1={TOP} y2={y(base)} stroke="var(--color-line-strong)" strokeWidth={1} />}
             {series.map((s, si) => {
               const i = active ?? n - 1
-              return <circle key={s.name} cx={x(i)} cy={y(s.values[i] ?? 0)} r={4} fill={colorOf(s, si)} stroke="var(--color-surface)" strokeWidth={2} />
+              return <circle key={s.name} cx={x(i)} cy={y(s.values[i] ?? base)} r={4} fill={colorOf(s, si)} stroke="var(--color-surface)" strokeWidth={2} />
             })}
-            <line x1={AXIS_W} x2={width} y1={y(0)} y2={y(0)} stroke="var(--color-line-strong)" strokeWidth={1} />
+            <line x1={AXIS_W} x2={width} y1={y(base)} y2={y(base)} stroke="var(--color-line-strong)" strokeWidth={1} />
           </svg>
         )}
         {active !== null && <Tooltip x={x(active)} title={titles?.[active] ?? labels[active]} series={series} index={active} format={format} width={width} />}

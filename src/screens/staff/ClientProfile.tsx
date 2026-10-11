@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
+import { Suspense, lazy, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { Link, NavLink, useNavigate, useParams } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useMe } from '../../auth'
@@ -26,6 +26,8 @@ const TABS: [string, string][] = [
   ['', 'Information'], ['subscriptions', 'Subscriptions'], ['attendance', 'Attendance'], ['workout', 'Workout'],
   ['follow-ups', 'Follow Up History'], ['documents', 'Client Document'], ['referrals', 'Client Referrals'],
 ]
+
+const ClientTrainingTab = lazy(() => import('./training/ClientTraining').then((m) => ({ default: m.ClientTrainingTab })))
 
 export default function ClientProfile() {
   const { id = '', tab = '' } = useParams()
@@ -146,7 +148,7 @@ export default function ClientProfile() {
           {tab === '' && <InfoTab client={c} subs={all} loading={subs.isLoading} medical={med} billing={billing} onMedical={() => setMedical(true)} isDesk={isDesk} onEdit={(s) => open('edit', s)} />}
           {tab === 'subscriptions' && <SubscriptionsTab subs={all} loading={subs.isLoading} isDesk={isDesk} onEdit={(s) => open('edit', s)} />}
           {tab === 'attendance' && <AttendanceTab memberId={c.id} />}
-          {tab === 'workout' && <Notice>Workout plans for {c.first_name} are assigned from App Settings › Workouts &amp; Diet › My Workout Plans, which is being built. Until then, keep using YDL's coach app for workouts.</Notice>}
+          {tab === 'workout' && <Suspense fallback={<p className="text-muted">Loading…</p>}><ClientTrainingTab memberId={c.id} name={c.first_name ?? c.full_name} /></Suspense>}
           {tab === 'follow-ups' && <FollowUpsTab memberId={c.id} name={c.full_name} notes={c.notes} kind={c.kind} />}
           {tab === 'documents' && <DocumentsTab memberId={c.id} />}
           {tab === 'referrals' && <ReferralsTab memberId={c.id} />}

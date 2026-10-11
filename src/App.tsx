@@ -66,6 +66,15 @@ const AN = {
   daily: page(money, 'DailyCollectionAnalysis'), pt: page(money, 'PtAnalysis'), leaderboard: page(money, 'Leaderboard'),
   forecast: page(money, 'RevenueForecast'), branches: page(money, 'BranchAnalysis'),
 }
+const workouts = () => import('./screens/staff/training/Workouts')
+const diets = () => import('./screens/staff/training/Diets')
+const library = () => import('./screens/staff/training/Library')
+const TR = {
+  workoutList: page(workouts, 'WorkoutPlanList'), workoutForm: page(workouts, 'WorkoutPlanForm'), workoutDays: page(workouts, 'WorkoutPlanDays'),
+  printWorkout: page(workouts, 'PrintWorkout'), dietList: page(diets, 'DietPlanList'), dietForm: page(diets, 'DietPlanForm'), dietMeals: page(diets, 'DietPlanMeals'),
+  printDiet: page(diets, 'PrintDiet'), exercises: page(library, 'ExerciseList'), foods: page(library, 'FoodList'), recipes: page(library, 'RecipeList'),
+  recipeVerify: page(library, 'RecipeVerify'), memberPlan: lazy(() => import('./screens/member/Plan')),
+}
 function Lazy({ c: C }: { c: ComponentType }) {
   return <Suspense fallback={<div className="px-5 py-10 text-center text-[14px] text-muted lg:px-8" role="status">Loading…</div>}><C /></Suspense>
 }
@@ -225,6 +234,15 @@ const BUILT: Record<string, { el: ReactNode; roles: Role[] }> = {
   '/app-settings/banners': { el: <BannerList />, roles: DESK },
   '/app-settings/social': { el: <SocialLinks />, roles: DESK },
   '/app-settings/measurements': { el: <MeasurementSettings />, roles: DESK },
+  // App Settings › Workouts & Diet
+  '/workouts': { el: <Lazy c={TR.workoutList} />, roles: DC },
+  '/workouts/new': { el: <Lazy key="wp-new" c={TR.workoutForm} />, roles: DC },
+  '/diets': { el: <Lazy c={TR.dietList} />, roles: DC },
+  '/diets/new': { el: <Lazy key="dp-new" c={TR.dietForm} />, roles: DC },
+  '/diets/foods': { el: <Lazy c={TR.foods} />, roles: DC },
+  '/recipes/verify': { el: <Lazy c={TR.recipeVerify} />, roles: DC },
+  '/recipes': { el: <Lazy c={TR.recipes} />, roles: DC },
+  '/exercises': { el: <Lazy c={TR.exercises} />, roles: DC },
   // Shaan Fitness additions
   '/settings/website': { el: <WebsiteSettings />, roles: ['owner'] },
 }
@@ -299,12 +317,14 @@ export default function App() {
         <Route path="/print/receipt/:id" element={<Only roles={DESK}><Print kind="receipt" /></Only>} />
         <Route path="/print/collection" element={<Only roles={DESK}><PrintReport kind="collection" /></Only>} />
         <Route path="/print/sales" element={<Only roles={DESK}><PrintReport kind="sales" /></Only>} />
+        <Route path="/print/workout/:id" element={<Only roles={[...STAFF, 'member']}><Lazy c={TR.printWorkout} /></Only>} />
+        <Route path="/print/diet/:id" element={<Only roles={[...STAFF, 'member']}><Lazy c={TR.printDiet} /></Only>} />
 
         {/* The member app */}
         <Route path="/app" element={!user ? <Navigate to="/login" replace /> : user.role !== 'member' ? <Navigate to={homeFor(user.role)} replace /> : <MemberShell />}>
           <Route index element={<MemberHome />} />
           <Route path="book" element={<ComingSoon title="Book" note="Booking, moving and cancelling sessions from the app comes with the member app." />} />
-          <Route path="plan" element={<ComingSoon title="Plan" note="Workout and diet plans from your coach come with the member app." />} />
+          <Route path="plan" element={<Lazy c={TR.memberPlan} />} />
           <Route path="chat" element={<ComingSoon title="Chat" note="Care chat between members, coaches and doctors comes next, with online status and phone notifications." />} />
           <Route path="profile" element={<More />} />
           <Route path="notices" element={<AppNotices key="notices" kind="notices" />} />
@@ -327,6 +347,10 @@ export default function App() {
           <Route path="/clients/:id" element={<Only roles={['owner', 'front_desk', 'coach']}><ClientProfile /></Only>} />
           <Route path="/clients/:id/:tab" element={<Only roles={['owner', 'front_desk', 'coach']}><ClientProfile /></Only>} />
           <Route path="/plans/:id/edit" element={<Only roles={DESK} right={['plans', 'edit']}><PlanForm /></Only>} />
+          <Route path="/workouts/:id/edit" element={<Only roles={DC}><Lazy c={TR.workoutForm} /></Only>} />
+          <Route path="/workouts/:id/exercises" element={<Only roles={DC}><Lazy c={TR.workoutDays} /></Only>} />
+          <Route path="/diets/:id/edit" element={<Only roles={DC}><Lazy c={TR.dietForm} /></Only>} />
+          <Route path="/diets/:id/meals" element={<Only roles={DC}><Lazy c={TR.dietMeals} /></Only>} />
           <Route path="/coupons/:id/edit" element={<Only roles={DESK} right={['coupons', 'on']}><CouponForm /></Only>} />
           <Route path="/combos/:id/edit" element={<Only roles={DESK} right={['plans', 'add']}><ComboForm /></Only>} />
           <Route path="/trainers/:id/edit" element={<Only roles={DESK} right={['trainers', 'edit']}><PersonForm kind="trainer" /></Only>} />

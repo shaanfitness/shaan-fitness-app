@@ -21,6 +21,9 @@ export interface SessionUser {
 const PRIORITY: Role[] = ['owner', 'front_desk', 'coach', 'doctor', 'member']
 
 async function loadRoles(userId: string): Promise<RoleRecord[]> {
+  // Wait until the client holds the new session's token, so the first reads after signing in
+  // aren't sent with the signed-out key.
+  await supabase.auth.getSession()
   const [staff, members] = await Promise.all([
     supabase.from('staff').select('id,studio_id,role,full_name,active').eq('user_id', userId).eq('active', true),
     supabase.from('members').select('id,studio_id,full_name').eq('user_id', userId).is('deleted_at', null),

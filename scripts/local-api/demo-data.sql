@@ -113,5 +113,93 @@ begin
   -- A few members renewing soon and one expired last week.
   update public.subscriptions set base_end_date = d + 3 where id in (select id from public.subscriptions where start_date > d - 50 order by start_date limit 2);
   update public.members set lead_status = 'not_interested' where kind = 'enquiry' and first_name in ('Ramya', 'Ganesh');
+
+  -- Workouts, diet and measurements (Part 7a). A member login for the member app: Rohit.
+  insert into auth.users (id, email) values ('20000000-0000-4000-8000-000000000005', 'member@example.com') on conflict do nothing;
+  update public.members set email = 'member@example.com' where studio_id = st and first_name = 'Rohit';
+  insert into public.workout_plans (id, studio_id, name, goal, level, trainer_id, days_per_week, instructions, is_public, created_by) values
+    ('00000000-0000-4000-8000-0000000a0001', st, 'Beginner Full Body 3 Days', 'Fat Loss', 'Beginner', coach1, 3, 'Warm up for 10 minutes before every session. Rest 60 seconds between sets.', true, coach1),
+    ('00000000-0000-4000-8000-0000000a0002', st, 'Muscle Gain Push Pull Legs', 'Muscle Gain', 'Intermediate', coach2, 6, null, false, coach2),
+    ('00000000-0000-4000-8000-0000000a0003', st, 'Fat Loss Circuit 4 Days', 'Fat Loss', 'General', null, 4, 'Keep the heart rate up: little rest between exercises.', false, desk);
+  insert into public.workout_plan_items (plan_id, day, seq, exercise_id, exercise_name, sets, reps, time, time_unit)
+  select x.plan, x.day, x.seq, e.id, e.name, x.sets, x.reps, x.time, x.unit
+  from (values
+    ('00000000-0000-4000-8000-0000000a0001'::uuid, 1, 1, 'Treadmill Walk', null::int, null::int, 10::numeric, 'mins'), ('00000000-0000-4000-8000-0000000a0001'::uuid, 1, 2, 'Goblet Squat', 3, 12, null, 'secs'),
+    ('00000000-0000-4000-8000-0000000a0001'::uuid, 1, 3, 'Dumbbell Bench Press (Flat)', 3, 12, null, 'secs'), ('00000000-0000-4000-8000-0000000a0001'::uuid, 1, 4, 'Lat Pull Down (Wide Grip)', 3, 12, null, 'secs'),
+    ('00000000-0000-4000-8000-0000000a0001'::uuid, 1, 5, 'Plank', 3, null, 30, 'secs'),
+    ('00000000-0000-4000-8000-0000000a0001'::uuid, 2, 1, 'Exercise Bike', null, null, 10, 'mins'), ('00000000-0000-4000-8000-0000000a0001'::uuid, 2, 2, 'Leg Press', 3, 15, null, 'secs'),
+    ('00000000-0000-4000-8000-0000000a0001'::uuid, 2, 3, 'Seated Cable Row', 3, 12, null, 'secs'), ('00000000-0000-4000-8000-0000000a0001'::uuid, 2, 4, 'Dumbbell Shoulder Press', 3, 10, null, 'secs'),
+    ('00000000-0000-4000-8000-0000000a0001'::uuid, 2, 5, 'Crunches', 3, 15, null, 'secs'),
+    ('00000000-0000-4000-8000-0000000a0001'::uuid, 3, 1, 'Cross Trainer', null, null, 12, 'mins'), ('00000000-0000-4000-8000-0000000a0001'::uuid, 3, 2, 'Walking Lunges', 3, 10, null, 'secs'),
+    ('00000000-0000-4000-8000-0000000a0001'::uuid, 3, 3, 'Push-up', 3, 10, null, 'secs'), ('00000000-0000-4000-8000-0000000a0001'::uuid, 3, 4, 'Dumbbell Biceps Curl', 3, 12, null, 'secs'),
+    ('00000000-0000-4000-8000-0000000a0001'::uuid, 3, 5, 'Triceps Pushdown (Rope)', 3, 12, null, 'secs'),
+    ('00000000-0000-4000-8000-0000000a0002'::uuid, 1, 1, 'Barbell Bench Press (Flat)', 4, 8, null, 'secs'), ('00000000-0000-4000-8000-0000000a0002'::uuid, 1, 2, 'Barbell Overhead Press', 4, 8, null, 'secs'),
+    ('00000000-0000-4000-8000-0000000a0002'::uuid, 2, 1, 'Deadlift', 4, 6, null, 'secs'), ('00000000-0000-4000-8000-0000000a0002'::uuid, 2, 2, 'Pull-up', 4, 8, null, 'secs'),
+    ('00000000-0000-4000-8000-0000000a0002'::uuid, 3, 1, 'Barbell Back Squat', 4, 8, null, 'secs'), ('00000000-0000-4000-8000-0000000a0002'::uuid, 3, 2, 'Romanian Deadlift', 4, 10, null, 'secs'),
+    ('00000000-0000-4000-8000-0000000a0003'::uuid, 1, 1, 'Burpees', 4, 12, null, 'secs'), ('00000000-0000-4000-8000-0000000a0003'::uuid, 1, 2, 'Kettlebell Swing', 4, 15, null, 'secs'),
+    ('00000000-0000-4000-8000-0000000a0003'::uuid, 2, 1, 'Skipping Rope', 4, null, 60, 'secs'), ('00000000-0000-4000-8000-0000000a0003'::uuid, 2, 2, 'Mountain Climbers', 4, null, 40, 'secs')
+  ) as x(plan, day, seq, ex, sets, reps, time, unit)
+  join public.exercises e on e.studio_id is null and e.name = x.ex;
+
+  insert into public.foods (studio_id, name, quantity, unit, calories, protein, fats, carbs, fibre, is_veg, is_verified, created_by) values
+    (st, 'Pesarattu', 1, 'piece', 160, 8, 4, 22, 3, true, true, coach1),
+    (st, 'Ragi malt (with milk)', 1, 'glass', 180, 7, 4, 29, 3, true, false, coach2),
+    (st, 'Chicken curry (home style)', 1, 'katori', 240, 22, 15, 5, 1, false, false, coach1);
+  insert into public.recipes (id, studio_id, name, quantity, unit, calories, protein, fats, carbs, fibre, prep_time_mins, ingredients, method, is_veg, is_verified, created_by) values
+    ('00000000-0000-4000-8000-0000000c0001', st, 'Moong Dal Chilla', 2, 'pieces', 230, 12, 6, 30, 5, 20, 'Moong dal, onion, green chilli, coriander', 'Soak the dal, grind, spread on a hot tawa, cook both sides.', true, true, coach1),
+    ('00000000-0000-4000-8000-0000000c0002', st, 'Paneer Bhurji', 1, 'katori', 290, 18, 21, 7, 2, 15, 'Paneer, onion, tomato, spices', 'Cook onion and tomato, add crumbled paneer and spices.', true, true, coach2),
+    ('00000000-0000-4000-8000-0000000c0003', st, 'Egg White Omelette', 1, 'serving', 120, 16, 4, 3, 1, 10, '4 egg whites, onion, tomato, chilli', 'Whisk, pour on a non-stick pan, fold.', false, true, desk);
+  insert into public.diet_plans (id, studio_id, name, goal, level, trainer_id, calories_target, instructions, is_public, created_by) values
+    ('00000000-0000-4000-8000-0000000d0001', st, '1800 kcal Fat Loss (Veg)', 'Fat Loss', 'General', coach1, 1800, 'Drink 3 to 4 litres of water a day. No sugar in tea or coffee.', false, coach1),
+    ('00000000-0000-4000-8000-0000000d0002', st, '2600 kcal Muscle Gain', 'Muscle Gain', 'General', coach2, 2600, null, false, coach2);
+  insert into public.diet_plan_items (plan_id, weekday, meal, meal_time, seq, food_id, recipe_id, item_name, quantity, unit, calories, protein, fats, carbs, fibre)
+  select x.plan, x.wd, x.meal, x.t::time, x.seq, f.id, r.id, coalesce(f.name, r.name, x.item), x.q, coalesce(f.unit, r.unit, x.u),
+    round(coalesce(f.calories, r.calories, 0) * x.q / coalesce(f.quantity, r.quantity, 1), 1), round(coalesce(f.protein, r.protein, 0) * x.q / coalesce(f.quantity, r.quantity, 1), 1),
+    round(coalesce(f.fats, r.fats, 0) * x.q / coalesce(f.quantity, r.quantity, 1), 1), round(coalesce(f.carbs, r.carbs, 0) * x.q / coalesce(f.quantity, r.quantity, 1), 1),
+    round(coalesce(f.fibre, r.fibre, 0) * x.q / coalesce(f.quantity, r.quantity, 1), 1)
+  from (values
+    ('00000000-0000-4000-8000-0000000d0001'::uuid, 0, 'Early Morning', '06:00', 1, 'Almonds', 15::numeric, 'g'),
+    ('00000000-0000-4000-8000-0000000d0001'::uuid, 0, 'Breakfast', '08:30', 1, 'Moong Dal Chilla', 2, 'pieces'),
+    ('00000000-0000-4000-8000-0000000d0001'::uuid, 0, 'Breakfast', '08:30', 2, 'Curd / dahi', 100, 'g'),
+    ('00000000-0000-4000-8000-0000000d0001'::uuid, 0, 'Mid Morning', '11:00', 1, 'Papaya', 150, 'g'),
+    ('00000000-0000-4000-8000-0000000d0001'::uuid, 0, 'Lunch', '13:30', 1, 'Phulka / roti (no oil)', 2, 'piece'),
+    ('00000000-0000-4000-8000-0000000d0001'::uuid, 0, 'Lunch', '13:30', 2, 'Moong dal (cooked)', 150, 'g'),
+    ('00000000-0000-4000-8000-0000000d0001'::uuid, 0, 'Lunch', '13:30', 3, 'Paneer Bhurji', 1, 'katori'),
+    ('00000000-0000-4000-8000-0000000d0001'::uuid, 0, 'Evening Snack', '17:00', 1, 'Roasted chana', 30, 'g'),
+    ('00000000-0000-4000-8000-0000000d0001'::uuid, 0, 'Evening Snack', '17:00', 2, 'Buttermilk / chaas', 200, 'ml'),
+    ('00000000-0000-4000-8000-0000000d0001'::uuid, 0, 'Dinner', '20:30', 1, 'Rice, brown (cooked)', 120, 'g'),
+    ('00000000-0000-4000-8000-0000000d0001'::uuid, 0, 'Dinner', '20:30', 2, 'Toor dal (cooked)', 150, 'g'),
+    ('00000000-0000-4000-8000-0000000d0001'::uuid, 7, 'Lunch', '13:30', 1, 'Rice, white (cooked)', 150, 'g'),
+    ('00000000-0000-4000-8000-0000000d0001'::uuid, 7, 'Lunch', '13:30', 2, 'Rajma (boiled)', 150, 'g'),
+    ('00000000-0000-4000-8000-0000000d0002'::uuid, 0, 'Breakfast', '08:00', 1, 'Egg White Omelette', 2, 'serving'),
+    ('00000000-0000-4000-8000-0000000d0002'::uuid, 0, 'Breakfast', '08:00', 2, 'Oats (dry)', 60, 'g'),
+    ('00000000-0000-4000-8000-0000000d0002'::uuid, 0, 'Lunch', '13:00', 1, 'Chicken breast (cooked)', 200, 'g'),
+    ('00000000-0000-4000-8000-0000000d0002'::uuid, 0, 'Lunch', '13:00', 2, 'Rice, white (cooked)', 250, 'g')
+  ) as x(plan, wd, meal, t, seq, item, q, u)
+  left join public.foods f on f.studio_id is null and f.name = x.item
+  left join public.recipes r on r.studio_id = st and r.name = x.item;
+
+  select id into m from public.members where studio_id = st and first_name = 'Rohit';
+  insert into public.recipes (studio_id, name, quantity, unit, calories, protein, fats, carbs, fibre, prep_time_mins, ingredients, is_veg, member_id, is_verified)
+  values (st, 'Ragi Idli (my mother''s)', 3, 'pieces', 210, 7, 2, 40, 6, 30, 'Ragi flour, idli rava, curd', true, m, false);
+  insert into public.member_workouts (studio_id, member_id, plan_id, weekdays, start_date, goal, level, assigned_by)
+  values (st, m, '00000000-0000-4000-8000-0000000a0001', array[1,3,5]::smallint[], d - 40, 'Fat Loss', 'Beginner', coach1);
+  insert into public.member_diets (studio_id, member_id, plan_id, start_date, assigned_by) values (st, m, '00000000-0000-4000-8000-0000000d0001', d - 40, coach1);
+  insert into public.workout_logs (member_id, item_id, date)
+  select m, i.id, x.dt from public.workout_plan_items i
+  cross join lateral (select g::date as dt from generate_series(d - 21, d - 1, interval '1 day') g) x
+  where i.plan_id = '00000000-0000-4000-8000-0000000a0001'
+    and extract(isodow from x.dt) in (1, 3, 5)
+    and i.day = (array[1,1,2,2,3,3,1])[extract(isodow from x.dt)::int] and abs(hashtext(i.id::text || x.dt::text)) % 5 <> 0;
+  insert into public.measurements (studio_id, member_id, measured_on, vals, weight_kg, height_cm, note, recorded_by)
+  select st, m, d - k * 10, jsonb_build_object('weight_kg', w, 'waist', ws, 'general_body_fat', bf) || case when k = 4 then '{"height": 172}'::jsonb else '{}'::jsonb end
+    || jsonb_build_object('bmi', round(w / 2.9584, 1)), w, case when k = 4 then 172 end, case when k = 0 then 'Feeling stronger' end, case when k = 2 then null else coach1 end
+  from (values (4, 82.0, 36.0, 27.5), (3, 81.1, 35.6, 26.9), (2, 80.2, 35.2, 26.1), (1, 79.4, 34.9, 25.6), (0, 78.4, 34.5, 25.0)) as v(k, w, ws, bf);
+  -- A few more clients weighed, for Weight Loss Analysis.
+  insert into public.measurements (studio_id, member_id, measured_on, vals, weight_kg, recorded_by)
+  select st, x.id, d - k * 12, jsonb_build_object('weight_kg', round((70 + (abs(hashtext(x.id::text)) % 20) - (2 - k) * ((abs(hashtext(x.id::text)) % 7) - 2) * 0.6)::numeric, 1)),
+    round((70 + (abs(hashtext(x.id::text)) % 20) - (2 - k) * ((abs(hashtext(x.id::text)) % 7) - 2) * 0.6)::numeric, 1), coach2
+  from (select id from public.members where studio_id = st and kind = 'member' and first_name in ('Aarav', 'Diya', 'Kiran', 'Meera', 'Sneha', 'Vikram')) x
+  cross join generate_series(0, 2) k;
   perform app.relink_existing_users();
 end $$;
