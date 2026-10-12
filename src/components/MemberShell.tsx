@@ -4,6 +4,7 @@ import { useStudio } from '../db/studio'
 import { setCurrency } from '../lib/format'
 import { useMe } from '../auth'
 import { Avatar, BrandMark, Icon } from './ui'
+import { NotificationBell } from '../screens/member/Notifications'
 
 // The member app (/app): phone-first with tabs along the bottom; on a computer the same
 // tabs sit in a top bar and the pages stay in a comfortable reading width.
@@ -33,6 +34,7 @@ export function MemberShell() {
             ))}
           </nav>
           <div className="flex items-center gap-4">
+            <NotificationBell />
             <Link to="/" className="text-[13px] font-semibold text-muted no-underline hover:text-ink">{t('app.website')}</Link>
             <Link to="/app/profile" aria-label={t('nav.profile')} className="no-underline"><Avatar name={me.name} size={36} gold /></Link>
           </div>

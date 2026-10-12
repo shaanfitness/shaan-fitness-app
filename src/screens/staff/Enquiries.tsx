@@ -15,6 +15,7 @@ import { BulkBar, DataTable, Pager, type Column } from '../../components/table'
 import { useToast } from '../../components/toast'
 import { Icon, PageHeader, Sheet } from '../../components/ui'
 import { CsvOnly } from '../../access-ui'
+import { NotifyDialog } from './ClientProfile'
 
 // YDL "Enquiries List": filters panel, dropdown filters, staff summary, the list,
 // row actions and bulk actions.
@@ -306,9 +307,7 @@ export default function Enquiries() {
         )}
       </Sheet>
 
-      <Sheet open={!!notify} onClose={() => setNotify(null)} title="Send notification">
-        <Notice tone="warn">App notifications and bulk WhatsApp go out once the member app and the WhatsApp connection are live (part of switch-day setup). For now, use the WhatsApp button on each enquiry.</Notice>
-      </Sheet>
+      <NotifyDialog open={!!notify} onClose={() => setNotify(null)} memberIds={notify ?? []} name={notify ? `${notify.length} selected` : undefined} />
 
       <FollowUpDialog target={respond} onClose={() => setRespond(null)} />
       <FollowUpHistory member={history} onClose={() => setHistory(null)} />

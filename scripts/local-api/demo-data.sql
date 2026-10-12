@@ -201,5 +201,19 @@ begin
     round((70 + (abs(hashtext(x.id::text)) % 20) - (2 - k) * ((abs(hashtext(x.id::text)) % 7) - 2) * 0.6)::numeric, 1), coach2
   from (select id from public.members where studio_id = st and kind = 'member' and first_name in ('Aarav', 'Diya', 'Kiran', 'Meera', 'Sneha', 'Vikram')) x
   cross join generate_series(0, 2) k;
+
+  -- Messages (Part 7b): the automatic WhatsApp of the last days, some sent, a few failed; app notifications for Rohit.
+  perform app.queue_scheduled(st, k) from unnest(array['birthday', 'balance_due', 'before_expiry', 'on_expiry', 'after_expiry', 'irregular']) k;
+  update public.messages set created_at = created_at - (abs(hashtext(id::text)) % 6) * interval '1 day' where studio_id = st;
+  update public.messages set status = 'sent', sent_at = created_at + interval '2 minutes', attempts = 1 where studio_id = st and abs(hashtext(id::text)) % 6 <> 0;
+  update public.messages set status = 'failed', attempts = 1, sent_at = created_at + interval '2 minutes',
+    error = 'Some error occurred while connecting your WhatsApp. Message will be automatically retried in couple of hours'
+  where studio_id = st and status = 'queued' and abs(hashtext(id::text)) % 2 = 0;
+  update public.studios set settings = jsonb_set(settings, '{sms}', '{"sender_id": "SHAANF", "templates": [{"name": "Holiday notice", "template_id": "1107170000000000001", "text": "Dear {cust_first_name}, the gym will be closed tomorrow for the festival. - SHAAN FITNESS"}]}') where id = st;
+  insert into public.sms_recharges (studio_id, credits, amount, paid_on, reference) values (st, 5000, 1250, d - 20, 'INV-2291');
+  insert into public.notifications (studio_id, member_id, title, body, sent_by, created_at, read_at)
+  select st, id, 'Diwali timings', 'The gym opens 6 AM to 12 noon on Diwali. Happy Diwali!', desk, now() - interval '3 days', now() - interval '2 days' from public.members where studio_id = st and first_name = 'Rohit'
+  union all
+  select st, id, 'New Zumba batch', 'A Zumba batch starts Monday at 7 PM. Ask the front desk to join.', desk, now() - interval '2 hours', null from public.members where studio_id = st and first_name = 'Rohit';
   perform app.relink_existing_users();
 end $$;

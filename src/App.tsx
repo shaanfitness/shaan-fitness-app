@@ -75,6 +75,15 @@ const TR = {
   printDiet: page(diets, 'PrintDiet'), exercises: page(library, 'ExerciseList'), foods: page(library, 'FoodList'), recipes: page(library, 'RecipeList'),
   recipeVerify: page(library, 'RecipeVerify'), memberPlan: lazy(() => import('./screens/member/Plan')),
 }
+const whatsapp = () => import('./screens/staff/messages/WhatsApp')
+const sms = () => import('./screens/staff/messages/Sms')
+const email = () => import('./screens/staff/messages/Email')
+const MSG = {
+  notify: page(email, 'SendNotification'), qr: page(whatsapp, 'QrManager'), waSettings: page(whatsapp, 'WhatsAppSettings'), waHistory: page(whatsapp, 'WhatsAppHistory'),
+  smsBalance: page(sms, 'SmsBalance'), smsSettings: page(sms, 'SmsSettings'), smsBulk: page(sms, 'SmsBulk'), smsHistory: page(sms, 'SmsHistory'),
+  smsCampaigns: page(sms, 'CampaignHistory'), smsRecharges: page(sms, 'RechargeHistory'), email: page(email, 'EmailListing'),
+  memberNotifications: lazy(() => import('./screens/member/Notifications')),
+}
 function Lazy({ c: C }: { c: ComponentType }) {
   return <Suspense fallback={<div className="px-5 py-10 text-center text-[14px] text-muted lg:px-8" role="status">Loading…</div>}><C /></Suspense>
 }
@@ -243,6 +252,18 @@ const BUILT: Record<string, { el: ReactNode; roles: Role[] }> = {
   '/recipes/verify': { el: <Lazy c={TR.recipeVerify} />, roles: DC },
   '/recipes': { el: <Lazy c={TR.recipes} />, roles: DC },
   '/exercises': { el: <Lazy c={TR.exercises} />, roles: DC },
+  // Notification & WhatsApp
+  '/notifications/send': { el: <Lazy c={MSG.notify} />, roles: DESK },
+  '/whatsapp/qr': { el: <Lazy c={MSG.qr} />, roles: ['owner'] },
+  '/whatsapp/settings': { el: <Lazy c={MSG.waSettings} />, roles: ['owner'] },
+  '/whatsapp/history': { el: <Lazy c={MSG.waHistory} />, roles: DESK },
+  '/sms/balance': { el: <Lazy c={MSG.smsBalance} />, roles: ['owner'] },
+  '/sms/settings': { el: <Lazy c={MSG.smsSettings} />, roles: ['owner'] },
+  '/sms/bulk': { el: <Lazy c={MSG.smsBulk} />, roles: DESK },
+  '/sms/history': { el: <Lazy c={MSG.smsHistory} />, roles: DESK },
+  '/sms/campaigns': { el: <Lazy c={MSG.smsCampaigns} />, roles: DESK },
+  '/sms/recharges': { el: <Lazy c={MSG.smsRecharges} />, roles: ['owner'] },
+  '/email': { el: <Lazy c={MSG.email} />, roles: DESK },
   // Shaan Fitness additions
   '/settings/website': { el: <WebsiteSettings />, roles: ['owner'] },
 }
@@ -325,6 +346,7 @@ export default function App() {
           <Route index element={<MemberHome />} />
           <Route path="book" element={<ComingSoon title="Book" note="Booking, moving and cancelling sessions from the app comes with the member app." />} />
           <Route path="plan" element={<Lazy c={TR.memberPlan} />} />
+          <Route path="notifications" element={<Lazy c={MSG.memberNotifications} />} />
           <Route path="chat" element={<ComingSoon title="Chat" note="Care chat between members, coaches and doctors comes next, with online status and phone notifications." />} />
           <Route path="profile" element={<More />} />
           <Route path="notices" element={<AppNotices key="notices" kind="notices" />} />

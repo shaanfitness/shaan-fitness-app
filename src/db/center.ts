@@ -11,7 +11,8 @@ async function rpc<T>(fn: string, args: Record<string, unknown>): Promise<T> {
 export const saveCenterInfo = (studioId: string, p: Record<string, unknown>) => rpc<void>('save_center_info', { p_studio: studioId, p })
 export const saveCenterPrivate = (studioId: string, p: Record<string, unknown>) => rpc<void>('save_center_private', { p_studio: studioId, p })
 export const saveCurrency = (studioId: string, currency: string, tax: string) => rpc<void>('save_currency', { p_studio: studioId, p_currency: currency, p_tax: tax })
-export const setSecret = (studioId: string, key: 'smtp_password' | 'otp_vendor_api_key', value: string) =>
+export type SecretKey = 'smtp_password' | 'otp_vendor_api_key' | 'whatsapp_token' | 'sms_api_key' | 'email_api_key'
+export const setSecret = (studioId: string, key: SecretKey, value: string) =>
   rpc<void>('set_studio_secret', { p_studio: studioId, p_key: key, p_value: value })
 export const secretStatus = (studioId: string) => rpc<Record<string, string> | null>('studio_secret_status', { p_studio: studioId })
 export const notifyMembers = (studioId: string, kind: 'notice' | 'holiday', id: string) => rpc<number>('notify_members', { p_studio: studioId, p_kind: kind, p_id: id })

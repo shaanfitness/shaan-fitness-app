@@ -6,7 +6,7 @@ import { supabase } from '../../lib/supabase'
 import { throwIf, useServices, useStudio } from '../../db/studio'
 import {
   CURRENCIES, DAY_LABELS, FACILITIES, saveCenterInfo, saveCenterPrivate, saveCurrency, secretStatus, setSecret, studioPrivate,
-  type Session, type StudioPrivate, type Timings,
+  type SecretKey, type Session, type StudioPrivate, type Timings,
 } from '../../db/center'
 import { setCurrency } from '../../lib/format'
 import { fmtClock, fmtDateTime } from '../../lib/dates'
@@ -617,7 +617,7 @@ function DeviceForm({ device, onDone }: { device: Device | null; onDone: () => v
 }
 
 // DLT OTP Manager and Email Manager (owner): settings plus one stored password or key each -------------------------
-function SecretField({ label, secretKey, hint }: { label: string; secretKey: 'smtp_password' | 'otp_vendor_api_key'; hint?: string }) {
+export function SecretField({ label, secretKey, hint }: { label: string; secretKey: SecretKey; hint?: string }) {
   const me = useMe()
   const toast = useToast()
   const qc = useQueryClient()

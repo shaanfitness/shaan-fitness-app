@@ -511,7 +511,7 @@ export function NotifyDialog({ open, onClose, memberIds, name }: { open: boolean
         {name && <div className="text-[14px] font-semibold">{name}</div>}
         <Field label="Notification" required id="ntitle" hint="Make sure your title is short and explanatory."><TextInput id="ntitle" value={title} onChange={setTitle} maxLength={80} /></Field>
         <Field label="Notification Body" required id="nbody" hint="Description you provide should explain the notification clearly in short."><TextArea id="nbody" value={body} onChange={setBody} /></Field>
-        <Notice>Clients see this in the Shaan Fitness app (and as a phone notification once the member app is live).</Notice>
+        <Notice>Clients see this under Notifications in the Shaan Fitness app (the bell on the home screen).</Notice>
         {error && <Notice tone="error">{error}</Notice>}
         <div className="flex gap-2"><button type="button" className="btn flex-1" onClick={onClose}>Close</button><button type="submit" className="btn-gold flex-1" disabled={m.isPending}>Send Notification</button></div>
       </form>

@@ -17,6 +17,7 @@ import { useStudio } from '../../db/studio'
 import { useTheme } from '../../theme'
 import type { Batch, SubscriptionOverview } from '../../db/types'
 import { HomeExtras } from './AppPages'
+import { NotificationBell } from './Notifications'
 
 // Member home in the member's own look (Settings › Look):
 //   A · Noir and gold   ring of sessions, serif headings
@@ -67,6 +68,7 @@ export default function MemberHome() {
       <header className="flex items-center justify-between gap-3 px-5 pt-6 lg:hidden">
         <BrandMark logo={look === 'clinic'} />
         <div className="flex items-center gap-2.5">
+          <NotificationBell />
           <LangToggle />
           <span className="me-avatar" aria-hidden="true">{initials(me.name)}</span>
         </div>

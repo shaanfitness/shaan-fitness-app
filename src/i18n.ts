@@ -76,6 +76,7 @@ const en = {
     notices: 'Notices', rules: 'Rules', feedback: 'Send feedback', feedbackHint: 'Tell us what’s working and what we can do better. Only the gym team reads it.',
     feedbackSend: 'Send', feedbackSent: 'Thank you. Your feedback reached the team.', yourFeedback: 'Your feedback', coaches: 'Our coaches', contact: 'Contact us',
     results: 'Results', noNotices: 'No notices right now.', noRules: 'No rules posted yet.', back: 'Back', soon: 'This opens in the app soon.',
+    notifications: 'Notifications', noNotifications: 'No notifications yet.', new: 'New', unread_one: '{{count}} unread notification', unread_other: '{{count}} unread notifications',
   },
   plan: {
     workout: 'Workout', diet: 'Diet', progress: 'Progress', noMember: 'Your plan shows here once the gym links your membership to this login.',
@@ -168,6 +169,7 @@ const te: typeof en = {
     notices: 'నోటీసులు', rules: 'నియమాలు', feedback: 'అభిప్రాయం పంపండి', feedbackHint: 'ఏది బాగుంది, ఏది మెరుగుపరచాలో చెప్పండి. జిమ్ టీమ్ మాత్రమే చదువుతుంది.',
     feedbackSend: 'పంపండి', feedbackSent: 'ధన్యవాదాలు. మీ అభిప్రాయం టీమ్‌కు చేరింది.', yourFeedback: 'మీ అభిప్రాయం', coaches: 'మా కోచ్‌లు', contact: 'సంప్రదించండి',
     results: 'ఫలితాలు', noNotices: 'ప్రస్తుతం నోటీసులు లేవు.', noRules: 'ఇంకా నియమాలు పెట్టలేదు.', back: 'వెనక్కి', soon: 'ఇది త్వరలో యాప్‌లో తెరుచుకుంటుంది.',
+    notifications: 'నోటిఫికేషన్లు', noNotifications: 'ఇంకా నోటిఫికేషన్లు లేవు.', new: 'కొత్తది', unread_one: '{{count}} చదవని నోటిఫికేషన్', unread_other: '{{count}} చదవని నోటిఫికేషన్లు',
   },
   plan: {
     workout: 'వర్కౌట్', diet: 'డైట్', progress: 'ప్రోగ్రెస్', noMember: 'జిమ్ మీ మెంబర్‌షిప్‌ను ఈ లాగిన్‌కు జత చేసిన తర్వాత మీ ప్లాన్ ఇక్కడ కనిపిస్తుంది.',
