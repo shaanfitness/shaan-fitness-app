@@ -44,7 +44,8 @@ export default function More() {
       {isMember && (
         <Section>
           <nav aria-label={t('nav.more')} className="card flex flex-col">
-            {([['/app/notices', t('app.notices'), 'bell'], ['/app/rules', t('app.rules'), 'doc'], ['/app/plans', t('app.plans'), 'list'],
+            {([['/app/notifications', t('app.notifications'), 'bell'], ['/app/community', t('community.title'), 'people'], ['/app/challenges', t('community.challenges'), 'trophy'],
+              ['/app/notices', t('app.notices'), 'doc'], ['/app/rules', t('app.rules'), 'doc'], ['/app/plans', t('app.plans'), 'list'],
               ['/app/coaches', t('app.coaches'), 'person'], ['/app/feedback', t('app.feedback'), 'chat'], ['/app/contact', t('app.contact'), 'phone']] as const).map(([to, label, icon]) => (
               <Link key={to} to={to} className="row text-ink no-underline hover:text-gold"><Icon name={icon} size={20} /><span className="flex-1 text-[15px] font-semibold">{label}</span><Icon name="chevronRight" size={16} /></Link>
             ))}

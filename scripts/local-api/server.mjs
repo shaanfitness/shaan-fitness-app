@@ -408,10 +408,18 @@ function fileFromMultipart(type, buf) {
   return buf
 }
 function storage(req, res, url, buf) {
+  const json = (code, v) => { res.writeHead(code, { ...CORS, 'Content-Type': 'application/json' }); return res.end(JSON.stringify(v)) }
+  // Signed links: createSignedUrls (POST /object/sign/<bucket> with paths) and createSignedUrl (POST /object/sign/<bucket>/<path>).
+  const many = url.pathname.match(/^\/storage\/v1\/object\/sign\/([^/]+)\/?$/)
+  if (many && req.method === 'POST') {
+    const paths = JSON.parse(buf.toString('utf8') || '{}').paths ?? []
+    return json(200, paths.map((p) => ({ path: p, signedURL: `/object/sign/${many[1]}/${p}?token=local`, error: null })))
+  }
   const m = url.pathname.match(/^\/storage\/v1\/object\/(public\/|sign\/)?([^/]+)\/(.+)$/)
   if (!m) { res.writeHead(404, CORS); return res.end() }
   const file = path.join(STORE, m[2], decodeURIComponent(m[3]))
   if (!file.startsWith(STORE)) { res.writeHead(400, CORS); return res.end() }
+  if (m[1] === 'sign/' && req.method === 'POST') return json(200, { signedURL: `/object/sign/${m[2]}/${m[3]}?token=local` })
   if (req.method === 'POST' || req.method === 'PUT') {
     fs.mkdirSync(path.dirname(file), { recursive: true })
     fs.writeFileSync(file, fileFromMultipart(req.headers['content-type'] ?? '', buf))

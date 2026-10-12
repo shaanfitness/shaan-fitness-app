@@ -213,6 +213,7 @@ with sync_playwright() as p:
 
     # Front desk executive (Asha): no coupons, no payroll, no CSV ---------------------------------------
     page.goto(BASE + "/dashboard")
+    page.wait_for_load_state("networkidle")   # let the owner's page finish loading before the session is wiped
     page.evaluate("localStorage.clear()")
     page.goto(BASE + "/login")
     page.fill("#email", "desk@example.com")

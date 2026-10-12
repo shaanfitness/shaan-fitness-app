@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useLocation } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import { useMe } from '../../auth'
@@ -44,7 +45,8 @@ export default function MemberPlan() {
   const app = ((studio?.settings as unknown as { app?: Record<string, unknown> })?.app ?? {}) as Record<string, unknown>
   const workoutOn = app.is_woplan_allowed !== false
   const dietOn = app.is_Diet_PlanAllowed !== false
-  const [tab, setTab] = useState<Tab>(workoutOn ? 'workout' : dietOn ? 'diet' : 'progress')
+  const asked = new URLSearchParams(useLocation().search).get('tab') as Tab | null
+  const [tab, setTab] = useState<Tab>(asked && ['workout', 'diet', 'progress'].includes(asked) ? asked : workoutOn ? 'workout' : dietOn ? 'diet' : 'progress')
   const memberId = me.memberId ?? ''
   const plans = useQuery({ queryKey: ['member-plans', memberId], queryFn: () => memberPlans(memberId), enabled: !!memberId })
   if (!memberId) return <div className="px-5 pt-6"><Notice>{t('plan.noMember')}</Notice></div>

@@ -94,6 +94,18 @@ const en = {
     more: 'Others', byGym: 'by the gym', bySelf: 'by you', showMore: 'Show {{count}}', confirmDelete: 'Delete this measurement?', delete: 'Delete',
     noPhotos: 'No progress photos yet.', photoOf: 'Progress photo, {{date}}',
   },
+  community: {
+    title: 'Community', newPost: 'New post', post: 'Post', posting: 'Posting…', placeholder: 'Share your progress, a tip or a win…',
+    pending: 'Posted. The gym checks it before others see it.', posted: 'Posted', empty: 'Nothing here yet. Be the first!', clap: 'Clap',
+    waiting: 'Waiting for the gym to approve', declined: 'Not approved by the gym', delete: 'Delete', confirmDelete: 'Delete your post?',
+    needContent: 'Add a photo or write something.', challenges: 'Challenges', noChallenges: 'No challenges right now.',
+    join: 'Join the challenge', joined: 'Joined', accept: 'I accept the terms and conditions', mustAccept: 'Accept the terms to join.',
+    joinedToast: 'You’re in! Good luck.', running: 'Running', upcoming: 'Starts {{date}}', ended: 'Ended', dates: '{{from}} to {{to}}',
+    myPoints: 'My points', points: '{{n}} pts', today: 'Today’s tasks', day: 'Day {{n}}', target: 'Target {{n}} {{unit}}', log: 'Save',
+    logged: 'Saved', done: 'Done', leaderboard: 'Leaderboard', teams: 'Teams', posts: 'Posts', terms: 'Terms & Conditions',
+    video: 'Watch the video', you: 'you', participants: '{{n}} taking part', notStarted: 'Tasks open when the challenge starts.',
+    postProgress: 'Post your progress', teamOf: 'Team {{name}}', details: 'About', restDay: 'No tasks today. Rest well!',
+  },
 }
 
 const te: typeof en = {
@@ -186,6 +198,18 @@ const te: typeof en = {
     chartLater: 'రెండు సార్లు బరువు నమోదు చేసిన తర్వాత చార్ట్ కనిపిస్తుంది.', sinceFirst: 'మొదటి నుండి', deleted: 'కొలత తొలగించబడింది', noMeasurements: 'ఇంకా కొలతలు లేవు.',
     more: 'ఇతరాలు', byGym: 'జిమ్ నమోదు', bySelf: 'మీ నమోదు', showMore: '{{count}} చూపించు', confirmDelete: 'ఈ కొలతను తొలగించాలా?', delete: 'తొలగించండి',
     noPhotos: 'ఇంకా ప్రోగ్రెస్ ఫోటోలు లేవు.', photoOf: 'ప్రోగ్రెస్ ఫోటో, {{date}}',
+  },
+  community: {
+    title: 'కమ్యూనిటీ', newPost: 'కొత్త పోస్ట్', post: 'పోస్ట్ చేయండి', posting: 'పోస్ట్ అవుతోంది…', placeholder: 'మీ ప్రోగ్రెస్, ఒక చిట్కా లేదా విజయం పంచుకోండి…',
+    pending: 'పోస్ట్ అయింది. ఇతరులు చూసే ముందు జిమ్ పరిశీలిస్తుంది.', posted: 'పోస్ట్ అయింది', empty: 'ఇక్కడ ఇంకా ఏమీ లేదు. మీరే మొదలుపెట్టండి!', clap: 'చప్పట్లు',
+    waiting: 'జిమ్ ఆమోదం కోసం వేచి ఉంది', declined: 'జిమ్ ఆమోదించలేదు', delete: 'తొలగించండి', confirmDelete: 'మీ పోస్ట్ తొలగించాలా?',
+    needContent: 'ఫోటో జోడించండి లేదా ఏదైనా రాయండి.', challenges: 'ఛాలెంజ్‌లు', noChallenges: 'ప్రస్తుతం ఛాలెంజ్‌లు లేవు.',
+    join: 'ఛాలెంజ్‌లో చేరండి', joined: 'చేరారు', accept: 'నియమ నిబంధనలు అంగీకరిస్తున్నాను', mustAccept: 'చేరడానికి నిబంధనలు అంగీకరించండి.',
+    joinedToast: 'మీరు చేరారు! శుభాకాంక్షలు.', running: 'జరుగుతోంది', upcoming: '{{date}} న మొదలు', ended: 'ముగిసింది', dates: '{{from}} నుండి {{to}}',
+    myPoints: 'నా పాయింట్లు', points: '{{n}} పాయింట్లు', today: 'ఈరోజు టాస్క్‌లు', day: 'రోజు {{n}}', target: 'లక్ష్యం {{n}} {{unit}}', log: 'సేవ్',
+    logged: 'సేవ్ అయింది', done: 'పూర్తి', leaderboard: 'లీడర్‌బోర్డ్', teams: 'టీమ్‌లు', posts: 'పోస్ట్‌లు', terms: 'నియమ నిబంధనలు',
+    video: 'వీడియో చూడండి', you: 'మీరు', participants: '{{n}} మంది పాల్గొంటున్నారు', notStarted: 'ఛాలెంజ్ మొదలైనప్పుడు టాస్క్‌లు తెరుచుకుంటాయి.',
+    postProgress: 'మీ ప్రోగ్రెస్ పోస్ట్ చేయండి', teamOf: 'టీమ్ {{name}}', details: 'వివరాలు', restDay: 'ఈరోజు టాస్క్‌లు లేవు. బాగా విశ్రాంతి తీసుకోండి!',
   },
 }
 

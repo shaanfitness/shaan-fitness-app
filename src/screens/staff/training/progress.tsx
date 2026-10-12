@@ -94,7 +94,7 @@ export function MeasurementForm({ memberId, onDone }: { memberId: string; onDone
       )}
       <Field label={t('plan.note')} id="ms-note"><TextInput id="ms-note" value={note} onChange={setNote} /></Field>
       <Field label={t('plan.photos')} id="ms-photos" hint={t('plan.photosHint')}>
-        <input id="ms-photos" type="file" accept="image/*" multiple className="text-[14px]" onChange={(e) => setFiles([...(e.target.files ?? [])].slice(0, 3))} />
+        <input id="ms-photos" type="file" accept="image/*" multiple className="input py-2" onChange={(e) => setFiles([...(e.target.files ?? [])].slice(0, 3))} />
       </Field>
       {error && <Notice tone="error">{error}</Notice>}
       <div className="flex gap-2">

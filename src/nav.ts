@@ -222,12 +222,12 @@ export const NAV: NavNode[] = [
       ]),
       g('Exercises', [p('Exercise List', '/exercises', '/fitness-center/exercise/exercise-list/', DC, { built: true })]),
     ]),
-    p('Community', '/community', '/community/pending-home-page/', D),
+    p('Community', '/community', '/community/pending-home-page/', D, { built: true }),
     g('Challenges', [
-      p('Create Challenge', '/challenges/new', '/app-challenge/basic-information/', D),
-      p('Challenge List', '/challenges', '/app-challenge/challenge-list/', D),
-      p('Create Teams', '/challenges/teams/new', '/app-challenge/group/group-basic-information/', D),
-      p('Team List', '/challenges/teams', '/app-challenge/group/group-list/', D),
+      p('Create Challenge', '/challenges/new', '/app-challenge/basic-information/', D, { built: true }),
+      p('Challenge List', '/challenges', '/app-challenge/challenge-list/', D, { built: true }),
+      p('Create Teams', '/challenges/teams/new', '/app-challenge/group/group-basic-information/', D, { built: true }),
+      p('Team List', '/challenges/teams', '/app-challenge/group/group-list/', D, { built: true }),
     ]),
   ], 'sparkle'),
   g('Tutorial & Help Videos', [

@@ -84,6 +84,14 @@ const MSG = {
   smsCampaigns: page(sms, 'CampaignHistory'), smsRecharges: page(sms, 'RechargeHistory'), email: page(email, 'EmailListing'),
   memberNotifications: lazy(() => import('./screens/member/Notifications')),
 }
+const community = () => import('./screens/staff/community/Community')
+const challenges = () => import('./screens/staff/community/Challenges')
+const memberCommunity = () => import('./screens/member/Community')
+const CM = {
+  community: page(community, 'CommunityPage'), list: page(challenges, 'ChallengeList'), form: page(challenges, 'ChallengeForm'), tasks: page(challenges, 'ChallengeTasks'),
+  view: page(challenges, 'ChallengeView'), teams: page(challenges, 'TeamList'), teamForm: page(challenges, 'TeamForm'), teamMembers: page(challenges, 'TeamMembers'),
+  feed: page(memberCommunity, 'MemberCommunity'), myChallenges: page(memberCommunity, 'MemberChallenges'), myChallenge: page(memberCommunity, 'MemberChallenge'),
+}
 function Lazy({ c: C }: { c: ComponentType }) {
   return <Suspense fallback={<div className="px-5 py-10 text-center text-[14px] text-muted lg:px-8" role="status">Loading…</div>}><C /></Suspense>
 }
@@ -264,6 +272,12 @@ const BUILT: Record<string, { el: ReactNode; roles: Role[] }> = {
   '/sms/campaigns': { el: <Lazy c={MSG.smsCampaigns} />, roles: DESK },
   '/sms/recharges': { el: <Lazy c={MSG.smsRecharges} />, roles: ['owner'] },
   '/email': { el: <Lazy c={MSG.email} />, roles: DESK },
+  // App Settings › Community and Challenges
+  '/community': { el: <Lazy c={CM.community} />, roles: DESK },
+  '/challenges/new': { el: <Lazy key="ch-new" c={CM.form} />, roles: DESK },
+  '/challenges': { el: <Lazy c={CM.list} />, roles: DESK },
+  '/challenges/teams/new': { el: <Lazy key="tm-new" c={CM.teamForm} />, roles: DESK },
+  '/challenges/teams': { el: <Lazy c={CM.teams} />, roles: DESK },
   // Shaan Fitness additions
   '/settings/website': { el: <WebsiteSettings />, roles: ['owner'] },
 }
@@ -347,6 +361,9 @@ export default function App() {
           <Route path="book" element={<ComingSoon title="Book" note="Booking, moving and cancelling sessions from the app comes with the member app." />} />
           <Route path="plan" element={<Lazy c={TR.memberPlan} />} />
           <Route path="notifications" element={<Lazy c={MSG.memberNotifications} />} />
+          <Route path="community" element={<Lazy c={CM.feed} />} />
+          <Route path="challenges" element={<Lazy c={CM.myChallenges} />} />
+          <Route path="challenges/:id" element={<Lazy c={CM.myChallenge} />} />
           <Route path="chat" element={<ComingSoon title="Chat" note="Care chat between members, coaches and doctors comes next, with online status and phone notifications." />} />
           <Route path="profile" element={<More />} />
           <Route path="notices" element={<AppNotices key="notices" kind="notices" />} />
@@ -369,6 +386,11 @@ export default function App() {
           <Route path="/clients/:id" element={<Only roles={['owner', 'front_desk', 'coach']}><ClientProfile /></Only>} />
           <Route path="/clients/:id/:tab" element={<Only roles={['owner', 'front_desk', 'coach']}><ClientProfile /></Only>} />
           <Route path="/plans/:id/edit" element={<Only roles={DESK} right={['plans', 'edit']}><PlanForm /></Only>} />
+          <Route path="/challenges/:id/edit" element={<Only roles={DESK}><Lazy c={CM.form} /></Only>} />
+          <Route path="/challenges/:id/tasks" element={<Only roles={DESK}><Lazy c={CM.tasks} /></Only>} />
+          <Route path="/challenges/:id" element={<Only roles={DESK}><Lazy c={CM.view} /></Only>} />
+          <Route path="/challenges/teams/:id/edit" element={<Only roles={DESK}><Lazy c={CM.teamForm} /></Only>} />
+          <Route path="/challenges/teams/:id/members" element={<Only roles={DESK}><Lazy c={CM.teamMembers} /></Only>} />
           <Route path="/workouts/:id/edit" element={<Only roles={DC}><Lazy c={TR.workoutForm} /></Only>} />
           <Route path="/workouts/:id/exercises" element={<Only roles={DC}><Lazy c={TR.workoutDays} /></Only>} />
           <Route path="/diets/:id/edit" element={<Only roles={DC}><Lazy c={TR.dietForm} /></Only>} />

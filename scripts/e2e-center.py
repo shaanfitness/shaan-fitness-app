@@ -224,7 +224,8 @@ with sync_playwright() as p:
     page.wait_for_url("**/app")
     expect(page.get_by_role("img", name="Diwali Offer")).to_be_visible()
     expect(page.get_by_role("button", name="Our Trainers")).to_be_visible()
-    expect(page.get_by_role("button", name="Track Diet")).to_have_count(0)
+    expect(page.get_by_role("button", name="Track Diet")).to_be_visible()          # the diet plan is in the app since part 7a
+    expect(page.get_by_role("button", name="Friend Requests")).to_have_count(0)    # no link set: hidden
     shot(page, "member-home")
     page.get_by_role("button", name="Notices").click()
     page.wait_for_url("**/app/notices")

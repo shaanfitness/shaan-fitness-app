@@ -215,5 +215,43 @@ begin
   select st, id, 'Diwali timings', 'The gym opens 6 AM to 12 noon on Diwali. Happy Diwali!', desk, now() - interval '3 days', now() - interval '2 days' from public.members where studio_id = st and first_name = 'Rohit'
   union all
   select st, id, 'New Zumba batch', 'A Zumba batch starts Monday at 7 PM. Ask the front desk to join.', desk, now() - interval '2 hours', null from public.members where studio_id = st and first_name = 'Rohit';
+
+  -- Community and challenges (Part 7c): a running challenge with tasks, teams, points and posts.
+  insert into public.challenges (id, studio_id, name, description, start_date, end_date, terms, has_tasks, created_by) values
+    ('00000000-0000-4000-8000-0000000e0001', st, '21 Day Fat Loss Challenge', 'Move every day for 21 days. Log your tasks in the app; the top three win a free month.',
+     d - 5, d + 15, 'Log only what you really did. Coaches may check your reps. Decisions of the judges are final.', true, desk),
+    ('00000000-0000-4000-8000-0000000e0002', st, 'Diwali Step Challenge', 'Walk 8,000 steps a day through Diwali week.', d + 10, d + 16, 'Steps from your phone count.', true, desk);
+  insert into public.challenge_tasks (challenge_id, title, target, unit, points, day, seq) values
+    ('00000000-0000-4000-8000-0000000e0001', '50 squats', 50, 'reps', 10, null, 1),
+    ('00000000-0000-4000-8000-0000000e0001', '20 minutes of cardio', 20, 'mins', 10, null, 2),
+    ('00000000-0000-4000-8000-0000000e0001', 'Kick-off plank', 60, 'secs', 25, 1, 3),
+    ('00000000-0000-4000-8000-0000000e0002', '8,000 steps', 8000, 'steps', 10, null, 1);
+  insert into public.challenge_teams (id, challenge_id, name, created_by) values
+    ('00000000-0000-4000-8000-0000000e0011', '00000000-0000-4000-8000-0000000e0001', 'Team Agni', desk),
+    ('00000000-0000-4000-8000-0000000e0012', '00000000-0000-4000-8000-0000000e0001', 'Team Vayu', desk);
+  insert into public.challenge_participants (challenge_id, member_id, team_id, added_by)
+  select '00000000-0000-4000-8000-0000000e0001', m.id,
+    case when row_number() over (order by m.first_name) % 2 = 0 then '00000000-0000-4000-8000-0000000e0011'::uuid else '00000000-0000-4000-8000-0000000e0012'::uuid end, desk
+  from public.members m where m.studio_id = st and m.first_name in ('Aarav', 'Diya', 'Kiran', 'Meera', 'Sneha', 'Vikram', 'Lakshmi', 'Arjun');
+  insert into public.challenge_participants (challenge_id, member_id, team_id)
+  select '00000000-0000-4000-8000-0000000e0001', id, '00000000-0000-4000-8000-0000000e0011' from public.members where studio_id = st and first_name = 'Rohit';
+  insert into public.challenge_entries (challenge_id, member_id, task_id, date, value, recorded_by)
+  select p.challenge_id, p.member_id, t.id, g::date, case when abs(hashtext(p.member_id::text || t.id::text || g::text)) % 4 = 0 then coalesce(t.target, 1) * 0.6 else coalesce(t.target, 1) end,
+    case when abs(hashtext(p.member_id::text || g::text)) % 2 = 0 then coach1 end
+  from public.challenge_participants p
+  join public.challenge_tasks t on t.challenge_id = p.challenge_id
+  cross join generate_series(d - 5, d - 1, interval '1 day') g
+  where p.challenge_id = '00000000-0000-4000-8000-0000000e0001' and (t.day is null or g::date = d - 5) and abs(hashtext(p.member_id::text || t.id::text || g::text)) % 5 <> 0;
+  insert into public.community_posts (author_staff_id, body, created_at) values
+    (desk, 'Gym timings on Dussehra: 6 AM to 11 AM only. Happy Dussehra to all our members!', now() - interval '2 days'),
+    (coach1, 'Form tip: in a squat, push your knees out over your toes and keep your chest up. Ask us to check your form any time.', now() - interval '5 days');
+  insert into public.community_posts (author_member_id, body, created_at)
+  select id, 'Down 3.6 kg in 6 weeks. Thank you Coach Ravi!', now() - interval '1 day' from public.members where studio_id = st and first_name = 'Rohit';
+  insert into public.community_posts (author_member_id, body, created_at)
+  select id, 'Finally did 10 pull-ups in a row!', now() - interval '3 hours' from public.members where studio_id = st and first_name = 'Arjun';
+  insert into public.community_posts (author_member_id, challenge_id, body, created_at)
+  select id, '00000000-0000-4000-8000-0000000e0001', 'Day 4 done, 50 squats and a 25 minute walk.', now() - interval '20 hours' from public.members where studio_id = st and first_name = 'Meera';
+  update public.community_posts set status = 'active', decided_by = desk, decided_at = created_at + interval '1 hour'
+  where studio_id = st and author_member_id is not null and body not like 'Finally%';
   perform app.relink_existing_users();
 end $$;

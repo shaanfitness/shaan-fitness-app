@@ -66,6 +66,11 @@ export function HomeExtras({ paid, pt }: { paid: boolean; pt: boolean }) {
       case 'MY_SUBSCRIPTIONS': return navigate('/app')
       case 'ABOUT_US': return navigate('/')
       case 'FREE_TRIAL': return trial.mutate()
+      case 'WORKOUT_PLAN': case 'TRACK_WORKOUT': return navigate('/app/plan?tab=workout')
+      case 'DIET_PLAN': return navigate('/app/plan?tab=diet')
+      case 'ADD_MEASUREMENT': case 'MEASUREMENT_LIST': case 'LOG_WEIGHT': return navigate('/app/plan?tab=progress')
+      case 'COMMUNITY_TAB': case 'ADD_POST': return navigate('/app/community')
+      case 'CHALLENGE_LIST': return navigate('/app/challenges')
       case 'EXTERNAL_WEB': case 'WEB': if (linkId && /^https:\/\//.test(linkId)) window.open(linkId, '_blank', 'noopener'); return
     }
   }

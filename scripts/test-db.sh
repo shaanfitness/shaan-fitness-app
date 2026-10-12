@@ -20,7 +20,7 @@ PSQL=("${RUN_AS[@]}" psql -h /tmp -p "$PORT" -U postgres -d postgres -v ON_ERROR
 for f in "$ROOT"/supabase/migrations/*.sql; do "${PSQL[@]}" -f "$f"; done
 "${PSQL[@]}" -f "$ROOT/supabase/seed.sql"
 "${PSQL[@]}" -f "$ROOT/supabase/fixtures/test-plans.sql"
-for t in "$ROOT"/supabase/tests/0[1-9]_*.sql; do "${PSQL[@]}" -f "$t"; done
+for t in "$ROOT"/supabase/tests/[0-9][0-9]_*.sql; do [ "$(basename "$t")" = 00_supabase_stubs.sql ] || "${PSQL[@]}" -f "$t"; done
 
 # The real setup: Shaan Fitness's YDL plans and batches load on a fresh database.
 "${RUN_AS[@]}" psql -h /tmp -p "$PORT" -U postgres -d postgres -q -c "create database ydlcheck"
