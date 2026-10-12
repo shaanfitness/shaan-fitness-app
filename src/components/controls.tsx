@@ -31,12 +31,12 @@ export function Select({ id, value, onChange, options, placeholder, small, disab
   )
 }
 
-export function TextInput({ id, value, onChange, type = 'text', placeholder, small, inputMode, autoComplete, onBlur, maxLength, ariaLabel, className = '' }: {
+export function TextInput({ id, value, onChange, type = 'text', placeholder, small, inputMode, autoComplete, onBlur, maxLength, ariaLabel, className = '', disabled }: {
   id?: string; value: string; onChange: (v: string) => void; type?: string; placeholder?: string; small?: boolean
-  inputMode?: 'text' | 'numeric' | 'tel' | 'email' | 'decimal'; autoComplete?: string; onBlur?: () => void; maxLength?: number; ariaLabel?: string; className?: string
+  inputMode?: 'text' | 'numeric' | 'tel' | 'email' | 'decimal'; autoComplete?: string; onBlur?: () => void; maxLength?: number; ariaLabel?: string; className?: string; disabled?: boolean
 }) {
   return (
-    <input id={id} type={type} aria-label={ariaLabel} className={`input ${small ? 'input-sm' : ''} ${className}`} value={value} placeholder={placeholder}
+    <input id={id} type={type} aria-label={ariaLabel} className={`input ${small ? 'input-sm' : ''} ${className}`} value={value} placeholder={placeholder} disabled={disabled}
       inputMode={inputMode} autoComplete={autoComplete} maxLength={maxLength} onBlur={onBlur} onChange={(e) => onChange(e.target.value)} />
   )
 }

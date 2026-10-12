@@ -70,7 +70,7 @@ export function useCrudRows<T extends Row>(def: CrudDef<T>) {
   })
 }
 
-export function CrudList<T extends Row>({ def, header }: { def: CrudDef<T>; header?: ReactNode }) {
+export function CrudList<T extends Row>({ def, header, openNew = false }: { def: CrudDef<T>; header?: ReactNode; openNew?: boolean }) {
   const toast = useToast()
   const qc = useQueryClient()
   const navigate = useNavigate()
@@ -80,7 +80,7 @@ export function CrudList<T extends Row>({ def, header }: { def: CrudDef<T>; head
   const [filter, setFilter] = useState<(r: T) => boolean>(() => () => true)
   const [selected, setSelected] = useState<Set<string>>(new Set())
   const [confirm, setConfirm] = useState<null | { action: 'delete' | 'deactivate' | 'activate'; ids: string[] }>(null)
-  const [form, setForm] = useState<T | 'new' | null>(null)
+  const [form, setForm] = useState<T | 'new' | null>(openNew && !def.pageForm ? 'new' : null)
   const [page, setPage] = useState(0)
   const size = def.pageSize ?? 25
   const rows = useMemo(() => data.filter((r) => filter(r) && (!search || (def.searchText?.(r) ?? '').toLowerCase().includes(search.toLowerCase()))), [data, filter, search, def])

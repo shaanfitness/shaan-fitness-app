@@ -71,13 +71,20 @@ export const AUDIENCE: [string, string][] = [
 ]
 export const audienceLabel = (a: string) => AUDIENCE.find(([k]) => k === a)?.[1] ?? a
 
-export type AppointmentStatus = 'open' | 'no_action' | 'attended' | 'no_show' | 'cancelled'
+export type AppointmentStatus = 'open' | 'no_action' | 'attended' | 'no_show' | 'cancelled' | 'rescheduled' | 'confirmed' | 'wait_list' | 'other'
+/** YDL Schedule Appointment's statuses (Rescheduled when editing; Confirmed and Wait List for members' requests). */
 export const APPOINTMENT_STATUS: [AppointmentStatus, string][] = [
   ['open', 'Open'], ['no_action', 'No Action'], ['attended', 'Attended'], ['no_show', 'No Show'], ['cancelled', 'Cancelled'],
+  ['rescheduled', 'Rescheduled'], ['confirmed', 'Confirmed'], ['wait_list', 'Wait List'], ['other', 'Other'],
 ]
+export const APPOINTMENT_CHIP: Record<AppointmentStatus, string> = {
+  open: 'chip-info', no_action: 'chip-muted', attended: 'chip-green', no_show: 'chip-red', cancelled: 'chip-muted', rescheduled: 'chip-amber', confirmed: 'chip-green',
+  wait_list: 'chip-amber', other: 'chip-muted',
+}
 export interface Appointment {
   id: string; studio_id: string; title: string; batch_id: string | null; appointment_date: string; start_time: string; end_time: string
   member_id: string; handled_by: string | null; room_no: string | null; status: AppointmentStatus; notify_client: boolean; created_at: string
+  purpose: string | null; comments: string | null; requested_by_member: boolean
   member_name: string; client_code: string | null; member_kind: string; member_country_code: string; member_phone: string | null
   handled_by_name: string | null; handled_by_photo: string | null; created_by_name: string | null; batch_name: string | null
 }

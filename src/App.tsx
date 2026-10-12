@@ -92,6 +92,22 @@ const CM = {
   view: page(challenges, 'ChallengeView'), teams: page(challenges, 'TeamList'), teamForm: page(challenges, 'TeamForm'), teamMembers: page(challenges, 'TeamMembers'),
   feed: page(memberCommunity, 'MemberCommunity'), myChallenges: page(memberCommunity, 'MemberChallenges'), myChallenge: page(memberCommunity, 'MemberChallenge'),
 }
+
+const walletP = () => import('./screens/staff/more/Wallet')
+const storeP = () => import('./screens/staff/more/Store')
+const helpP = () => import('./screens/staff/Help')
+const schedP = () => import('./screens/staff/ScheduleAppointments')
+const memberShop = () => import('./screens/member/Shop')
+const memberServices = () => import('./screens/member/Services')
+const MO = {
+  cats: page(walletP, 'WalletCategoryList'), catForm: page(walletP, 'WalletCategoryForm'), acts: page(walletP, 'WalletActivityList'), actForm: page(walletP, 'WalletActivityForm'),
+  traffic: page(walletP, 'ActivityTraffic'), register: page(walletP, 'WalletRegister'),
+  stores: page(storeP, 'StoreList'), storeForm: page(storeP, 'StoreForm'), storeView: page(storeP, 'StoreView'), storeCats: page(storeP, 'StoreCategories'),
+  products: page(storeP, 'StoreProducts'), orders: page(storeP, 'ClientOrders'), addOrder: page(storeP, 'AddOrder'),
+  videos: page(helpP, 'TutorialVideos'), faq: page(helpP, 'AdminFaq'), schedule: page(schedP, 'ScheduleAppointments'),
+  shop: page(memberShop, 'MemberStore'), myOrders: page(memberShop, 'MemberOrders'), wallet: page(memberServices, 'MemberWallet'),
+  appointments: page(memberServices, 'MemberAppointments'), memberVideos: page(memberServices, 'MemberVideos'),
+}
 function Lazy({ c: C }: { c: ComponentType }) {
   return <Suspense fallback={<div className="px-5 py-10 text-center text-[14px] text-muted lg:px-8" role="status">Loading…</div>}><C /></Suspense>
 }
@@ -278,6 +294,19 @@ const BUILT: Record<string, { el: ReactNode; roles: Role[] }> = {
   '/challenges': { el: <Lazy c={CM.list} />, roles: DESK },
   '/challenges/teams/new': { el: <Lazy key="tm-new" c={CM.teamForm} />, roles: DESK },
   '/challenges/teams': { el: <Lazy c={CM.teams} />, roles: DESK },
+  // Tutorial & Help Videos, Appointments, More Options › Wallet and › E-commerce
+  '/help/videos': { el: <Lazy c={MO.videos} />, roles: STAFF },
+  '/help/faq': { el: <Lazy c={MO.faq} />, roles: STAFF },
+  '/appointments': { el: <Lazy c={MO.schedule} />, roles: DC },
+  '/wallet/categories/new': { el: <Lazy key="wc-new" c={MO.catForm} />, roles: ['owner'] },
+  '/wallet/categories': { el: <Lazy c={MO.cats} />, roles: ['owner'] },
+  '/wallet/activities/new': { el: <Lazy key="wa-new" c={MO.actForm} />, roles: ['owner'] },
+  '/wallet/activities': { el: <Lazy c={MO.acts} />, roles: ['owner'] },
+  '/wallet/traffic': { el: <Lazy c={MO.traffic} />, roles: ['owner'] },
+  '/wallet/register': { el: <Lazy c={MO.register} />, roles: ['owner'] },
+  '/store/new': { el: <Lazy key="st-new" c={MO.storeForm} />, roles: ['owner'] },
+  '/store': { el: <Lazy c={MO.stores} />, roles: ['owner'] },
+  '/store/orders': { el: <Lazy c={MO.orders} />, roles: DESK },
   // Shaan Fitness additions
   '/settings/website': { el: <WebsiteSettings />, roles: ['owner'] },
 }
@@ -364,6 +393,11 @@ export default function App() {
           <Route path="community" element={<Lazy c={CM.feed} />} />
           <Route path="challenges" element={<Lazy c={CM.myChallenges} />} />
           <Route path="challenges/:id" element={<Lazy c={CM.myChallenge} />} />
+          <Route path="store" element={<Lazy c={MO.shop} />} />
+          <Route path="orders" element={<Lazy c={MO.myOrders} />} />
+          <Route path="wallet" element={<Lazy c={MO.wallet} />} />
+          <Route path="appointments" element={<Lazy c={MO.appointments} />} />
+          <Route path="videos" element={<Lazy c={MO.memberVideos} />} />
           <Route path="chat" element={<ComingSoon title="Chat" note="Care chat between members, coaches and doctors comes next, with online status and phone notifications." />} />
           <Route path="profile" element={<More />} />
           <Route path="notices" element={<AppNotices key="notices" kind="notices" />} />
@@ -391,6 +425,13 @@ export default function App() {
           <Route path="/challenges/:id" element={<Only roles={DESK}><Lazy c={CM.view} /></Only>} />
           <Route path="/challenges/teams/:id/edit" element={<Only roles={DESK}><Lazy c={CM.teamForm} /></Only>} />
           <Route path="/challenges/teams/:id/members" element={<Only roles={DESK}><Lazy c={CM.teamMembers} /></Only>} />
+          <Route path="/wallet/categories/:id/edit" element={<Only roles={['owner']}><Lazy c={MO.catForm} /></Only>} />
+          <Route path="/wallet/activities/:id/edit" element={<Only roles={['owner']}><Lazy c={MO.actForm} /></Only>} />
+          <Route path="/store/orders/new" element={<Only roles={DESK}><Lazy c={MO.addOrder} /></Only>} />
+          <Route path="/store/:id/edit" element={<Only roles={['owner']}><Lazy c={MO.storeForm} /></Only>} />
+          <Route path="/store/:id/categories" element={<Only roles={['owner']}><Lazy c={MO.storeCats} /></Only>} />
+          <Route path="/store/:id/products" element={<Only roles={['owner']}><Lazy c={MO.products} /></Only>} />
+          <Route path="/store/:id" element={<Only roles={['owner']}><Lazy c={MO.storeView} /></Only>} />
           <Route path="/workouts/:id/edit" element={<Only roles={DC}><Lazy c={TR.workoutForm} /></Only>} />
           <Route path="/workouts/:id/exercises" element={<Only roles={DC}><Lazy c={TR.workoutDays} /></Only>} />
           <Route path="/diets/:id/edit" element={<Only roles={DC}><Lazy c={TR.dietForm} /></Only>} />

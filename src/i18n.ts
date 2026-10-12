@@ -106,6 +106,29 @@ const en = {
     video: 'Watch the video', you: 'you', participants: '{{n}} taking part', notStarted: 'Tasks open when the challenge starts.',
     postProgress: 'Post your progress', teamOf: 'Team {{name}}', details: 'About', restDay: 'No tasks today. Rest well!',
   },
+  shop: {
+    title: 'Store', myOrders: 'My orders', closed: 'The gym store isn’t open yet.', all: 'All', categories: 'Categories', empty: 'Nothing here yet.',
+    out: 'Out of stock', left: 'Only {{n}} left', add: 'Add', less: 'One less {{name}}', more: 'One more {{name}}', items_one: '{{count}} item', items_other: '{{count}} items',
+    viewCart: 'View cart', cart: 'Your cart', gst: 'GST', packing: 'Packaging', total: 'Total', notes: 'A note for the gym (optional)',
+    howItWorks: 'Collect your order at the front desk and pay there. We’ll tell you in the app when it’s ready.', place: 'Place order', placing: 'Placing…',
+    placed: 'Order placed. We’ll tell you when it’s ready to collect.', noOrders: 'No orders yet.', paid: 'Paid', due: 'To pay at the gym', cancel: 'Cancel order',
+    confirmCancel: 'Cancel this order?', cancelled: 'Order cancelled',
+    status: { pending: 'Waiting', confirmed: 'Confirmed', collected: 'Collected', cancelled: 'Cancelled' },
+  },
+  wallet: {
+    title: 'My wallet', balance: 'Balance', topUp: 'Add money or claim a reward at the front desk.', useFor: 'Use it for', earn: 'Ways to earn', once: 'Once', perHours: 'Per {{n}} hr',
+    history: 'History', empty: 'Nothing in your wallet yet.',
+    source: { top_up: 'Money added', reward: 'Reward', activity: 'Activity', refund: 'Refund', adjustment: 'Correction' },
+  },
+  appt: {
+    title: 'Appointments', ask: 'Ask for one', upcoming: 'Coming up', past: 'Earlier', none: 'No appointments coming up.', room: 'Room {{n}}',
+    waiting: 'The gym will confirm the time with you.', cancel: 'Cancel', confirmCancel: 'Cancel this appointment?', cancelled: 'Appointment cancelled',
+    purpose: 'What for', choose: 'Choose', day: 'Day', time: 'Time', comments: 'Anything we should know', send: 'Send request',
+    sent: 'Request sent. The gym will confirm it in the app.', needPurpose: 'Choose what the appointment is for.', needTime: 'Choose the day and time.',
+    howItWorks: 'This is a request. The front desk confirms the time and who you meet; you’ll see it here and get a notification.',
+    status: { open: 'Booked', no_action: 'No action', attended: 'Attended', no_show: 'Missed', cancelled: 'Cancelled', rescheduled: 'Rescheduled', confirmed: 'Confirmed', wait_list: 'Requested', other: 'Other' },
+  },
+  help: { videos: 'Help videos', none: 'No videos yet.' },
 }
 
 const te: typeof en = {
@@ -211,6 +234,29 @@ const te: typeof en = {
     video: 'వీడియో చూడండి', you: 'మీరు', participants: '{{n}} మంది పాల్గొంటున్నారు', notStarted: 'ఛాలెంజ్ మొదలైనప్పుడు టాస్క్‌లు తెరుచుకుంటాయి.',
     postProgress: 'మీ ప్రోగ్రెస్ పోస్ట్ చేయండి', teamOf: 'టీమ్ {{name}}', details: 'వివరాలు', restDay: 'ఈరోజు టాస్క్‌లు లేవు. బాగా విశ్రాంతి తీసుకోండి!',
   },
+  shop: {
+    title: 'స్టోర్', myOrders: 'నా ఆర్డర్లు', closed: 'జిమ్ స్టోర్ ఇంకా తెరవలేదు.', all: 'అన్నీ', categories: 'విభాగాలు', empty: 'ఇక్కడ ఇంకా ఏమీ లేదు.',
+    out: 'స్టాక్ లేదు', left: '{{n}} మాత్రమే ఉన్నాయి', add: 'జోడించండి', less: '{{name}} ఒకటి తగ్గించండి', more: '{{name}} ఒకటి పెంచండి', items_one: '{{count}} వస్తువు', items_other: '{{count}} వస్తువులు',
+    viewCart: 'కార్ట్ చూడండి', cart: 'మీ కార్ట్', gst: 'జీఎస్టీ', packing: 'ప్యాకింగ్', total: 'మొత్తం', notes: 'జిమ్‌కు ఒక నోట్ (ఐచ్ఛికం)',
+    howItWorks: 'మీ ఆర్డర్‌ను ఫ్రంట్ డెస్క్ వద్ద తీసుకుని అక్కడే చెల్లించండి. సిద్ధమైనప్పుడు యాప్‌లో చెబుతాం.', place: 'ఆర్డర్ చేయండి', placing: 'ఆర్డర్ అవుతోంది…',
+    placed: 'ఆర్డర్ అయింది. తీసుకోవడానికి సిద్ధమైనప్పుడు చెబుతాం.', noOrders: 'ఇంకా ఆర్డర్లు లేవు.', paid: 'చెల్లించారు', due: 'జిమ్‌లో చెల్లించాల్సింది', cancel: 'ఆర్డర్ రద్దు చేయండి',
+    confirmCancel: 'ఈ ఆర్డర్ రద్దు చేయాలా?', cancelled: 'ఆర్డర్ రద్దయింది',
+    status: { pending: 'వేచి ఉంది', confirmed: 'నిర్ధారించారు', collected: 'తీసుకున్నారు', cancelled: 'రద్దయింది' },
+  },
+  wallet: {
+    title: 'నా వాలెట్', balance: 'బ్యాలెన్స్', topUp: 'ఫ్రంట్ డెస్క్ వద్ద డబ్బు జమ చేయండి లేదా రివార్డ్ పొందండి.', useFor: 'దీనితో వాడవచ్చు', earn: 'సంపాదించే మార్గాలు', once: 'ఒకసారి', perHours: 'ప్రతి {{n}} గంటకు',
+    history: 'చరిత్ర', empty: 'మీ వాలెట్‌లో ఇంకా ఏమీ లేదు.',
+    source: { top_up: 'డబ్బు జమ', reward: 'రివార్డ్', activity: 'యాక్టివిటీ', refund: 'రీఫండ్', adjustment: 'సవరణ' },
+  },
+  appt: {
+    title: 'అపాయింట్‌మెంట్లు', ask: 'అడగండి', upcoming: 'రాబోయేవి', past: 'గతంలో', none: 'రాబోయే అపాయింట్‌మెంట్లు లేవు.', room: 'రూమ్ {{n}}',
+    waiting: 'జిమ్ మీతో సమయం ఖరారు చేస్తుంది.', cancel: 'రద్దు చేయండి', confirmCancel: 'ఈ అపాయింట్‌మెంట్ రద్దు చేయాలా?', cancelled: 'అపాయింట్‌మెంట్ రద్దయింది',
+    purpose: 'దేనికోసం', choose: 'ఎంచుకోండి', day: 'రోజు', time: 'సమయం', comments: 'మేము తెలుసుకోవలసినది', send: 'అభ్యర్థన పంపండి',
+    sent: 'అభ్యర్థన పంపాం. జిమ్ యాప్‌లో నిర్ధారిస్తుంది.', needPurpose: 'అపాయింట్‌మెంట్ దేనికోసమో ఎంచుకోండి.', needTime: 'రోజు, సమయం ఎంచుకోండి.',
+    howItWorks: 'ఇది అభ్యర్థన మాత్రమే. ఫ్రంట్ డెస్క్ సమయం, మీరు కలిసే వ్యక్తిని ఖరారు చేస్తుంది; ఇక్కడ కనిపిస్తుంది, నోటిఫికేషన్ వస్తుంది.',
+    status: { open: 'బుక్ అయింది', no_action: 'చర్య లేదు', attended: 'హాజరయ్యారు', no_show: 'రాలేదు', cancelled: 'రద్దయింది', rescheduled: 'మార్చారు', confirmed: 'నిర్ధారించారు', wait_list: 'అభ్యర్థించారు', other: 'ఇతర' },
+  },
+  help: { videos: 'సహాయ వీడియోలు', none: 'ఇంకా వీడియోలు లేవు.' },
 }
 
 let saved: string | null = null

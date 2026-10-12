@@ -231,27 +231,27 @@ export const NAV: NavNode[] = [
     ]),
   ], 'sparkle'),
   g('Tutorial & Help Videos', [
-    p('Tutorial Videos', '/help/videos', '/all_tutorial_videos/?data=Customer Application', ALL),
-    p("Admin Dashboard FAQ's", '/help/faq', '/admin_dashboard/?data=Admin Dashboard', ALL),
+    p('Tutorial Videos', '/help/videos', '/all_tutorial_videos/?data=Customer Application', ALL, { built: true }),
+    p("Admin Dashboard FAQ's", '/help/faq', '/admin_dashboard/?data=Admin Dashboard', ALL, { built: true }),
   ], 'help'),
-  { ...p('Appointments', '/appointments', '/book-appoinment/', DC), icon: 'clock' },
+  { ...p('Appointments', '/appointments', '/book-appoinment/', DC, { built: true }), icon: 'clock' },
   g('More Options', [
     g('Wallet', [
       g('Categories', [
-        p('Create Category', '/wallet/categories/new', '/fitness-center/wallet-category/basic-information/', O),
-        p('Category List', '/wallet/categories', '/fitness-center/category/category-list/', O),
+        p('Create Category', '/wallet/categories/new', '/fitness-center/wallet-category/basic-information/', O, { built: true }),
+        p('Category List', '/wallet/categories', '/fitness-center/category/category-list/', O, { built: true }),
       ]),
       g('Activity Plans', [
-        p('Create Activity', '/wallet/activities/new', '/fitness-center/activity/basic-information/', O),
-        p('My Activity Plans', '/wallet/activities', '/fitness-center/activity/activity-list/', O),
+        p('Create Activity', '/wallet/activities/new', '/fitness-center/activity/basic-information/', O, { built: true }),
+        p('My Activity Plans', '/wallet/activities', '/fitness-center/activity/activity-list/', O, { built: true }),
       ]),
-      p('Activity Traffic', '/wallet/traffic', '/fitness-center/activity/activity-traffic/', O),
-      p('Wallet Register', '/wallet/register', '/fitness-center/activity/activity-register/', O),
+      p('Activity Traffic', '/wallet/traffic', '/fitness-center/activity/activity-traffic/', O, { built: true }),
+      p('Wallet Register', '/wallet/register', '/fitness-center/activity/activity-register/', O, { built: true }),
     ]),
     g('E-commerce', [
-      p('Create Store', '/store/new', '/ecommerce/store/basic-information/', O),
-      p('Store List', '/store', '/ecommerce/store-list/', O),
-      p('Client Orders', '/store/orders', '/ecommerce/product-order-list/', D),
+      p('Create Store', '/store/new', '/ecommerce/store/basic-information/', O, { built: true }),
+      p('Store List', '/store', '/ecommerce/store-list/', O, { built: true }),
+      p('Client Orders', '/store/orders', '/ecommerce/product-order-list/', D, { built: true }),
     ]),
   ], 'more'),
 ]

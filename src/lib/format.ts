@@ -22,12 +22,19 @@ export const minutesOf = (hhmm: string) => {
 
 // Amounts show in the studio's currency (Fitness Center › Currency Setting); rupees until it loads.
 let fmt = new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 })
+let fmtPaise = new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', minimumFractionDigits: 0, maximumFractionDigits: 2 })
 let current = 'INR'
 export function setCurrency(code: string | null | undefined) {
   if (!code || code === current) return
-  try { fmt = new Intl.NumberFormat('en-IN', { style: 'currency', currency: code, maximumFractionDigits: 0 }); current = code } catch { /* unknown code: keep rupees */ }
+  try {
+    fmt = new Intl.NumberFormat('en-IN', { style: 'currency', currency: code, maximumFractionDigits: 0 })
+    fmtPaise = new Intl.NumberFormat('en-IN', { style: 'currency', currency: code, minimumFractionDigits: 0, maximumFractionDigits: 2 })
+    current = code
+  } catch { /* unknown code: keep rupees */ }
 }
 export const money = (n: number) => fmt.format(Math.round(n))
+/** An amount with its paise when it has any (store prices and tax): ₹305.08, ₹2,870. */
+export const moneyExact = (n: number) => fmtPaise.format(Math.round(Number(n) * 100) / 100)
 
 export const initials = (name: string) =>
   name.replace(/[^\p{L}\s]/gu, '').split(/\s+/).filter(Boolean).slice(0, 2).map((p) => p[0]!.toUpperCase()).join('')

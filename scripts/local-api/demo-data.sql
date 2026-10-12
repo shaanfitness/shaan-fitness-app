@@ -253,5 +253,46 @@ begin
   select id, '00000000-0000-4000-8000-0000000e0001', 'Day 4 done, 50 squats and a 25 minute walk.', now() - interval '20 hours' from public.members where studio_id = st and first_name = 'Meera';
   update public.community_posts set status = 'active', decided_by = desk, decided_at = created_at + interval '1 hour'
   where studio_id = st and author_member_id is not null and body not like 'Finally%';
+  -- Wallet, store and appointments (Part 7d).
+  insert into public.wallet_categories (id, studio_id, name, description) values ('00000000-0000-4000-8000-0000000f0001', st, 'Games', 'Courts and the games area.');
+  insert into public.wallet_activities (id, studio_id, category_id, name, price, one_time, duration_hours) values
+    ('00000000-0000-4000-8000-0000000f0011', st, '00000000-0000-4000-8000-0000000f0001', 'Badminton Court', 200, false, 1),
+    ('00000000-0000-4000-8000-0000000f0012', st, '00000000-0000-4000-8000-0000000f0001', 'Steam Bath', 150, true, null),
+    ('00000000-0000-4000-8000-0000000f0013', st, (select id from public.wallet_categories where studio_id = st and name = 'Refer & Earn'), 'Referral Reward', 500, true, null);
+  insert into public.wallet_transactions (member_id, source, amount, payment_method, txn_date, created_by)
+  select id, 'top_up', 1000, 'UPI', d - 6, desk from public.members where studio_id = st and first_name = 'Rohit';
+  insert into public.wallet_transactions (member_id, source, activity_id, txn_date, created_by)
+  select id, 'activity', '00000000-0000-4000-8000-0000000f0012', d - 2, desk from public.members where studio_id = st and first_name = 'Rohit';
+  insert into public.wallet_transactions (member_id, source, activity_id, txn_date, created_by)
+  select id, 'reward', '00000000-0000-4000-8000-0000000f0013', d - 1, desk from public.members where studio_id = st and first_name = 'Meera';
+  insert into public.stores (id, studio_id, name, company_name, tagline, description, gst_type, packaging_charges, created_by) values
+    ('00000000-0000-4000-8000-0000000f0101', st, 'Shaan Fitness Store', 'Shaan Fitness', 'Fuel for your training', 'Supplements, shakers and gym gear at the front desk.', 'inclusive', 0, desk);
+  insert into public.store_categories (id, store_id, name, seq) values
+    ('00000000-0000-4000-8000-0000000f0111', '00000000-0000-4000-8000-0000000f0101', 'Supplements', 1),
+    ('00000000-0000-4000-8000-0000000f0112', '00000000-0000-4000-8000-0000000f0101', 'Accessories', 2);
+  insert into public.products (id, store_id, category_id, name, price, mrp, gst_percent, stock) values
+    ('00000000-0000-4000-8000-0000000f0121', '00000000-0000-4000-8000-0000000f0101', '00000000-0000-4000-8000-0000000f0111', 'Whey Protein 1 kg', 2499, 2999, 18, 12),
+    ('00000000-0000-4000-8000-0000000f0122', '00000000-0000-4000-8000-0000000f0101', '00000000-0000-4000-8000-0000000f0111', 'Creatine 250 g', 899, null, 18, 3),
+    ('00000000-0000-4000-8000-0000000f0123', '00000000-0000-4000-8000-0000000f0101', '00000000-0000-4000-8000-0000000f0112', 'Shaker Bottle', 299, null, 18, null),
+    ('00000000-0000-4000-8000-0000000f0124', '00000000-0000-4000-8000-0000000f0101', '00000000-0000-4000-8000-0000000f0112', 'Gym Gloves', 449, null, 12, 0);
+  insert into public.store_orders (id, studio_id, store_id, member_id, order_no, items_count, subtotal, gst_amount, total, received, payment_type, status, payment_status, created_by, created_at)
+  select '00000000-0000-4000-8000-0000000f0131', st, '00000000-0000-4000-8000-0000000f0101', id, 'ORD' || lpad(nextval('app.order_no_seq')::text, 5, '0'),
+    2, 2798, 426.81, 2798, 2798, 'upi', 'collected', 'paid', desk, now() - interval '3 days'
+  from public.members where studio_id = st and first_name = 'Vikram';
+  insert into public.store_order_items (studio_id, order_id, product_id, name, qty, price, gst_percent, gst_amount, total) values
+    (st, '00000000-0000-4000-8000-0000000f0131', '00000000-0000-4000-8000-0000000f0121', 'Whey Protein 1 kg', 1, 2499, 18, 381.20, 2499),
+    (st, '00000000-0000-4000-8000-0000000f0131', '00000000-0000-4000-8000-0000000f0123', 'Shaker Bottle', 1, 299, 18, 45.61, 299);
+  insert into public.store_orders (id, studio_id, store_id, member_id, order_no, items_count, subtotal, gst_amount, total, placed_by_member, created_at)
+  select '00000000-0000-4000-8000-0000000f0132', st, '00000000-0000-4000-8000-0000000f0101', id, 'ORD' || lpad(nextval('app.order_no_seq')::text, 5, '0'),
+    1, 899, 137.14, 899, true, now() - interval '1 hour'
+  from public.members where studio_id = st and first_name = 'Sneha';
+  insert into public.store_order_items (studio_id, order_id, product_id, name, qty, price, gst_percent, gst_amount, total) values
+    (st, '00000000-0000-4000-8000-0000000f0132', '00000000-0000-4000-8000-0000000f0122', 'Creatine 250 g', 1, 899, 18, 137.14, 899);
+  insert into public.appointments (studio_id, title, purpose, comments, appointment_date, start_time, end_time, member_id, handled_by, room_no, status, created_by)
+  select st, 'Diet Consultation', 'Diet Consultation', 'Bring last month''s weight log', d + 1, '10:00'::time, '10:30'::time, id, coach1, '2', 'open', desk from public.members where studio_id = st and first_name = 'Rohit'
+  union all
+  select st, 'Fitness Test', 'Fitness Test', null, d, '17:00'::time, '17:45'::time, id, coach1, null, 'confirmed', desk from public.members where studio_id = st and first_name = 'Aarav';
+  insert into public.appointments (studio_id, title, purpose, comments, appointment_date, start_time, end_time, member_id, status, requested_by_member)
+  select st, 'BMI Check', 'BMI Check', 'Evening after 6 works best', d + 2, '18:00', '18:30', id, 'wait_list', true from public.members where studio_id = st and first_name = 'Diya';
   perform app.relink_existing_users();
 end $$;

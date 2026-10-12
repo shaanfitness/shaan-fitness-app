@@ -24,10 +24,12 @@ import { Avatar, Icon, Loading, Sheet } from '../../components/ui'
 
 const TABS: [string, string][] = [
   ['', 'Information'], ['subscriptions', 'Subscriptions'], ['attendance', 'Attendance'], ['workout', 'Workout'],
-  ['follow-ups', 'Follow Up History'], ['documents', 'Client Document'], ['referrals', 'Client Referrals'],
+  ['follow-ups', 'Follow Up History'], ['documents', 'Client Document'], ['referrals', 'Client Referrals'], ['wallet', 'Wallet & Orders'],
 ]
+const DESK_TABS = new Set(['wallet'])
 
 const ClientTrainingTab = lazy(() => import('./training/ClientTraining').then((m) => ({ default: m.ClientTrainingTab })))
+const ClientMoneyTab = lazy(() => import('./more/ClientMoney').then((m) => ({ default: m.ClientMoneyTab })))
 
 export default function ClientProfile() {
   const { id = '', tab = '' } = useParams()
@@ -100,7 +102,7 @@ export default function ClientProfile() {
                   : <button type="button" className="btn btn-sm" disabled={checkIn.isPending} onClick={() => checkIn.mutate(false)}>Check in</button>}
                 <button type="button" className="btn btn-sm" onClick={() => setNotify(true)}><Icon name="bell" size={16} />Send Notification</button>
                 {c.phone && <button type="button" className="btn btn-sm" onClick={() => setWhatsapp(true)}><Icon name="whatsapp" size={16} />Send WhatsApp Message</button>}
-                <Link to={`/store/orders?client=${c.id}`} className="btn btn-sm">Place Order</Link>
+                <Link to={`/store/orders/new?client=${c.id}`} className="btn btn-sm">Place Order</Link>
                 <Link to={`/clients/${c.id}/follow-ups`} className="btn btn-sm">See Follow Up History</Link>
                 <Link to={`/challenges?client=${c.id}`} className="btn btn-sm">View Participated Challenges</Link>
               </div>
@@ -137,8 +139,8 @@ export default function ClientProfile() {
 
         {/* Tabs */}
         <section className="flex min-w-0 flex-col gap-4">
-          <nav aria-label="Client sections" className="flex gap-1 overflow-x-auto rounded-2xl border border-line bg-surface p-1">
-            {TABS.map(([k, label]) => (
+          <nav aria-label="Client sections" className="flex flex-wrap gap-1 rounded-2xl border border-line bg-surface p-1">
+            {TABS.filter(([k]) => isDesk || !DESK_TABS.has(k)).map(([k, label]) => (
               <NavLink key={k} to={`/clients/${c.id}${k ? `/${k}` : ''}`} end
                 className={({ isActive }) => `whitespace-nowrap rounded-xl px-3.5 py-2 text-[13px] font-semibold no-underline ${isActive ? 'bg-surface-3 text-gold' : 'text-muted hover:text-ink'}`}>
                 {label}
@@ -152,6 +154,7 @@ export default function ClientProfile() {
           {tab === 'follow-ups' && <FollowUpsTab memberId={c.id} name={c.full_name} notes={c.notes} kind={c.kind} />}
           {tab === 'documents' && <DocumentsTab memberId={c.id} />}
           {tab === 'referrals' && <ReferralsTab memberId={c.id} />}
+          {tab === 'wallet' && isDesk && <Suspense fallback={<p className="text-muted">Loading…</p>}><ClientMoneyTab memberId={c.id} name={c.full_name} /></Suspense>}
         </section>
       </div>
 

@@ -71,6 +71,10 @@ export function HomeExtras({ paid, pt }: { paid: boolean; pt: boolean }) {
       case 'ADD_MEASUREMENT': case 'MEASUREMENT_LIST': case 'LOG_WEIGHT': return navigate('/app/plan?tab=progress')
       case 'COMMUNITY_TAB': case 'ADD_POST': return navigate('/app/community')
       case 'CHALLENGE_LIST': return navigate('/app/challenges')
+      case 'APPOINTMENTS': return navigate('/app/appointments')
+      case 'STORE': return navigate('/app/store')
+      case 'MY_ORDERS': return navigate('/app/orders')
+      case 'WALLET': return navigate('/app/wallet')
       case 'EXTERNAL_WEB': case 'WEB': if (linkId && /^https:\/\//.test(linkId)) window.open(linkId, '_blank', 'noopener'); return
     }
   }

@@ -3,7 +3,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useMe } from '../../auth'
 import { supabase } from '../../lib/supabase'
 import { throwIf, useBatches, useStudio, useTeam } from '../../db/studio'
-import { APPOINTMENT_STATUS, saveAppointment, timeRange, useSchedule, type Appointment, type AppointmentStatus, type ClassSlot } from '../../db/classes'
+import { APPOINTMENT_CHIP, APPOINTMENT_STATUS, saveAppointment, timeRange, useSchedule, type Appointment, type AppointmentStatus, type ClassSlot } from '../../db/classes'
 import { fmtClock, fmtDay, studioToday } from '../../lib/dates'
 import { ClientLookup } from '../../components/billing'
 import { Field, Notice, RadioGroup, Select, TextInput } from '../../components/controls'
@@ -14,7 +14,7 @@ import { ClassDetails } from './Classes'
 // YDL "Daily Booking Appointment": a day's classes and appointments in one column per trainer,
 // with "Book Appointment" (Schedule Appointment) and "Edit Class".
 
-const STATUS_CHIP: Record<AppointmentStatus, string> = { open: 'chip-info', no_action: 'chip-muted', attended: 'chip-green', no_show: 'chip-red', cancelled: 'chip-muted' }
+const STATUS_CHIP = APPOINTMENT_CHIP
 const statusLabel = (s: AppointmentStatus) => APPOINTMENT_STATUS.find(([k]) => k === s)?.[1] ?? s
 
 export function DailyAppointments() {
