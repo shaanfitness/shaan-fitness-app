@@ -97,7 +97,7 @@ export function MemberAppointments() {
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['my-appointments'] }); toast(t('appt.cancelled')) },
     onError: (e: Error) => toast(e.message),
   })
-  const canAsk = (studio?.settings.center as Record<string, unknown> | undefined)?.can_book_appointment !== false
+  const canAsk = (studio?.settings.app as Record<string, unknown> | undefined)?.can_book_appointment !== false
   const all = q.data ?? []
   const upcoming = all.filter((a) => a.appointment_date >= today && !['cancelled', 'attended', 'no_show'].includes(a.status)).reverse()
   const past = all.filter((a) => !upcoming.includes(a))
@@ -132,7 +132,7 @@ export function MemberAppointments() {
   )
 }
 
-function AskForm({ onDone }: { onDone: () => void }) {
+export function AskForm({ onDone, trainer }: { onDone: () => void; trainer?: { id: string; name: string } }) {
   const { t } = useTranslation()
   const toast = useToast()
   const qc = useQueryClient()
@@ -142,7 +142,7 @@ function AskForm({ onDone }: { onDone: () => void }) {
   const [error, setError] = useState<string | null>(null)
   const m = useMutation({
     mutationFn: async () => {
-      const r = await supabase.rpc('request_appointment', { p: { purpose: f.purpose, appointment_date: f.date, start_time: f.time, comments: f.comments } })
+      const r = await supabase.rpc('request_appointment', { p: { purpose: f.purpose, appointment_date: f.date, start_time: f.time, comments: f.comments, trainer_id: trainer?.id ?? null } })
       if (r.error) throw new Error(r.error.message)
     },
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['my-appointments'] }); toast(t('appt.sent')); onDone() },
@@ -150,6 +150,7 @@ function AskForm({ onDone }: { onDone: () => void }) {
   })
   return (
     <form className="flex flex-col gap-4" noValidate onSubmit={(e) => { e.preventDefault(); setError(null); if (!f.purpose) setError(t('appt.needPurpose')); else if (!f.date || !f.time) setError(t('appt.needTime')); else m.mutate() }}>
+      {trainer && <p className="m-0 text-[14px]">{t('appt.withCoach', { name: trainer.name })}</p>}
       <Field label={t('appt.purpose')} required id="ask-purpose"><Select id="ask-purpose" value={f.purpose} onChange={(v) => setF({ ...f, purpose: v })} placeholder={t('appt.choose')} options={purposes.map((p) => ({ value: p.label, label: p.label }))} /></Field>
       <div className="grid grid-cols-2 gap-3">
         <Field label={t('appt.day')} required id="ask-date"><TextInput id="ask-date" type="date" value={f.date} onChange={(v) => setF({ ...f, date: v })} /></Field>

@@ -74,7 +74,7 @@ export const linkLabel = (v: unknown) => LINKS.find((l) => l.value === v)?.label
 /** Links the member app opens today (the rest arrive with the member app's features). */
 export const LIVE_LINKS = new Set(['SUBSCRIPTIONS', 'TRAINERS_LIST', 'ABOUT_US', 'CONTACT', 'FREE_TRIAL', 'FITNESS_NOTICES', 'FITNESS_RULES', 'FEEDBACK',
   'TRANSFORMATIONS', 'EXTERNAL_WEB', 'WEB', 'PROFILE', 'MY_SUBSCRIPTIONS', 'WORKOUT_PLAN', 'TRACK_WORKOUT', 'DIET_PLAN', 'ADD_MEASUREMENT',
-  'MEASUREMENT_LIST', 'LOG_WEIGHT', 'COMMUNITY_TAB', 'ADD_POST', 'CHALLENGE_LIST', 'APPOINTMENTS', 'STORE', 'MY_ORDERS', 'WALLET'])
+  'MEASUREMENT_LIST', 'LOG_WEIGHT', 'COMMUNITY_TAB', 'ADD_POST', 'CHALLENGE_LIST', 'APPOINTMENTS', 'STORE', 'MY_ORDERS', 'WALLET', 'PT_TAB', 'TOTAL_CHECKINS', 'TRAFFIC', 'GIVE_REFERRAL', 'BROWSE_CLASSES', 'OWN_PROGRAM_LIST', 'TRAINER_PROFILE'])
 
 /** YDL's icon choices, drawn with our own icons (YDL's pictures stay with YDL). */
 export const ICONS: { value: string; label: string; icon: string }[] = [

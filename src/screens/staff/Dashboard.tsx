@@ -14,6 +14,7 @@ import { Select, TextInput, opts } from '../../components/controls'
 import { FollowUpDialog, FollowUpHistory, type FollowUpTarget } from '../../components/FollowUp'
 import { DataTable, type Column } from '../../components/table'
 import { Icon, PageHeader } from '../../components/ui'
+import { AlertsBell } from './Alerts'
 
 // YDL dashboard, section by section: alerts, filters, expected payments, my follow-ups,
 // missed follow-ups, today's batches, the twelve cards, traffic, quick links,
@@ -164,6 +165,7 @@ export default function Dashboard() {
     <>
       <PageHeader title="Dashboard" sub={`${studio?.name ?? ''}${studio?.branch_name ? ` (${studio.branch_name})` : ''} · ${fmtDay(today, 'EEEE, d MMMM yyyy')}`}
         actions={<>
+          <AlertsBell />
           <Link to="/enquiries/new" className="btn-gold min-h-11"><Icon name="userPlus" size={18} />Add enquiry</Link>
         </>} />
 

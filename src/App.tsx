@@ -48,7 +48,7 @@ import { BiometricManager, CenterEdit, CenterList, CenterView, CurrencySetting, 
 import { AppPermissions, CenterSettings, MeasurementSettings } from './screens/staff/CenterSettings'
 import { Equipment, FeedbackList, Holidays, Notices, Rules } from './screens/staff/CenterLists'
 import { ActionForm, ActionList, BannerForm, BannerList, GalleryForm, GalleryList, ServicesList, SocialLinks } from './screens/staff/AppContent'
-import { AppCoaches, AppContact, AppFeedback, AppNotices, AppPlans, AppResults } from './screens/member/AppPages'
+import { AppContact, AppFeedback, AppNotices, AppPlans, AppResults } from './screens/member/AppPages'
 import { prettyPhone, telLink, useSite } from './db/site'
 import { Notice } from './components/controls'
 
@@ -99,6 +99,15 @@ const helpP = () => import('./screens/staff/Help')
 const schedP = () => import('./screens/staff/ScheduleAppointments')
 const memberShop = () => import('./screens/member/Shop')
 const memberServices = () => import('./screens/member/Services')
+const memberBook = () => import('./screens/member/Book')
+const memberAccount = () => import('./screens/member/Account')
+const alertsP = () => import('./screens/staff/Alerts')
+const importsP = () => import('./screens/staff/Imports')
+const MA = {
+  book: lazy(memberBook), memberships: page(memberAccount, 'MemberMemberships'), attendance: page(memberAccount, 'MemberAttendance'),
+  traffic: page(memberAccount, 'MemberTraffic'), refer: page(memberAccount, 'MemberRefer'), coaches: page(memberAccount, 'MemberCoaches'),
+  alerts: page(alertsP, 'StaffNotifications'), importBatches: page(importsP, 'ImportBatches'), importPlans: page(importsP, 'ImportPlans'),
+}
 const MO = {
   cats: page(walletP, 'WalletCategoryList'), catForm: page(walletP, 'WalletCategoryForm'), acts: page(walletP, 'WalletActivityList'), actForm: page(walletP, 'WalletActivityForm'),
   traffic: page(walletP, 'ActivityTraffic'), register: page(walletP, 'WalletRegister'),
@@ -278,6 +287,9 @@ const BUILT: Record<string, { el: ReactNode; roles: Role[] }> = {
   '/exercises': { el: <Lazy c={TR.exercises} />, roles: DC },
   // Notification & WhatsApp
   '/notifications/send': { el: <Lazy c={MSG.notify} />, roles: DESK },
+  '/notifications': { el: <Lazy c={MA.alerts} />, roles: DESK },
+  '/batches/import': { el: <Lazy c={MA.importBatches} />, roles: DESK },
+  '/plans/import': { el: <Lazy c={MA.importPlans} />, roles: DESK },
   '/whatsapp/qr': { el: <Lazy c={MSG.qr} />, roles: ['owner'] },
   '/whatsapp/settings': { el: <Lazy c={MSG.waSettings} />, roles: ['owner'] },
   '/whatsapp/history': { el: <Lazy c={MSG.waHistory} />, roles: DESK },
@@ -377,8 +389,8 @@ export default function App() {
         <Route path="/login" element={<SignedOutOnly><Login /></SignedOutOnly>} />
         <Route path="/join" element={<SignedOutOnly><Join /></SignedOutOnly>} />
         <Route path="/forgot-password" element={<SignedOutOnly><ForgotPassword /></SignedOutOnly>} />
-        <Route path="/print/invoice/:id" element={<Only roles={DESK}><Print kind="invoice" /></Only>} />
-        <Route path="/print/receipt/:id" element={<Only roles={DESK}><Print kind="receipt" /></Only>} />
+        <Route path="/print/invoice/:id" element={<Only roles={[...DESK, 'member']}><Print kind="invoice" /></Only>} />
+        <Route path="/print/receipt/:id" element={<Only roles={[...DESK, 'member']}><Print kind="receipt" /></Only>} />
         <Route path="/print/collection" element={<Only roles={DESK}><PrintReport kind="collection" /></Only>} />
         <Route path="/print/sales" element={<Only roles={DESK}><PrintReport kind="sales" /></Only>} />
         <Route path="/print/workout/:id" element={<Only roles={[...STAFF, 'member']}><Lazy c={TR.printWorkout} /></Only>} />
@@ -387,7 +399,7 @@ export default function App() {
         {/* The member app */}
         <Route path="/app" element={!user ? <Navigate to="/login" replace /> : user.role !== 'member' ? <Navigate to={homeFor(user.role)} replace /> : <MemberShell />}>
           <Route index element={<MemberHome />} />
-          <Route path="book" element={<ComingSoon title="Book" note="Booking, moving and cancelling sessions from the app comes with the member app." />} />
+          <Route path="book" element={<Lazy c={MA.book} />} />
           <Route path="plan" element={<Lazy c={TR.memberPlan} />} />
           <Route path="notifications" element={<Lazy c={MSG.memberNotifications} />} />
           <Route path="community" element={<Lazy c={CM.feed} />} />
@@ -404,7 +416,11 @@ export default function App() {
           <Route path="rules" element={<AppNotices key="rules" kind="rules" />} />
           <Route path="feedback" element={<AppFeedback />} />
           <Route path="plans" element={<AppPlans />} />
-          <Route path="coaches" element={<AppCoaches />} />
+          <Route path="coaches" element={<Lazy c={MA.coaches} />} />
+          <Route path="memberships" element={<Lazy c={MA.memberships} />} />
+          <Route path="attendance" element={<Lazy c={MA.attendance} />} />
+          <Route path="traffic" element={<Lazy c={MA.traffic} />} />
+          <Route path="refer" element={<Lazy c={MA.refer} />} />
           <Route path="contact" element={<AppContact />} />
           <Route path="results" element={<AppResults />} />
         </Route>

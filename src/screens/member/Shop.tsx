@@ -51,7 +51,7 @@ export function MemberStore() {
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['shop'] }); qc.invalidateQueries({ queryKey: ['my-orders'] }); toast(t('shop.placed')); setCart({}); setOpen(false); navigate('/app/orders') },
     onError: (e: Error) => toast(e.message),
   })
-  const banner = (studio?.settings.center as Record<string, unknown> | undefined)?.ecommerce_banner as string | undefined
+  const banner = (studio?.settings.app as Record<string, unknown> | undefined)?.ecommerce_banner as string | undefined
   return (
     <div className="flex flex-col gap-4 px-5 pt-6 pb-28 lg:mx-auto lg:max-w-[760px]">
       <Back />

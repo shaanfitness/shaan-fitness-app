@@ -121,7 +121,7 @@ const en = {
     source: { top_up: 'Money added', reward: 'Reward', activity: 'Activity', refund: 'Refund', adjustment: 'Correction' },
   },
   appt: {
-    title: 'Appointments', ask: 'Ask for one', upcoming: 'Coming up', past: 'Earlier', none: 'No appointments coming up.', room: 'Room {{n}}',
+    title: 'Appointments', ask: 'Ask for one', withCoach: 'With {{name}}', upcoming: 'Coming up', past: 'Earlier', none: 'No appointments coming up.', room: 'Room {{n}}',
     waiting: 'The gym will confirm the time with you.', cancel: 'Cancel', confirmCancel: 'Cancel this appointment?', cancelled: 'Appointment cancelled',
     purpose: 'What for', choose: 'Choose', day: 'Day', time: 'Time', comments: 'Anything we should know', send: 'Send request',
     sent: 'Request sent. The gym will confirm it in the app.', needPurpose: 'Choose what the appointment is for.', needTime: 'Choose the day and time.',
@@ -129,6 +129,39 @@ const en = {
     status: { open: 'Booked', no_action: 'No action', attended: 'Attended', no_show: 'Missed', cancelled: 'Cancelled', rescheduled: 'Rescheduled', confirmed: 'Confirmed', wait_list: 'Requested', other: 'Other' },
   },
   help: { videos: 'Help videos', none: 'No videos yet.' },
+  book: {
+    title: 'Book', classes: 'Classes', myBookings: 'My bookings', programs: 'Live online', days: 'Days', today: 'Today',
+    noClasses: 'No classes on this day.', noMoreToday: 'No more classes today. Pick another day.', noBookings: 'No classes booked. Pick one under Classes.', noPrograms: 'No live online programs for you right now.',
+    cutoff_one: 'You can cancel up to {{count}} hour before a class.', cutoff_other: 'You can cancel up to {{count}} hours before a class.',
+    cutoffShort_one: 'Cancel up to {{count}} hour before', cutoffShort_other: 'Cancel up to {{count}} hours before',
+    with: 'with {{name}}', attended: 'Attended', booked: 'Booked', waiting: 'Waiting list', full: 'Full',
+    spotsLeft_one: '{{count}} spot left', spotsLeft_other: '{{count}} spots left', book: 'Book', joinWaiting: 'Join waiting list', cancel: 'Cancel booking',
+    confirmCancel: 'Cancel this booking?', started: 'Started', bookedToast: 'Booked. See you there!', waitingToast: 'You’re on the waiting list. We’ll tell you if a spot opens.',
+    cancelledToast: 'Booking cancelled', liveNow: 'Live', everyDay: 'Every day', join: 'Join now',
+    blocked: { gender: 'Not for your group', no_membership: 'Your membership doesn’t include this class', frozen: 'Your membership is frozen that day' },
+  },
+  account: {
+    memberships: 'My memberships', noMemberships: 'No memberships yet.', daysLeft: 'Days left', days: 'Days', sessions: 'Sessions', balance: 'To pay',
+    paidOf: 'Paid {{paid}} of {{total}}', dueOn: 'due {{date}}', invoice: 'Invoice', receipt: 'Receipt', payments: 'Payments', freeze: 'Freeze',
+    freezeTitle: 'Ask to freeze', freezeSent: 'Freeze request sent. The gym will confirm it.', freezeWaiting: 'Freeze of {{days}} days from {{date}} is waiting for the gym.',
+    frozenFor: 'Frozen {{days}} days ({{from}} to {{to}}). Your end date moved.', freezeFromToday: 'The freeze can start from today.', freezeDays: 'Choose between 1 and 90 days.',
+    endsOn: 'ends {{date}}', from: 'From', forDays: 'Days', why: 'Reason (optional)', freezeHow: 'The gym approves freezes; your end date moves by the days frozen.',
+    sendRequest: 'Send request', attendance: 'My attendance', prevMonth: 'Previous month', nextMonth: 'Next month', calendar: 'Calendar', came: 'came',
+    visits: 'Visits this month', perWeek: 'Visits a week', noCoaches: 'No coaches listed yet.', years_one: '{{count}} year', years_other: '{{count}} years',
+    bookWith: 'Book an appointment', call: 'Call',
+    kind: { gym: 'Membership', pt: 'Personal training', trial: 'Trial' },
+    state: { active: 'Active', frozen: 'Frozen', pending: 'Starts soon', expired: 'Ended', cancelled: 'Cancelled', used: 'Used', deleted: 'Removed' },
+  },
+  traffic: {
+    title: 'Gym right now', quiet: 'Quiet. A good time to come.', normal: 'Some people training.', busy: 'Busy right now.', inNow: 'in the gym',
+    usual: 'Bars: how busy it usually is on this day, by hour.',
+  },
+  refer: {
+    title: 'Refer a friend', closed: 'Referrals are not open right now.', needName: 'Enter your friend’s name.', needPhone: 'Enter a 10-digit mobile number.',
+    intro: 'Know someone who’d love training here? Share their number and we’ll invite them for a trial.', name: 'Friend’s name', phone: 'Mobile number',
+    note: 'Anything we should know (optional)', privacy: 'We call your friend once to invite them. We don’t share their number.', send: 'Refer', sent: 'Thanks! We’ll call {{name}}.',
+    yours: 'Your referrals', joined: 'Joined', invited: 'Invited',
+  },
 }
 
 const te: typeof en = {
@@ -249,7 +282,7 @@ const te: typeof en = {
     source: { top_up: 'డబ్బు జమ', reward: 'రివార్డ్', activity: 'యాక్టివిటీ', refund: 'రీఫండ్', adjustment: 'సవరణ' },
   },
   appt: {
-    title: 'అపాయింట్‌మెంట్లు', ask: 'అడగండి', upcoming: 'రాబోయేవి', past: 'గతంలో', none: 'రాబోయే అపాయింట్‌మెంట్లు లేవు.', room: 'రూమ్ {{n}}',
+    title: 'అపాయింట్‌మెంట్లు', ask: 'అడగండి', withCoach: '{{name}} తో', upcoming: 'రాబోయేవి', past: 'గతంలో', none: 'రాబోయే అపాయింట్‌మెంట్లు లేవు.', room: 'రూమ్ {{n}}',
     waiting: 'జిమ్ మీతో సమయం ఖరారు చేస్తుంది.', cancel: 'రద్దు చేయండి', confirmCancel: 'ఈ అపాయింట్‌మెంట్ రద్దు చేయాలా?', cancelled: 'అపాయింట్‌మెంట్ రద్దయింది',
     purpose: 'దేనికోసం', choose: 'ఎంచుకోండి', day: 'రోజు', time: 'సమయం', comments: 'మేము తెలుసుకోవలసినది', send: 'అభ్యర్థన పంపండి',
     sent: 'అభ్యర్థన పంపాం. జిమ్ యాప్‌లో నిర్ధారిస్తుంది.', needPurpose: 'అపాయింట్‌మెంట్ దేనికోసమో ఎంచుకోండి.', needTime: 'రోజు, సమయం ఎంచుకోండి.',
@@ -257,6 +290,39 @@ const te: typeof en = {
     status: { open: 'బుక్ అయింది', no_action: 'చర్య లేదు', attended: 'హాజరయ్యారు', no_show: 'రాలేదు', cancelled: 'రద్దయింది', rescheduled: 'మార్చారు', confirmed: 'నిర్ధారించారు', wait_list: 'అభ్యర్థించారు', other: 'ఇతర' },
   },
   help: { videos: 'సహాయ వీడియోలు', none: 'ఇంకా వీడియోలు లేవు.' },
+  book: {
+    title: 'బుక్', classes: 'క్లాసులు', myBookings: 'నా బుకింగ్‌లు', programs: 'లైవ్ ఆన్‌లైన్', days: 'రోజులు', today: 'ఈరోజు',
+    noClasses: 'ఈ రోజు క్లాసులు లేవు.', noMoreToday: 'ఈరోజు ఇంకా క్లాసులు లేవు. మరో రోజు ఎంచుకోండి.', noBookings: 'క్లాసులు బుక్ చేయలేదు. క్లాసుల్లో ఒకటి ఎంచుకోండి.', noPrograms: 'ప్రస్తుతం మీకోసం లైవ్ ఆన్‌లైన్ ప్రోగ్రామ్‌లు లేవు.',
+    cutoff_one: 'క్లాస్‌కు {{count}} గంట ముందు వరకు రద్దు చేయవచ్చు.', cutoff_other: 'క్లాస్‌కు {{count}} గంటల ముందు వరకు రద్దు చేయవచ్చు.',
+    cutoffShort_one: '{{count}} గంట ముందు వరకు రద్దు', cutoffShort_other: '{{count}} గంటల ముందు వరకు రద్దు',
+    with: '{{name}} తో', attended: 'హాజరయ్యారు', booked: 'బుక్ అయింది', waiting: 'వెయిటింగ్ లిస్ట్', full: 'నిండింది',
+    spotsLeft_one: '{{count}} స్థలం ఉంది', spotsLeft_other: '{{count}} స్థలాలు ఉన్నాయి', book: 'బుక్ చేయండి', joinWaiting: 'వెయిటింగ్ లిస్ట్‌లో చేరండి', cancel: 'బుకింగ్ రద్దు',
+    confirmCancel: 'ఈ బుకింగ్ రద్దు చేయాలా?', started: 'మొదలైంది', bookedToast: 'బుక్ అయింది. అక్కడ కలుద్దాం!', waitingToast: 'మీరు వెయిటింగ్ లిస్ట్‌లో ఉన్నారు. స్థలం దొరికితే చెబుతాం.',
+    cancelledToast: 'బుకింగ్ రద్దయింది', liveNow: 'లైవ్', everyDay: 'ప్రతిరోజు', join: 'ఇప్పుడు చేరండి',
+    blocked: { gender: 'మీ గ్రూప్‌కు కాదు', no_membership: 'మీ మెంబర్‌షిప్‌లో ఈ క్లాస్ లేదు', frozen: 'ఆ రోజు మీ మెంబర్‌షిప్ ఫ్రీజ్‌లో ఉంది' },
+  },
+  account: {
+    memberships: 'నా మెంబర్‌షిప్‌లు', noMemberships: 'ఇంకా మెంబర్‌షిప్‌లు లేవు.', daysLeft: 'మిగిలిన రోజులు', days: 'రోజులు', sessions: 'సెషన్లు', balance: 'చెల్లించాల్సింది',
+    paidOf: '{{total}} లో {{paid}} చెల్లించారు', dueOn: '{{date}} లోపు', invoice: 'ఇన్‌వాయిస్', receipt: 'రసీదు', payments: 'చెల్లింపులు', freeze: 'ఫ్రీజ్',
+    freezeTitle: 'ఫ్రీజ్ అడగండి', freezeSent: 'ఫ్రీజ్ అభ్యర్థన పంపాం. జిమ్ నిర్ధారిస్తుంది.', freezeWaiting: '{{date}} నుండి {{days}} రోజుల ఫ్రీజ్ జిమ్ ఆమోదం కోసం వేచి ఉంది.',
+    frozenFor: '{{days}} రోజులు ఫ్రీజ్ ({{from}} నుండి {{to}}). మీ ముగింపు తేదీ మారింది.', freezeFromToday: 'ఫ్రీజ్ ఈరోజు నుండి మొదలవ్వవచ్చు.', freezeDays: '1 నుండి 90 రోజుల మధ్య ఎంచుకోండి.',
+    endsOn: '{{date}} న ముగుస్తుంది', from: 'నుండి', forDays: 'రోజులు', why: 'కారణం (ఐచ్ఛికం)', freezeHow: 'ఫ్రీజ్‌లను జిమ్ ఆమోదిస్తుంది; ఫ్రీజ్ రోజుల మేరకు మీ ముగింపు తేదీ మారుతుంది.',
+    sendRequest: 'అభ్యర్థన పంపండి', attendance: 'నా హాజరు', prevMonth: 'గత నెల', nextMonth: 'తర్వాతి నెల', calendar: 'క్యాలెండర్', came: 'వచ్చారు',
+    visits: 'ఈ నెల రాకలు', perWeek: 'వారానికి రాకలు', noCoaches: 'ఇంకా కోచ్‌లు లేరు.', years_one: '{{count}} సంవత్సరం', years_other: '{{count}} సంవత్సరాలు',
+    bookWith: 'అపాయింట్‌మెంట్ బుక్ చేయండి', call: 'కాల్',
+    kind: { gym: 'మెంబర్‌షిప్', pt: 'పర్సనల్ ట్రైనింగ్', trial: 'ట్రయల్' },
+    state: { active: 'యాక్టివ్', frozen: 'ఫ్రీజ్', pending: 'త్వరలో మొదలు', expired: 'ముగిసింది', cancelled: 'రద్దయింది', used: 'వాడేశారు', deleted: 'తొలగించారు' },
+  },
+  traffic: {
+    title: 'ఇప్పుడు జిమ్', quiet: 'ప్రశాంతంగా ఉంది. రావడానికి మంచి సమయం.', normal: 'కొంతమంది ట్రైన్ అవుతున్నారు.', busy: 'ఇప్పుడు రద్దీగా ఉంది.', inNow: 'జిమ్‌లో ఉన్నారు',
+    usual: 'బార్లు: ఈ రోజున గంటల వారీగా సాధారణంగా ఎంత రద్దీ ఉంటుందో.',
+  },
+  refer: {
+    title: 'స్నేహితుడిని రెఫర్ చేయండి', closed: 'ప్రస్తుతం రెఫరల్స్ తెరవలేదు.', needName: 'మీ స్నేహితుడి పేరు రాయండి.', needPhone: '10 అంకెల మొబైల్ నంబర్ రాయండి.',
+    intro: 'ఇక్కడ ట్రైనింగ్ ఇష్టపడే ఎవరైనా తెలుసా? వారి నంబర్ ఇవ్వండి, ట్రయల్‌కు ఆహ్వానిస్తాం.', name: 'స్నేహితుడి పేరు', phone: 'మొబైల్ నంబర్',
+    note: 'మేము తెలుసుకోవలసినది (ఐచ్ఛికం)', privacy: 'మీ స్నేహితుడికి ఆహ్వానించడానికి ఒకసారి కాల్ చేస్తాం. వారి నంబర్ ఎవరితోనూ పంచుకోం.', send: 'రెఫర్ చేయండి', sent: 'ధన్యవాదాలు! {{name}} కి కాల్ చేస్తాం.',
+    yours: 'మీ రెఫరల్స్', joined: 'చేరారు', invited: 'ఆహ్వానించాం',
+  },
 }
 
 let saved: string | null = null

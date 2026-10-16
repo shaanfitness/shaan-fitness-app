@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { NavLink, Outlet, useLocation } from 'react-router-dom'
+import { useQuery } from '@tanstack/react-query'
+import { openAlertCount } from '../db/memberApp'
 import { useTranslation } from 'react-i18next'
 import { useStudio } from '../db/studio'
 import { setCurrency } from '../lib/format'
@@ -119,6 +121,19 @@ export function StaffMenu({ onNavigate }: { onNavigate?: () => void }) {
   )
 }
 
+// Notifications from the app and the website waiting for the gym (YDL top-bar bell).
+function AlertsLink() {
+  const me = useMe()
+  const q = useQuery({ queryKey: ['staff-alerts', 'count', me.studioId], queryFn: () => openAlertCount(me.studioId), refetchInterval: 120_000 })
+  const n = q.data ?? 0
+  return (
+    <NavLink to="/notifications" className={({ isActive }) => `flex items-center justify-between rounded-xl px-1 text-[12px] font-semibold no-underline ${isActive ? 'text-gold' : 'text-muted hover:text-ink'}`}>
+      <span className="flex items-center gap-2"><Icon name="bell" size={15} />Notifications</span>
+      {n > 0 && <span className="rounded-full bg-gold px-2 py-0.5 text-[11px] font-bold text-on-gold" aria-label={`${n} to handle`}>{n > 99 ? '99+' : n}</span>}
+    </NavLink>
+  )
+}
+
 function RoleSwitch() {
   const { user, switchRole } = useAuth()
   if (!user || user.roles.length < 2) return null
@@ -157,6 +172,7 @@ export function AppShell() {
         </div>
         <div className="flex flex-col gap-3 border-t border-line p-4">
           <RoleSwitch />
+          {(me.role === 'owner' || me.role === 'front_desk') && <AlertsLink />}
           <a href="/" target="_blank" rel="noreferrer" className="flex items-center justify-between rounded-xl px-1 text-[12px] font-semibold text-muted no-underline hover:text-ink">
             Open the website <Icon name="chevronRight" size={14} />
           </a>

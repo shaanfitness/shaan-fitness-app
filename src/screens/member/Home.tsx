@@ -1,4 +1,5 @@
-import { useEffect, useState, type ReactNode } from 'react'
+import { Suspense, lazy, useEffect, useState, type ReactNode } from 'react'
+import { Link } from 'react-router-dom'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import QRCode from 'qrcode'
@@ -18,6 +19,8 @@ import { useTheme } from '../../theme'
 import type { Batch, SubscriptionOverview } from '../../db/types'
 import { HomeExtras } from './AppPages'
 import { NotificationBell } from './Notifications'
+
+const TrafficCard = lazy(() => import('./Account').then((m) => ({ default: m.TrafficCard })))
 
 // Member home in the member's own look (Settings › Look):
 //   A · Noir and gold   ring of sessions, serif headings
@@ -54,6 +57,7 @@ export default function MemberHome() {
   const { t } = useTranslation()
   const { theme } = useTheme()
   const { data: d, error } = useHomeData()
+  const { data: studio } = useStudio()
   const [qr, setQr] = useState(false)
   if (error) return <div className="p-8 text-red">{(error as Error).message}</div>
   if (!d) return <Loading />
@@ -74,6 +78,9 @@ export default function MemberHome() {
         </div>
       </header>
       {look === 'club' ? <ClubHome {...props} /> : look === 'clinic' ? <ClinicHome {...props} /> : <NoirHome {...props} />}
+      {c && (studio?.settings.app as Record<string, unknown> | undefined)?.live_gym_traffic !== false && (
+        <div className="px-5 pt-3"><Link to="/app/traffic" className="block text-ink no-underline"><Suspense fallback={null}><TrafficCard compact /></Suspense></Link></div>
+      )}
       <HomeExtras paid={!!c} pt={pt} />
       {!c && <Welcome memberId={me.memberId!} />}
       <Sheet open={qr} onClose={() => setQr(false)} title={t('member.checkIn')}>{qr && <CheckInCode />}</Sheet>

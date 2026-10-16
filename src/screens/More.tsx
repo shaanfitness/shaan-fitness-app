@@ -44,10 +44,10 @@ export default function More() {
       {isMember && (
         <Section>
           <nav aria-label={t('nav.more')} className="card flex flex-col">
-            {([['/app/notifications', t('app.notifications'), 'bell'], ['/app/community', t('community.title'), 'people'], ['/app/challenges', t('community.challenges'), 'trophy'],
+            {([['/app/memberships', t('account.memberships'), 'receipt'], ['/app/attendance', t('account.attendance'), 'calendar'], ['/app/notifications', t('app.notifications'), 'bell'], ['/app/community', t('community.title'), 'people'], ['/app/challenges', t('community.challenges'), 'trophy'],
               ['/app/store', t('shop.title'), 'receipt'], ['/app/wallet', t('wallet.title'), 'rupee'], ['/app/appointments', t('appt.title'), 'clock'],
               ['/app/notices', t('app.notices'), 'doc'], ['/app/rules', t('app.rules'), 'doc'], ['/app/plans', t('app.plans'), 'list'],
-              ['/app/coaches', t('app.coaches'), 'person'], ['/app/videos', t('help.videos'), 'help'], ['/app/feedback', t('app.feedback'), 'chat'], ['/app/contact', t('app.contact'), 'phone']] as const).map(([to, label, icon]) => (
+              ['/app/coaches', t('app.coaches'), 'person'], ['/app/refer', t('refer.title'), 'userPlus'], ['/app/traffic', t('traffic.title'), 'chart'], ['/app/videos', t('help.videos'), 'help'], ['/app/feedback', t('app.feedback'), 'chat'], ['/app/contact', t('app.contact'), 'phone']] as const).map(([to, label, icon]) => (
               <Link key={to} to={to} className="row text-ink no-underline hover:text-gold"><Icon name={icon} size={20} /><span className="flex-1 text-[15px] font-semibold">{label}</span><Icon name="chevronRight" size={16} /></Link>
             ))}
           </nav>

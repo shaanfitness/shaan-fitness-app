@@ -259,9 +259,9 @@ export const NAV: NavNode[] = [
 // Screens YDL opens from its top bar or from inside lists, not from the menu.
 export const EXTRA_PAGES: NavPage[] = [
   { path: '/quick-billing', label: 'Quick Billing', ydl: '/fitness-center/customer/quick-add-customer-subscription/', roles: D, built: true },
-  { path: '/notifications', label: 'Notifications', ydl: '/fitness-center/notifications/', roles: D },
-  { path: '/batches/import', label: 'Import Batches', ydl: '/fitness-center/batch/csv/import/', roles: D },
-  { path: '/plans/import', label: 'Import Membership', ydl: '(Import Membership button on My Membership Plans)', roles: O },
+  { path: '/notifications', label: 'Notifications', ydl: '/fitness-center/notifications/', roles: D, built: true },
+  { path: '/batches/import', label: 'Import Batches', ydl: '/fitness-center/batch/csv/import/', roles: D, built: true },
+  { path: '/plans/import', label: 'Import Membership', ydl: '(Import Membership button on My Membership Plans)', roles: O, built: true },
 ]
 
 export interface FlatPage extends NavPage { trail: string[] }
