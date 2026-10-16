@@ -35,8 +35,8 @@ export interface DietItem {
   id: string; plan_id: string; weekday: number; meal: string; meal_time: string | null; seq: number; food_id: string | null; recipe_id: string | null
   item_name: string; quantity: number | null; unit: string | null; calories: number; protein: number; fats: number; carbs: number; fibre: number; notes: string | null
 }
-export interface MemberWorkout { id: string; member_id: string; plan_id: string; weekdays: number[]; start_date: string; end_date: string | null; goal: string | null; level: string | null; active: boolean; created_at: string }
-export interface MemberDiet { id: string; member_id: string; plan_id: string; start_date: string; end_date: string | null; active: boolean; created_at: string }
+export interface MemberWorkout { id: string; member_id: string; plan_id: string; weekdays: number[]; start_date: string; end_date: string | null; goal: string | null; level: string | null; active: boolean; assigned_by: string | null; created_at: string }
+export interface MemberDiet { id: string; member_id: string; plan_id: string; start_date: string; end_date: string | null; active: boolean; assigned_by: string | null; created_at: string }
 export interface WorkoutLog { id: string; member_id: string; item_id: string; date: string; sets_done: number | null; reps_done: number | null; weight_kg: number | null }
 export interface Measurement {
   id: string; member_id: string; measured_on: string; vals: Record<string, number | string>; weight_kg: number | null; height_cm: number | null

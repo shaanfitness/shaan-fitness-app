@@ -59,44 +59,50 @@ const isoDate = (s: string) => {
   return m ? `${m[3]}-${m[2].padStart(2, '0')}-${m[1].padStart(2, '0')}` : undefined
 }
 
-function Importer<T>({ title, back, template, example, check, existing, save, noun }: {
+function Importer<T>({ title, back, template, example, check, existing, save, noun, ready }: {
   title: string; back: [string, string]; template: string[]; example: string[][]; noun: string
   check: (cells: Cells) => { row: T | null; problems: string[] }
   existing: (rows: T[]) => string[]
   save: (rows: T[]) => Promise<number>
+  /** The lists rows are checked against (trainers, services, codes) have loaded. */
+  ready: boolean
 }) {
   const toast = useToast()
   const qc = useQueryClient()
   const { data: studio } = useStudio()
   const [file, setFile] = useState<string | null>(null)
-  const [rows, setRows] = useState<Checked<T>[] | null>(null)
+  const [grid, setGrid] = useState<{ head: string[]; body: string[][] } | null>(null)
   const [error, setError] = useState<string | null>(null)
   const read = async (f: File) => {
-    setError(null); setRows(null); setFile(f.name)
+    setError(null); setGrid(null); setFile(f.name)
     if (f.size > 2 * 1024 * 1024) return setError('The file is larger than 2 MB. Split it and import in parts.')
-    const grid = parseCsv(await f.text())
-    if (grid.length < 2) return setError('The file has no rows under the header.')
-    const head = grid[0].map(norm)
+    const all = parseCsv(await f.text())
+    if (all.length < 2) return setError('The file has no rows under the header.')
+    const head = all[0].map(norm)
     const missing = template.filter((h, i) => i < 2 && !head.includes(norm(h)))
     if (missing.length) return setError(`The header must have the template's columns. Missing: ${missing.join(', ')}.`)
-    const out: Checked<T>[] = grid.slice(1).slice(0, 1000).map((r, i) => {
+    setGrid({ head, body: all.slice(1).slice(0, 1000) })
+  }
+  // Rows are checked against the current lists, so a list that loads late still counts.
+  const rows: Checked<T>[] | null = !grid || !ready ? null : (() => {
+    const out: Checked<T>[] = grid.body.map((r, i) => {
       const cells: Cells = {}
-      template.forEach((h) => { const at = head.indexOf(norm(h)); cells[h] = at >= 0 ? (r[at] ?? '').trim() : '' })
+      template.forEach((h) => { const at = grid.head.indexOf(norm(h)); cells[h] = at >= 0 ? (r[at] ?? '').trim() : '' })
       const c = check(cells)
-      return { line: i + 2, cells, row: c.row, problems: c.problems }
+      return { line: i + 2, cells, row: c.row, problems: [...c.problems] }
     })
     const dupes = existing(out.filter((x) => x.row).map((x) => x.row!))
     for (const x of out) if (x.row && dupes.length) {
       const key = String((x.row as Record<string, unknown>).batch_code ?? (x.row as Record<string, unknown>).plan_code ?? '')
       if (key && dupes.includes(key.toLowerCase())) { x.problems.push('This code is already used'); x.row = null }
     }
-    setRows(out)
-  }
+    return out
+  })()
   const good = (rows ?? []).filter((x) => x.row && !x.problems.length)
   const bad = (rows ?? []).filter((x) => !x.row || x.problems.length)
   const go = useMutation({
     mutationFn: () => save(good.map((x) => x.row!)),
-    onSuccess: (n) => { qc.invalidateQueries(); toast(`${n} ${noun} imported`); setRows(null); setFile(null) },
+    onSuccess: (n) => { qc.invalidateQueries(); toast(`${n} ${noun} imported`); setGrid(null); setFile(null) },
     onError: (e: Error) => setError(e.message),
   })
   return (
@@ -111,6 +117,7 @@ function Importer<T>({ title, back, template, example, check, existing, save, no
         <section className="card flex flex-col gap-3 p-5">
           <h2 className="m-0 text-[17px] font-bold">2. Choose the CSV</h2>
           <input type="file" accept=".csv,text/csv" className="input py-2" aria-label="CSV file" onChange={(e) => { const f = e.target.files?.[0]; if (f) void read(f) }} />
+          {file && grid && !ready && <p className="m-0 text-[14px] text-muted" role="status">Checking the rows…</p>}
           {file && rows && <p className="m-0 text-[14px]">{file}: <strong>{good.length}</strong> ready{bad.length ? <>, <strong className="text-red">{bad.length}</strong> with problems (left out)</> : ''}.</p>}
           {error && <Notice tone="error">{error}</Notice>}
         </section>
@@ -143,7 +150,8 @@ interface BatchIn { name: string; start_time: string; end_time: string; days: nu
 export function ImportBatches() {
   const me = useMe()
   const team = useTeam()
-  const { data: services = [] } = useServices()
+  const servicesQ = useServices()
+  const services = servicesQ.data ?? []
   const existing = useQuery({ queryKey: ['batch-codes', me.studioId], queryFn: async () => (throwIf(await supabase.from('batches').select('batch_code').eq('studio_id', me.studioId)) as { batch_code: string | null }[]).map((b) => (b.batch_code ?? '').toLowerCase()).filter(Boolean) })
   const byName = (list: { id: string; names: string[] }[], s: string) => list.find((x) => x.names.some((n) => norm(n) === norm(s)))?.id
   const trainers = team.everyone.map((s) => ({ id: s.id, names: [s.full_name, s.staff_code ?? ''] }))
@@ -173,7 +181,7 @@ export function ImportBatches() {
     }
   }
   return (
-    <Importer<BatchIn> title="Import Batches" back={['/batches', 'Batch List']} template={BATCH_COLS} noun="batches"
+    <Importer<BatchIn> title="Import Batches" back={['/batches', 'Batch List']} template={BATCH_COLS} noun="batches" ready={team.ready && servicesQ.isSuccess && existing.isSuccess}
       example={[['Morning Strength', '6:00 AM', '7:00 AM', 'Mon-Sat', 'B-101', '12', 'All', team.trainers[0]?.full_name ?? 'Trainer name', services[0]?.name ?? 'Service name', 'Floor 1', '', '', '']]}
       check={check} existing={(rows) => { const have = existing.data ?? []; const seen = new Set<string>(); return rows.map((r) => (r.batch_code ?? '').toLowerCase()).filter((k) => k && (have.includes(k) || (seen.has(k) ? true : (seen.add(k), false)))) }}
       save={async (rows) => { throwIf(await supabase.from('batches').insert(rows.map((r) => ({ ...r, studio_id: me.studioId }))).select('id')); return rows.length }} />
@@ -189,7 +197,8 @@ interface PlanIn {
 
 export function ImportPlans() {
   const me = useMe()
-  const { data: services = [] } = useServices()
+  const servicesQ = useServices()
+  const services = servicesQ.data ?? []
   const existing = useQuery({ queryKey: ['plan-codes', me.studioId], queryFn: async () => (throwIf(await supabase.from('plans').select('plan_code').eq('studio_id', me.studioId)) as { plan_code: string | null }[]).map((b) => (b.plan_code ?? '').toLowerCase()).filter(Boolean) })
   const svc = services.map((s) => ({ id: s.id, names: [s.name, s.custom_name ?? ''] }))
   const num = (s: string) => (s.trim() === '' ? null : Number(s.replace(/[₹,\s]/g, '')))
@@ -219,7 +228,7 @@ export function ImportPlans() {
     }
   }
   return (
-    <Importer<PlanIn> title="Import Membership" back={['/plans', 'My Membership Plans']} template={PLAN_COLS} noun="plans"
+    <Importer<PlanIn> title="Import Membership" back={['/plans', 'My Membership Plans']} template={PLAN_COLS} noun="plans" ready={servicesQ.isSuccess && existing.isSuccess}
       example={[['Group Training 28 Days', '4999', '28', 'Days', 'Gym', 'GT-28', services[0]?.name ?? 'Service name', '', '24', '7', '6', 'Yes', 'No', '']]}
       check={check} existing={(rows) => { const have = existing.data ?? []; const seen = new Set<string>(); return rows.map((r) => (r.plan_code ?? '').toLowerCase()).filter((k) => k && (have.includes(k) || (seen.has(k) ? true : (seen.add(k), false)))) }}
       save={async (rows) => { throwIf(await supabase.from('plans').insert(rows.map((r) => ({ ...r, studio_id: me.studioId }))).select('id')); return rows.length }} />

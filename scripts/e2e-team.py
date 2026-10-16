@@ -151,7 +151,7 @@ with sync_playwright() as p:
     dlg.locator("#lvr").fill("Sister's wedding")
     dlg.get_by_role("button", name="Request").click()
     toast(page, "Leave requested")
-    page.get_by_role("checkbox", name="Select Ravi Teja").check()
+    page.locator("tr").filter(has_text="Sister's wedding").get_by_role("checkbox", name="Select Ravi Teja").check()
     page.get_by_role("button", name="Approve as paid").click()
     page.get_by_role("dialog").get_by_role("button", name="Yes").click()
     toast(page, "approved as paid")

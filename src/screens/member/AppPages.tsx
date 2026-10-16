@@ -80,6 +80,16 @@ export function HomeExtras({ paid, pt }: { paid: boolean; pt: boolean }) {
       case 'STORE': return navigate('/app/store')
       case 'MY_ORDERS': return navigate('/app/orders')
       case 'WALLET': return navigate('/app/wallet')
+      case 'ADD_DIARY': case 'DIARY_LISTING': return navigate('/app/diary')
+      case 'DIET_ANALYSIS': case 'EXERCISE_VOLUME_GRAPHS': case 'WORKOUT_ANALYSIS': return navigate('/app/analysis')
+      case 'HYDRATION': case 'SLEEP_TRACKER': case 'STEPS': return navigate('/app/track')
+      case 'FITNESS_TOOLS': return navigate('/app/tools')
+      case 'RECIPE_LIST': return navigate('/app/recipes')
+      case 'RECIPE_DETAILS': return navigate(linkId && /^[0-9a-f-]{36}$/i.test(linkId) ? `/app/recipes/${linkId}` : '/app/recipes')
+      case 'FREE_WORKOUT': return navigate('/app/free-plans?tab=workout')
+      case 'FREE_DIET': return navigate('/app/free-plans?tab=diet')
+      case 'WORKOUT_DIET_OPTIONS': return navigate('/app/free-plans')
+      case 'VIEW_PARQ_FORM': return navigate('/app/health-form')
       case 'EXTERNAL_WEB': case 'WEB': if (linkId && /^https:\/\//.test(linkId)) window.open(linkId, '_blank', 'noopener'); return
     }
   }

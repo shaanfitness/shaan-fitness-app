@@ -21,6 +21,7 @@ import { HomeExtras } from './AppPages'
 import { NotificationBell } from './Notifications'
 
 const TrafficCard = lazy(() => import('./Account').then((m) => ({ default: m.TrafficCard })))
+const TodayCard = lazy(() => import('./Health').then((m) => ({ default: m.TodayCard })))
 
 // Member home in the member's own look (Settings › Look):
 //   A · Noir and gold   ring of sessions, serif headings
@@ -81,6 +82,7 @@ export default function MemberHome() {
       {c && (studio?.settings.app as Record<string, unknown> | undefined)?.live_gym_traffic !== false && (
         <div className="px-5 pt-3"><Link to="/app/traffic" className="block text-ink no-underline"><Suspense fallback={null}><TrafficCard compact /></Suspense></Link></div>
       )}
+      <div className="px-5 pt-3"><Suspense fallback={null}><TodayCard /></Suspense></div>
       <HomeExtras paid={!!c} pt={pt} />
       {!c && <Welcome memberId={me.memberId!} />}
       <Sheet open={qr} onClose={() => setQr(false)} title={t('member.checkIn')}>{qr && <CheckInCode />}</Sheet>

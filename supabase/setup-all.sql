@@ -9123,6 +9123,755 @@ revoke all on function public.place_store_order(jsonb), public.set_order_status(
   public.cancel_my_order(uuid), public.refund_order(uuid, boolean), public.store_order_counts(uuid), public.request_appointment(jsonb), public.cancel_my_appointment(uuid) from public, anon;
 call app.apply_grants();
 
+-- ===== 20261016000018_member_app.sql =====
+-- Shaan Fitness app · 18. The member app (YDL's customer app) and the gym's notifications
+-- Members book and cancel classes, see their memberships, payments and invoices, ask for a freeze, see their
+-- attendance and how busy the gym is, refer friends and see their trainers. The gym gets one list of everything
+-- members ask for in the app (YDL Notifications Listing): sign-ups, trials, call backs, referrals, feedback,
+-- appointment requests, app orders, posts to check, freeze and extension requests.
+
+-- App settings (App Settings › On/Off Permission) are in studios.settings->'app'.
+create or replace function app.app_setting(p_studio uuid, p_key text)
+returns jsonb language sql stable security definer set search_path = '' as $$
+  select coalesce(s.settings->'app'->p_key, app.default_app_settings()->p_key) from public.studios s where s.id = p_studio;
+$$;
+
+-- ---------------------------------------------------------------------------
+-- The gym's notifications
+-- ---------------------------------------------------------------------------
+create table public.staff_alerts (
+  id uuid primary key default gen_random_uuid(),
+  studio_id uuid not null references public.studios(id) on delete cascade,
+  kind text not null check (kind in ('signup', 'trial', 'callback', 'plan', 'referral', 'feedback', 'appointment', 'order', 'post', 'freeze', 'extension')),
+  member_id uuid references public.members(id) on delete cascade,
+  ref_id uuid,                                           -- the request it is about; handling that request closes it
+  title text not null,
+  body text,
+  link text,
+  created_at timestamptz not null default now(),
+  done_at timestamptz,
+  done_by uuid references public.staff(id) on delete set null
+);
+create index staff_alerts_studio_idx on public.staff_alerts (studio_id, created_at desc);
+create index staff_alerts_open_idx on public.staff_alerts (studio_id) where done_at is null;
+create index staff_alerts_ref_idx on public.staff_alerts (ref_id) where done_at is null;
+alter table public.staff_alerts enable row level security;
+create policy staff_alerts_read on public.staff_alerts for select to authenticated using (app.is_desk(studio_id));
+
+create or replace function app.add_alert(p_studio uuid, p_kind text, p_member uuid, p_title text, p_body text, p_link text, p_ref uuid)
+returns void language sql security definer set search_path = '' as $$
+  insert into public.staff_alerts (studio_id, kind, member_id, ref_id, title, body, link)
+  values (p_studio, p_kind, p_member, p_ref, left(p_title, 200), left(p_body, 1000), p_link);
+$$;
+
+-- When the request itself is handled (post decided, appointment confirmed, order confirmed, freeze decided,
+-- follow-up answered) its notification closes by itself.
+create or replace function app.close_alerts()
+returns trigger language plpgsql security definer set search_path = '' as $$
+begin
+  update public.staff_alerts set done_at = now(), done_by = app.my_staff_id(studio_id) where ref_id = old.id and done_at is null;
+  return null;
+end $$;
+
+-- What members start in the app reaches the gym's list.
+create or replace function app.alert_follow_up()
+returns trigger language plpgsql security definer set search_path = '' as $$
+declare v_name text; v_kind text; v_title text;
+begin
+  select m.full_name into v_name from public.members m where m.id = new.member_id;
+  if new.notes like 'Joined on the website%' then v_kind := 'signup'; v_title := v_name || ' signed up on the website';
+  elsif new.notes like 'Asked for a free trial in the app%' then v_kind := 'trial'; v_title := v_name || ' asked for a free trial';
+  elsif new.notes like 'Asked for a call back in the app%' then v_kind := 'callback'; v_title := v_name || ' asked for a call back';
+  elsif new.notes like 'Wants to join%' then v_kind := 'plan'; v_title := v_name || ' wants to join';
+  elsif new.notes like 'Referred by % in the app%' then v_kind := 'referral'; v_title := 'New referral: ' || v_name;
+  else return null;
+  end if;
+  perform app.add_alert(new.studio_id, v_kind, new.member_id, v_title, new.notes, '/clients/' || new.member_id || '/follow-ups', new.id);
+  return null;
+end $$;
+create trigger follow_ups_alert after insert on public.follow_ups for each row when (new.source = 'system') execute function app.alert_follow_up();
+
+create or replace function app.alert_feedback()
+returns trigger language plpgsql security definer set search_path = '' as $$
+begin
+  perform app.add_alert(new.studio_id, 'feedback', new.member_id,
+    'Feedback from ' || (select m.full_name from public.members m where m.id = new.member_id), new.feedback, '/centers/feedback', new.id);
+  return null;
+end $$;
+create trigger app_feedback_alert after insert on public.app_feedback for each row execute function app.alert_feedback();
+
+create or replace function app.alert_appointment()
+returns trigger language plpgsql security definer set search_path = '' as $$
+begin
+  perform app.add_alert(new.studio_id, 'appointment', new.member_id,
+    (select m.full_name from public.members m where m.id = new.member_id) || ' asked for an appointment',
+    coalesce(new.purpose, new.title) || ' on ' || to_char(new.appointment_date, 'DD Mon') || ' at ' || to_char(new.start_time, 'HH12:MI AM')
+    || coalesce('. ' || new.comments, ''), '/appointments', new.id);
+  return null;
+end $$;
+create trigger appointments_alert after insert on public.appointments for each row when (new.requested_by_member) execute function app.alert_appointment();
+
+create or replace function app.alert_order()
+returns trigger language plpgsql security definer set search_path = '' as $$
+begin
+  perform app.add_alert(new.studio_id, 'order', new.member_id,
+    'App order ' || new.order_no || ' from ' || (select m.full_name from public.members m where m.id = new.member_id),
+    'Confirm it and keep it ready at the front desk.', '/store/orders', new.id);
+  return null;
+end $$;
+create trigger store_orders_alert after insert on public.store_orders for each row when (new.placed_by_member) execute function app.alert_order();
+
+create or replace function app.alert_post()
+returns trigger language plpgsql security definer set search_path = '' as $$
+begin
+  perform app.add_alert(new.studio_id, 'post', new.author_member_id,
+    (select m.full_name from public.members m where m.id = new.author_member_id) || ' posted' || case when new.challenge_id is null then ' in the community' else ' in a challenge' end,
+    left(coalesce(new.body, 'A photo'), 200), case when new.challenge_id is null then '/community' else '/challenges/' || new.challenge_id end, new.id);
+  return null;
+end $$;
+create trigger community_posts_alert after insert on public.community_posts for each row when (new.status = 'pending') execute function app.alert_post();
+
+create or replace function app.alert_freeze()
+returns trigger language plpgsql security definer set search_path = '' as $$
+begin
+  perform app.add_alert(new.studio_id, 'freeze', new.member_id,
+    (select m.full_name from public.members m where m.id = new.member_id) || ' asked to freeze',
+    new.days || ' days from ' || to_char(new.start_date, 'DD Mon YYYY') || coalesce('. ' || new.note, ''), '/registers/freezes', new.id);
+  return null;
+end $$;
+create or replace function app.alert_extension()
+returns trigger language plpgsql security definer set search_path = '' as $$
+begin
+  perform app.add_alert(new.studio_id, 'extension', new.member_id,
+    (select m.full_name from public.members m where m.id = new.member_id) || ': extension to approve',
+    new.days || ' days' || coalesce('. ' || new.note, ''), '/registers/extensions', new.id);
+  return null;
+end $$;
+create trigger freezes_alert after insert on public.freezes for each row when (new.status = 'requested') execute function app.alert_freeze();
+create trigger extensions_alert after insert on public.extensions for each row when (new.status = 'requested') execute function app.alert_extension();
+
+create trigger follow_ups_close_alert after update of status on public.follow_ups for each row when (old.status = 'open' and new.status <> 'open') execute function app.close_alerts();
+create trigger appointments_close_alert after update of status on public.appointments for each row when (old.status = 'wait_list' and new.status <> 'wait_list') execute function app.close_alerts();
+create trigger store_orders_close_alert after update of status on public.store_orders for each row when (old.status = 'pending' and new.status <> 'pending') execute function app.close_alerts();
+create trigger community_posts_close_alert after update of status on public.community_posts for each row when (old.status = 'pending' and new.status <> 'pending') execute function app.close_alerts();
+create trigger freezes_close_alert after update of status on public.freezes for each row when (old.status = 'requested' and new.status <> 'requested') execute function app.close_alerts();
+create trigger extensions_close_alert after update of status on public.extensions for each row when (old.status = 'requested' and new.status <> 'requested') execute function app.close_alerts();
+
+-- Mark notifications as handled (some, or all that are open).
+create or replace function public.mark_alerts_done(p_studio uuid, p_ids uuid[] default null)
+returns int language plpgsql security definer set search_path = '' as $$
+declare v_n int;
+begin
+  if not app.is_desk(p_studio) then raise exception 'Only owner and front desk'; end if;
+  update public.staff_alerts set done_at = now(), done_by = app.my_staff_id(p_studio)
+  where studio_id = p_studio and done_at is null and (p_ids is null or id = any (p_ids));
+  get diagnostics v_n = row_count;
+  return v_n;
+end $$;
+
+-- ---------------------------------------------------------------------------
+-- Classes in the app: the schedule with my booking and whether my membership covers each class
+-- ---------------------------------------------------------------------------
+create or replace function public.my_classes(p_from date, p_to date)
+returns table (batch_id uuid, class_date date, title text, info text, room text, start_time time, end_time time, trainer_names text,
+  service_names text, capacity int, booked int, waiting int, booking_id uuid, booking_status text, attended boolean, blocked text)
+language sql stable security definer set search_path = '' as $$
+  with me as (
+    select m.* from public.members m where m.user_id = (select auth.uid()) and m.deleted_at is null order by m.created_at limit 1
+  )
+  select s.batch_id, s.class_date, s.title, s.info, s.room, s.start_time, s.end_time, s.trainer_names,
+    (select string_agg(coalesce(v.custom_name, v.name), ', ' order by v.sort) from public.services v where v.id = any (s.service_ids)),
+    s.capacity, s.booked, s.waiting, cb.id, cb.status, cb.attendance_id is not null,
+    case
+      when s.gender <> 'all' and me.gender is not null and me.gender <> s.gender then 'gender'
+      when sub.id is null then 'no_membership'
+      when exists (select 1 from public.freezes f where f.subscription_id = sub.id and f.status = 'approved' and s.class_date between f.start_date and f.end_date) then 'frozen'
+    end
+  from me
+  cross join lateral public.class_schedule(me.studio_id, p_from, least(p_to, p_from + 31)) s
+  left join public.class_bookings cb on cb.batch_id = s.batch_id and cb.member_id = me.id and cb.class_date = s.class_date
+    and cb.cancelled_at is null and cb.deleted_at is null and cb.status <> 'rejected'
+  left join lateral (
+    select x.id from public.subscriptions x join public.plans pl on pl.id = x.plan_id
+    where x.member_id = me.id and x.deleted_at is null and x.cancelled_at is null and x.status = 'live' and not x.mark_used
+      and s.class_date between x.start_date and x.end_date and (cardinality(s.service_ids) = 0 or pl.service_ids && s.service_ids)
+    order by (x.kind = 'trial'), x.end_date desc limit 1
+  ) sub on true
+  order by s.class_date, s.start_time, s.title;
+$$;
+
+-- ---------------------------------------------------------------------------
+-- Freeze request from the app (the owner approves it in the Freeze Register)
+-- ---------------------------------------------------------------------------
+create or replace function public.request_freeze(p_subscription uuid, p_start date, p_days int, p_note text)
+returns uuid language plpgsql security definer set search_path = '' as $$
+declare s public.subscriptions; v_plan_days int; v_max int; v_used int; v_id uuid; v_today date;
+begin
+  select * into s from public.subscriptions where id = p_subscription and app.is_self(member_id);
+  if s.id is null then raise exception 'Membership not found'; end if;
+  if not coalesce((app.app_setting(s.studio_id, 'fc_allow_freeze_memberships') #>> '{}')::boolean, true)
+     or not coalesce((app.center_setting(s.studio_id, 'freeze_membership') #>> '{}')::boolean, true) then
+    raise exception 'The gym takes freeze requests at the front desk';
+  end if;
+  v_today := app.today(s.studio_id);
+  if s.deleted_at is not null or s.cancelled_at is not null or s.status <> 'live' or s.end_date < v_today then raise exception 'This membership can''t be frozen'; end if;
+  if p_days is null or p_days < 1 or p_days > 90 then raise exception 'Choose between 1 and 90 days'; end if;
+  if p_start is null or p_start < v_today then raise exception 'The freeze can start from today'; end if;
+  if p_start > s.end_date then raise exception 'The freeze must start before the membership ends (%)', to_char(s.end_date, 'DD Mon YYYY'); end if;
+  if exists (select 1 from public.freezes f where f.subscription_id = s.id and f.status = 'requested') then
+    raise exception 'You already have a freeze request waiting';
+  end if;
+  if exists (select 1 from public.freezes f where f.subscription_id = s.id and f.status = 'approved'
+             and daterange(f.start_date, f.end_date, '[]') && daterange(p_start, p_start + p_days - 1, '[]')) then
+    raise exception 'Those days are already frozen';
+  end if;
+  select coalesce(p.freeze_days, 0) into v_plan_days from public.plans p where p.id = s.plan_id;
+  select coalesce((st.settings->'freeze'->>'max_days')::int, 0) into v_max from public.studios st where st.id = s.studio_id;
+  v_max := case when v_plan_days > 0 then v_plan_days else v_max end;
+  select coalesce(sum(f.days), 0) into v_used from public.freezes f where f.subscription_id = s.id and f.status = 'approved';
+  if v_max > 0 and v_used + p_days > v_max then
+    raise exception 'Your membership allows % freeze days; % left', v_max, greatest(v_max - v_used, 0);
+  end if;
+  insert into public.freezes (studio_id, subscription_id, member_id, start_date, days, note, status, requested_by)
+  values (s.studio_id, s.id, s.member_id, p_start, p_days, left(nullif(trim(p_note), ''), 300), 'requested', (select auth.uid()))
+  returning id into v_id;
+  return v_id;
+end $$;
+
+-- ---------------------------------------------------------------------------
+-- How busy the gym is (numbers only, never who): in now, and the usual check-ins by hour for this weekday
+-- ---------------------------------------------------------------------------
+create or replace function public.gym_traffic(p_studio uuid)
+returns jsonb language sql stable security definer set search_path = '' as $$
+  with tz as (select coalesce(s.timezone, 'Asia/Kolkata') as z, app.today(s.id) as today from public.studios s where s.id = p_studio and app.in_studio(p_studio))
+  select jsonb_build_object(
+    'now', (select count(distinct a.member_id) from public.attendance a, tz
+            where a.studio_id = p_studio and a.date = tz.today and a.status = 'present' and a.check_out is null and a.check_in > now() - interval '2 hours'),
+    'today', (select count(distinct a.member_id) from public.attendance a, tz where a.studio_id = p_studio and a.date = tz.today and a.status = 'present'),
+    'hours', (select coalesce(jsonb_agg(jsonb_build_object('h', h, 'avg', round(n / 4.0, 1)) order by h), '[]'::jsonb) from (
+      select extract(hour from a.check_in at time zone tz.z)::int as h, count(*) as n
+      from public.attendance a, tz
+      where a.studio_id = p_studio and a.status = 'present' and a.date >= tz.today - 28 and a.date < tz.today
+        and extract(isodow from a.date) = extract(isodow from tz.today)
+      group by 1) x)
+  ) from tz;
+$$;
+
+-- ---------------------------------------------------------------------------
+-- Refer a friend (App Settings › Show Refer Friends Card)
+-- ---------------------------------------------------------------------------
+create table public.referrals (
+  id uuid primary key default gen_random_uuid(),
+  studio_id uuid not null references public.studios(id) on delete cascade,
+  referrer_id uuid not null references public.members(id) on delete cascade,
+  member_id uuid references public.members(id) on delete set null,      -- the friend's record (new enquiry or existing)
+  name text not null,
+  phone text not null,
+  note text,
+  created_at timestamptz not null default now()
+);
+create index referrals_referrer_idx on public.referrals (referrer_id, created_at desc);
+alter table public.referrals enable row level security;
+create policy referrals_read on public.referrals for select to authenticated using (app.is_desk(studio_id));
+
+create or replace function public.refer_friend(p_name text, p_phone text, p_note text default null)
+returns text language plpgsql security definer set search_path = '' as $$
+declare me public.members; v_phone text = right(app.digits(p_phone), 10); v_name text = left(trim(coalesce(p_name, '')), 80);
+        v_friend uuid; v_first text; v_last text;
+begin
+  select * into me from public.members where user_id = (select auth.uid()) and deleted_at is null order by created_at limit 1;
+  if me.id is null then raise exception 'Sign in as a member to refer a friend'; end if;
+  if not coalesce((app.app_setting(me.studio_id, 'can_refer_friend') #>> '{}')::boolean, true) then raise exception 'Referrals are not open right now'; end if;
+  if v_name = '' then raise exception 'Enter your friend''s name'; end if;
+  if v_phone !~ '^[6-9][0-9]{9}$' then raise exception 'Enter a 10-digit mobile number'; end if;
+  if app.same_phone(me.phone, v_phone) then raise exception 'That''s your own number'; end if;
+  if (select count(*) from public.referrals r where r.referrer_id = me.id and r.created_at > now() - interval '1 day') >= 10 then
+    raise exception 'You''ve referred 10 friends today. Thank you! Please add more tomorrow.';
+  end if;
+  if exists (select 1 from public.referrals r where r.referrer_id = me.id and right(app.digits(r.phone), 10) = v_phone) then
+    raise exception 'You have already referred this number';
+  end if;
+  select m.id into v_friend from public.members m where m.studio_id = me.studio_id and m.deleted_at is null and app.same_phone(m.phone, v_phone)
+  order by (m.kind = 'member') desc, m.created_at limit 1;
+  if v_friend is null then
+    v_first := split_part(v_name, ' ', 1);
+    v_last := nullif(trim(substr(v_name, length(v_first) + 1)), '');
+    insert into public.members (studio_id, kind, first_name, last_name, phone, source_promotion, enquiry_date, referred_by_member_id, added_by)
+    values (me.studio_id, 'enquiry', v_first, v_last, v_phone, 'Member Referral', app.today(me.studio_id), me.id, me.added_by)
+    returning id into v_friend;
+  end if;
+  insert into public.referrals (studio_id, referrer_id, member_id, name, phone, note) values (me.studio_id, me.id, v_friend, v_name, v_phone, left(nullif(trim(p_note), ''), 300));
+  insert into public.follow_ups (studio_id, member_id, type, due_at, status, contact_type, notes, source)
+  values (me.studio_id, v_friend, 'Referral', now(), 'open', 'Phone',
+          'Referred by ' || me.full_name || ' in the app' || coalesce('. ' || left(nullif(trim(p_note), ''), 300), '') || '. Call to invite them for a trial.', 'system');
+  return 'sent';
+end $$;
+
+-- The friends I referred and whether they joined (names as I typed them).
+create or replace function public.my_referrals()
+returns table (id uuid, name text, created_at timestamptz, joined boolean)
+language sql stable security definer set search_path = '' as $$
+  select r.id, r.name, r.created_at,
+    exists (select 1 from public.subscriptions s where s.member_id = r.member_id and s.created_at >= r.created_at and s.deleted_at is null and s.kind <> 'trial')
+  from public.referrals r
+  where r.referrer_id = (select m.id from public.members m where m.user_id = (select auth.uid()) and m.deleted_at is null order by m.created_at limit 1)
+  order by r.created_at desc;
+$$;
+
+-- ---------------------------------------------------------------------------
+-- The coaches in the app, with the buttons the gym allows (App Settings: call, WhatsApp, book an appointment)
+-- ---------------------------------------------------------------------------
+create or replace function public.my_coaches()
+returns table (id uuid, name text, designation text, photo_url text, services text, years_experience int, phone text, can_call boolean, can_whatsapp boolean, can_book boolean)
+language sql stable security definer set search_path = '' as $$
+  with me as (select m.studio_id from public.members m where m.user_id = (select auth.uid()) and m.deleted_at is null order by m.created_at limit 1),
+  st as (select me.studio_id,
+           coalesce((app.app_setting(me.studio_id, 'can_trainer_call') #>> '{}')::boolean, false) as c,
+           coalesce((app.app_setting(me.studio_id, 'can_whatsapp_trainer') #>> '{}')::boolean, false) as w,
+           coalesce((app.app_setting(me.studio_id, 'can_book_appointment') #>> '{}')::boolean, true) as b
+         from me)
+  select t.id, t.full_name, coalesce(nullif(t.employee_type, ''), 'Trainer'), case when t.photo_url ~ '^https?://' then t.photo_url end,
+    (select string_agg(coalesce(v.custom_name, v.name), ', ' order by v.sort) from public.services v where v.id = any (t.service_ids)),
+    t.years_experience,
+    case when st.c or st.w then nullif(t.country_code || app.digits(t.phone), '') end, st.c and t.phone is not null, st.w and t.phone is not null, st.b
+  from st join public.staff t on t.studio_id = st.studio_id and t.active and t.role = 'coach'
+  order by t.star_trainer desc, t.years_experience desc nulls last, t.full_name;
+$$;
+
+-- Appointment requests follow the App Settings switch, and may name the coach (the desk still confirms).
+create or replace function public.request_appointment(p jsonb)
+returns uuid language plpgsql security definer set search_path = '' as $$
+declare m public.members; v_id uuid; v_date date = nullif(p->>'appointment_date', '')::date; v_start time = nullif(p->>'start_time', '')::time;
+        v_purpose text = nullif(trim(p->>'purpose'), ''); v_coach uuid = nullif(p->>'trainer_id', '')::uuid;
+begin
+  select * into m from public.members where user_id = (select auth.uid()) and deleted_at is null order by created_at limit 1;
+  if m.id is null then raise exception 'Sign in as a member to ask for an appointment'; end if;
+  if not coalesce((app.app_setting(m.studio_id, 'can_book_appointment') #>> '{}')::boolean, true) then
+    raise exception 'The gym takes appointments at the front desk';
+  end if;
+  if v_purpose is null then raise exception 'Choose what the appointment is for'; end if;
+  if v_date is null or v_start is null then raise exception 'Choose the day and time'; end if;
+  if v_start < time '05:00' or v_start > time '22:00' then raise exception 'Choose a time between 5 AM and 10 PM'; end if;
+  if v_date < app.today(m.studio_id) then raise exception 'Choose a day from today on'; end if;
+  if v_date > app.today(m.studio_id) + 60 then raise exception 'Choose a day in the next two months'; end if;
+  if v_coach is not null and not exists (select 1 from public.staff s where s.id = v_coach and s.studio_id = m.studio_id and s.active and s.role = 'coach') then
+    raise exception 'Coach not found';
+  end if;
+  if (select count(*) from public.appointments a where a.member_id = m.id and a.requested_by_member and a.status = 'wait_list') >= 3 then
+    raise exception 'You already have 3 requests waiting; the gym will get back to you';
+  end if;
+  insert into public.appointments (studio_id, title, purpose, comments, appointment_date, start_time, end_time, member_id, handled_by, status, notify_client, requested_by_member)
+  values (m.studio_id, v_purpose, v_purpose, left(nullif(trim(p->>'comments'), ''), 500), v_date, v_start, v_start + interval '30 minutes', m.id, v_coach, 'wait_list', true, true)
+  returning id into v_id;
+  return v_id;
+end $$;
+
+revoke all on function public.mark_alerts_done(uuid, uuid[]), public.my_classes(date, date), public.request_freeze(uuid, date, int, text),
+  public.gym_traffic(uuid), public.refer_friend(text, text, text), public.my_referrals(), public.my_coaches() from public, anon;
+call app.apply_grants();
+
+-- ===== 20261016000019_health.sql =====
+-- Shaan Fitness app · 19. Health tracking in the member app (YDL customer app: Track Your Diet, Diet Analysis,
+-- Workout Analysis, Hydration, Sleep and Steps trackers, Diary, PAR-Q form, Free Workout and Diet Plans).
+-- Everything here is the member's own record. Their coach and the front desk can read it to guide them;
+-- other members never see it.
+
+-- An App Settings › On/Off Permission switch (the gym's choice, else the default, else p_default).
+create or replace function app.app_flag(p_studio uuid, p_key text, p_default boolean)
+returns boolean language sql stable security definer set search_path = '' as $$
+  select coalesce((app.app_setting(p_studio, p_key) #>> '{}')::boolean, p_default);
+$$;
+
+-- ---------------------------------------------------------------------------
+-- What I ate (Track Your Diet)
+-- ---------------------------------------------------------------------------
+create table public.food_logs (
+  id uuid primary key default gen_random_uuid(),
+  studio_id uuid not null references public.studios(id) on delete cascade,
+  member_id uuid not null references public.members(id) on delete cascade,
+  date date not null,
+  meal text not null check (length(trim(meal)) > 0),
+  plan_item_id uuid references public.diet_plan_items(id) on delete set null,   -- ticked from my diet plan
+  food_id uuid references public.foods(id) on delete set null,
+  recipe_id uuid references public.recipes(id) on delete set null,
+  name text not null check (length(trim(name)) > 0),
+  quantity numeric(8,2) check (quantity is null or quantity > 0),
+  unit text,
+  calories numeric(8,2) not null default 0 check (calories >= 0),
+  protein numeric(8,2) not null default 0 check (protein >= 0),
+  carbs numeric(8,2) not null default 0 check (carbs >= 0),
+  fats numeric(8,2) not null default 0 check (fats >= 0),
+  fibre numeric(8,2) not null default 0 check (fibre >= 0),
+  created_at timestamptz not null default now()
+);
+create index food_logs_member_idx on public.food_logs (member_id, date desc);
+create unique index food_logs_plan_item_once on public.food_logs (member_id, date, plan_item_id) where plan_item_id is not null;
+
+-- A logged food takes the member's gym; its numbers come from the plan item, food or recipe (scaled by quantity)
+-- unless typed in; no future days. Food outside the plan only when the gym allows it
+-- (App Settings › "Allow clients to add their food in diet plan?").
+create or replace function app.check_food_log()
+returns trigger language plpgsql security definer set search_path = '' as $$
+declare f public.foods; r public.recipes; pi public.diet_plan_items; v_scale numeric;
+begin
+  select m.studio_id into new.studio_id from public.members m where m.id = new.member_id;
+  if new.studio_id is null then raise exception 'Client not found'; end if;
+  if new.date > app.today(new.studio_id) then raise exception 'You can''t log a future day'; end if;
+  if new.date < app.today(new.studio_id) - 60 then raise exception 'You can log up to 60 days back'; end if;
+  if new.plan_item_id is null and tg_op = 'INSERT' and not app.app_flag(new.studio_id, 'can_add_food', true) then
+    raise exception 'Your gym has turned off adding your own food; tick the items in your diet plan';
+  end if;
+  if new.plan_item_id is not null then
+    select i.* into pi from public.diet_plan_items i join public.diet_plans p on p.id = i.plan_id
+    where i.id = new.plan_item_id and p.studio_id = new.studio_id;
+    if pi.id is null then raise exception 'Diet plan item not found'; end if;
+    new.name := pi.item_name; new.meal := pi.meal; new.quantity := pi.quantity; new.unit := pi.unit;
+    new.calories := pi.calories; new.protein := pi.protein; new.carbs := pi.carbs; new.fats := pi.fats; new.fibre := pi.fibre;
+    new.food_id := pi.food_id; new.recipe_id := pi.recipe_id;
+  elsif new.food_id is not null then
+    select * into f from public.foods where id = new.food_id and (studio_id is null or studio_id = new.studio_id);
+    if f.id is null then raise exception 'Food not found'; end if;
+    v_scale := coalesce(new.quantity, f.quantity) / f.quantity;
+    new.name := f.name; new.unit := coalesce(new.unit, f.unit); new.quantity := coalesce(new.quantity, f.quantity);
+    new.calories := round(f.calories * v_scale, 1); new.protein := round(f.protein * v_scale, 1); new.carbs := round(f.carbs * v_scale, 1);
+    new.fats := round(f.fats * v_scale, 1); new.fibre := round(f.fibre * v_scale, 1);
+  elsif new.recipe_id is not null then
+    select * into r from public.recipes where id = new.recipe_id and studio_id = new.studio_id and (is_verified or member_id = new.member_id);
+    if r.id is null then raise exception 'Recipe not found'; end if;
+    v_scale := coalesce(new.quantity, r.quantity) / r.quantity;
+    new.name := r.name; new.unit := coalesce(new.unit, r.unit); new.quantity := coalesce(new.quantity, r.quantity);
+    new.calories := round(r.calories * v_scale, 1); new.protein := round(r.protein * v_scale, 1); new.carbs := round(r.carbs * v_scale, 1);
+    new.fats := round(r.fats * v_scale, 1); new.fibre := round(r.fibre * v_scale, 1);
+  end if;
+  return new;
+end $$;
+create trigger food_logs_check before insert or update on public.food_logs for each row execute function app.check_food_log();
+
+-- ---------------------------------------------------------------------------
+-- Daily trackers (water, steps, sleep, mood) with my goals, and my diary
+-- ---------------------------------------------------------------------------
+create table public.daily_logs (
+  member_id uuid not null references public.members(id) on delete cascade,
+  date date not null,
+  studio_id uuid not null references public.studios(id) on delete cascade,
+  water_ml int check (water_ml is null or water_ml between 0 and 10000),
+  steps int check (steps is null or steps between 0 and 100000),
+  sleep_hours numeric(4,2) check (sleep_hours is null or sleep_hours between 0 and 24),
+  mood smallint check (mood is null or mood between 1 and 5),
+  updated_at timestamptz not null default now(),
+  primary key (member_id, date)
+);
+
+create table public.member_goals (
+  member_id uuid primary key references public.members(id) on delete cascade,
+  studio_id uuid not null references public.studios(id) on delete cascade,
+  water_ml int not null default 3000 check (water_ml between 500 and 10000),
+  steps int not null default 8000 check (steps between 500 and 50000),
+  sleep_hours numeric(4,2) not null default 7.5 check (sleep_hours between 3 and 12),
+  calories int check (calories is null or calories between 800 and 6000),
+  updated_at timestamptz not null default now()
+);
+
+create table public.diary_entries (
+  id uuid primary key default gen_random_uuid(),
+  studio_id uuid not null references public.studios(id) on delete cascade,
+  member_id uuid not null references public.members(id) on delete cascade,
+  date date not null,
+  body text not null check (length(trim(body)) between 1 and 4000),
+  video_url text check (video_url is null or video_url ~* '^https://'),
+  created_at timestamptz not null default now()
+);
+create index diary_entries_member_idx on public.diary_entries (member_id, date desc, created_at desc);
+
+-- Rows take the member's gym; no future days; App Settings decide whether members set goals ("Can Set Goal?")
+-- and keep a diary ("Show Diary", "Show Diary Video").
+create or replace function app.member_row()
+returns trigger language plpgsql security definer set search_path = '' as $$
+begin
+  select m.studio_id into new.studio_id from public.members m where m.id = new.member_id and m.deleted_at is null;
+  if new.studio_id is null then raise exception 'Client not found'; end if;
+  if tg_table_name in ('daily_logs', 'diary_entries') then
+    if new.date > app.today(new.studio_id) then raise exception 'You can''t log a future day'; end if;
+  end if;
+  if tg_table_name = 'member_goals' and not app.app_flag(new.studio_id, 'can_set_goal', true) then
+    raise exception 'Your gym sets your goals';
+  end if;
+  if tg_table_name = 'diary_entries' then
+    if not app.app_flag(new.studio_id, 'show_diary', true) then raise exception 'The diary is turned off'; end if;
+    if new.video_url is not null and not app.app_flag(new.studio_id, 'show_diary_video', true) then raise exception 'Videos in the diary are turned off'; end if;
+  end if;
+  if tg_table_name in ('daily_logs', 'member_goals') then new.updated_at := now(); end if;
+  return new;
+end $$;
+create trigger daily_logs_row before insert or update on public.daily_logs for each row execute function app.member_row();
+create trigger member_goals_row before insert or update on public.member_goals for each row execute function app.member_row();
+create trigger diary_entries_row before insert or update on public.diary_entries for each row execute function app.member_row();
+
+-- A member's own recipe belongs to their gym, and only when the gym has recipes on (App Settings › Enable Recipe).
+create or replace function app.check_member_recipe()
+returns trigger language plpgsql security definer set search_path = '' as $$
+begin
+  if new.member_id is null then return new; end if;
+  select m.studio_id into new.studio_id from public.members m where m.id = new.member_id and m.deleted_at is null;
+  if new.studio_id is null then raise exception 'Client not found'; end if;
+  if tg_op = 'INSERT' and not app.is_staff(new.studio_id) and not app.app_flag(new.studio_id, 'allow_recipes', true) then
+    raise exception 'Recipes are turned off';
+  end if;
+  return new;
+end $$;
+create trigger recipes_member before insert or update on public.recipes for each row execute function app.check_member_recipe();
+
+-- ---------------------------------------------------------------------------
+-- PAR-Q from the app (App Settings › Enable PAR-Q Form): the member answers for themself
+-- ---------------------------------------------------------------------------
+alter table public.member_medical add column filled_by_member_at timestamptz;
+
+create or replace function public.save_my_medical(p_answers jsonb, p_note text)
+returns void language plpgsql security definer set search_path = '' as $$
+declare m public.members; v_keys text[] = array['heart_problem', 'diabetes', 'chest_pain_while_exercise', 'feel_faint', 'back_pain_or_joints_pain',
+  'asthma', 'medication', 'any_surgery', 'any_reason_to_modify_exercise', 'pregnant', 'allergies', 'medical_problem'];
+  v_clean jsonb = '{}'::jsonb; k text;
+begin
+  select * into m from public.members where user_id = (select auth.uid()) and deleted_at is null order by created_at limit 1;
+  if m.id is null then raise exception 'Sign in as a member to fill the form'; end if;
+  if not coalesce((app.app_setting(m.studio_id, 'can_view_parq_form') #>> '{}')::boolean, true) then raise exception 'The gym fills this form with you at the front desk'; end if;
+  if jsonb_typeof(p_answers) is distinct from 'object' then raise exception 'Answer the questions'; end if;
+  foreach k in array v_keys loop
+    if jsonb_typeof(p_answers->k) = 'boolean' then v_clean := v_clean || jsonb_build_object(k, p_answers->k); end if;
+  end loop;
+  insert into public.member_medical (member_id, studio_id, answers, note, updated_at, filled_by_member_at)
+  values (m.id, m.studio_id, v_clean, left(nullif(trim(p_note), ''), 1000), now(), now())
+  on conflict (member_id) do update set answers = excluded.answers, note = excluded.note, updated_at = now(), updated_by = null, filled_by_member_at = now();
+end $$;
+
+-- ---------------------------------------------------------------------------
+-- Free plans (YDL Free Workout Plans List / Free Diet Plans List): a member starts a public plan for themself,
+-- unless their coach has given them one. Switching from one free plan to another needs App Settings
+-- › "Can Change Workout Plan?" / "Can Change Diet Plan?".
+-- ---------------------------------------------------------------------------
+create or replace function public.start_free_plan(p_kind text, p_plan uuid)
+returns uuid language plpgsql security definer set search_path = '' as $$
+declare m public.members; v_id uuid; v_n smallint; v_current record;
+begin
+  select * into m from public.members where user_id = (select auth.uid()) and deleted_at is null order by created_at limit 1;
+  if m.id is null then raise exception 'Sign in as a member to start a plan'; end if;
+  if p_kind = 'workout' then
+    if not app.app_flag(m.studio_id, 'is_woplan_allowed', true) then raise exception 'Workout plans are turned off in the app'; end if;
+    select p.days_per_week into v_n from public.workout_plans p where p.id = p_plan and p.studio_id = m.studio_id and p.is_public and p.active;
+    if not found then raise exception 'Plan not found'; end if;
+    select * into v_current from public.member_workouts w where w.member_id = m.id and w.active;
+    if v_current.id is not null and v_current.assigned_by is not null then raise exception 'Your coach has given you a workout plan; ask them to change it'; end if;
+    if v_current.id is not null and not app.app_flag(m.studio_id, 'can_change_workout_plan', false) then
+      raise exception 'You already follow a workout plan; ask the gym to change it';
+    end if;
+    update public.member_workouts set active = false, end_date = app.today(m.studio_id) where member_id = m.id and active;
+    insert into public.member_workouts (studio_id, member_id, plan_id, weekdays, start_date, assigned_by)
+    values (m.studio_id, m.id, p_plan,
+            -- training days spread over the week: 3 → Mon, Wed, Fri; 4 → Mon, Tue, Thu, Fri …
+            (case v_n when 1 then '{1}' when 2 then '{1,4}' when 3 then '{1,3,5}' when 4 then '{1,2,4,5}' when 5 then '{1,2,3,4,5}'
+                      when 6 then '{1,2,3,4,5,6}' else '{1,2,3,4,5,6,7}' end)::smallint[], app.today(m.studio_id), null)
+    returning id into v_id;
+  elsif p_kind = 'diet' then
+    if not app.app_flag(m.studio_id, 'is_Diet_PlanAllowed', true) then raise exception 'Diet plans are turned off in the app'; end if;
+    perform 1 from public.diet_plans p where p.id = p_plan and p.studio_id = m.studio_id and p.is_public and p.active;
+    if not found then raise exception 'Plan not found'; end if;
+    select * into v_current from public.member_diets d where d.member_id = m.id and d.active;
+    if v_current.id is not null and v_current.assigned_by is not null then raise exception 'Your coach has given you a diet plan; ask them to change it'; end if;
+    if v_current.id is not null and not app.app_flag(m.studio_id, 'can_change_diet_plan', false) then
+      raise exception 'You already follow a diet plan; ask the gym to change it';
+    end if;
+    update public.member_diets set active = false, end_date = app.today(m.studio_id) where member_id = m.id and active;
+    insert into public.member_diets (studio_id, member_id, plan_id, start_date, assigned_by) values (m.studio_id, m.id, p_plan, app.today(m.studio_id), null)
+    returning id into v_id;
+  else
+    raise exception 'Choose a workout or diet plan';
+  end if;
+  return v_id;
+end $$;
+
+-- ---------------------------------------------------------------------------
+-- Workout Analysis / Exercise Analysis (volume): week by week, for me, or for a client a staff member looks after
+-- ---------------------------------------------------------------------------
+create or replace function public.workout_analysis(p_member uuid default null, p_weeks int default 8)
+returns jsonb language plpgsql stable security definer set search_path = '' as $$
+declare v_member uuid; v_studio uuid; v_today date; v_from date;
+begin
+  if p_member is null then
+    select m.id, m.studio_id into v_member, v_studio from public.members m where m.user_id = (select auth.uid()) and m.deleted_at is null order by m.created_at limit 1;
+  elsif app.is_self(p_member) or app.sees_member(p_member) then
+    select m.id, m.studio_id into v_member, v_studio from public.members m where m.id = p_member;
+  end if;
+  if v_member is null then raise exception 'Client not found'; end if;
+  v_today := app.today(v_studio);
+  v_from := date_trunc('week', v_today)::date - 7 * (least(greatest(coalesce(p_weeks, 8), 1), 26) - 1);
+  return jsonb_build_object(
+    'from', v_from, 'to', v_today,
+    'weeks', (
+      select coalesce(jsonb_agg(jsonb_build_object('week', w.wk, 'days', coalesce(s.days, 0), 'exercises', coalesce(s.n, 0), 'volume', coalesce(s.vol, 0)) order by w.wk), '[]'::jsonb)
+      from (select g::date as wk from generate_series(v_from, v_today, interval '7 days') g) w
+      left join (
+        select date_trunc('week', l.date)::date as wk, count(distinct l.date)::int as days, count(*)::int as n,
+               round(sum(coalesce(l.sets_done, i.sets, 1) * coalesce(l.reps_done, i.reps, 0) * coalesce(l.weight_kg, i.weight_kg, 0)), 1) as vol
+        from public.workout_logs l left join public.workout_plan_items i on i.id = l.item_id
+        where l.member_id = v_member and l.date between v_from and v_today group by 1
+      ) s on s.wk = w.wk),
+    'parts', (
+      select coalesce(jsonb_agg(jsonb_build_object('part', p.part, 'n', p.n) order by p.n desc, p.part), '[]'::jsonb)
+      from (
+        select coalesce(nullif(trim(i.body_part), ''), nullif(trim(e.body_part), ''), 'Other') as part, count(*)::int as n
+        from public.workout_logs l
+        left join public.workout_plan_items i on i.id = l.item_id
+        left join public.exercises e on e.id = i.exercise_id
+        where l.member_id = v_member and l.date between v_from and v_today group by 1
+      ) p));
+end $$;
+
+-- ---------------------------------------------------------------------------
+-- Access rules: the member writes their own; staff who look after them can read
+-- ---------------------------------------------------------------------------
+alter table public.food_logs enable row level security;
+alter table public.daily_logs enable row level security;
+alter table public.member_goals enable row level security;
+alter table public.diary_entries enable row level security;
+
+create policy food_logs_read on public.food_logs for select to authenticated using (app.is_self(member_id) or app.sees_member(member_id));
+create policy food_logs_own on public.food_logs for all to authenticated using (app.is_self(member_id)) with check (app.is_self(member_id));
+create policy daily_logs_read on public.daily_logs for select to authenticated using (app.is_self(member_id) or app.sees_member(member_id));
+create policy daily_logs_own on public.daily_logs for all to authenticated using (app.is_self(member_id)) with check (app.is_self(member_id));
+create policy member_goals_read on public.member_goals for select to authenticated using (app.is_self(member_id) or app.sees_member(member_id));
+create policy member_goals_own on public.member_goals for all to authenticated using (app.is_self(member_id)) with check (app.is_self(member_id));
+create policy diary_entries_read on public.diary_entries for select to authenticated using (app.is_self(member_id) or app.in_care_team(member_id));
+create policy diary_entries_own on public.diary_entries for all to authenticated using (app.is_self(member_id)) with check (app.is_self(member_id));
+
+revoke all on function public.save_my_medical(jsonb, text), public.start_free_plan(text, uuid), public.workout_analysis(uuid, int) from public, anon;
+revoke all on function app.app_flag(uuid, text, boolean) from public, anon;
+grant execute on function app.app_flag(uuid, text, boolean) to authenticated, service_role;
+call app.apply_grants();
+
+-- ===== 20261016000020_coach_app.sql =====
+-- Shaan Fitness app · 20. The coach app (YDL trainer app): the coach's day in one call (own check-in, today's
+-- classes, PT clients, appointments, leave), a class roster to mark attendance from the phone, and substitute
+-- coaches (a class's trainer changed for one day) marking that class too.
+
+-- A coach of the class on that day: the batch's coaches, or the coach put on that one day's class.
+create or replace function app.coaches_class(p_batch uuid, p_date date)
+returns boolean language sql stable security definer set search_path = '' as $$
+  select app.coaches_batch(p_batch) or exists (
+    select 1 from public.class_sessions cs
+    where cs.batch_id = p_batch and cs.class_date = p_date and cs.trainer_ids && array(select app.my_staff_ids())
+  );
+$$;
+
+-- Check clients in to a class (YDL "Mark Customer Attendance" › Check In), now also by the day's substitute coach.
+create or replace function public.class_check_in(p_batch uuid, p_date date, p_member_ids uuid[])
+returns int language plpgsql security definer set search_path = '' as $$
+declare b public.batches; v_member uuid; v_att uuid; v_n int = 0; v_when timestamptz; v_start time; v_trainers uuid[];
+begin
+  select * into b from public.batches where id = p_batch;
+  if b.id is null then raise exception 'Class not found'; end if;
+  if not (app.is_desk(b.studio_id) or app.coaches_class(b.id, p_date)) then raise exception 'Only staff can mark attendance'; end if;
+  if p_date > app.today(b.studio_id) then raise exception 'Attendance can''t be marked for a future class'; end if;
+  select coalesce(cs.start_time, b.start_time), coalesce(cs.trainer_ids, b.trainer_ids) into v_start, v_trainers
+  from (select 1) x left join public.class_sessions cs on cs.batch_id = b.id and cs.class_date = p_date;
+  v_when = case when p_date = app.today(b.studio_id) then now() else (p_date + v_start) at time zone 'Asia/Kolkata' end;
+  foreach v_member in array p_member_ids loop
+    if not exists (select 1 from public.members m where m.id = v_member and m.studio_id = b.studio_id and m.deleted_at is null) then
+      raise exception 'Client not found';
+    end if;
+    select a.id into v_att from public.attendance a where a.member_id = v_member and a.date = p_date and a.batch_id = b.id;
+    if v_att is null then
+      insert into public.attendance (studio_id, member_id, batch_id, date, check_in, source, status, trainer_id, marked_by)
+      values (b.studio_id, v_member, b.id, p_date, v_when, 'class', 'present', v_trainers[1], app.my_staff_id(b.studio_id))
+      returning id into v_att;
+      v_n = v_n + 1;
+    end if;
+    update public.class_bookings set attendance_id = v_att
+    where batch_id = b.id and member_id = v_member and class_date = p_date and cancelled_at is null and deleted_at is null and status = 'booked';
+  end loop;
+  return v_n;
+end $$;
+
+-- Who is expected in a class on a day: the batch's fixed members and the clients who booked it, with who is in.
+create or replace function public.coach_roster(p_batch uuid, p_date date)
+returns table (member_id uuid, name text, code text, booked boolean, in_batch boolean, present boolean, check_in timestamptz)
+language plpgsql stable security definer set search_path = '' as $$
+declare b public.batches;
+begin
+  select * into b from public.batches where id = p_batch;
+  if b.id is null or not (app.is_desk(b.studio_id) or app.coaches_class(b.id, p_date)) then raise exception 'Class not found'; end if;
+  return query
+  with e as (
+    select bm.member_id, false as booked, true as in_batch from public.batch_members bm where bm.batch_id = b.id
+    union all
+    select cb.member_id, true, false from public.class_bookings cb
+    where cb.batch_id = b.id and cb.class_date = p_date and cb.cancelled_at is null and cb.deleted_at is null and cb.status = 'booked'
+  ), g as (select e.member_id, bool_or(e.booked) as booked, bool_or(e.in_batch) as in_batch from e group by e.member_id)
+  select m.id, m.full_name, coalesce(m.member_code, m.enquiry_code), g.booked, g.in_batch, a.id is not null, a.check_in
+  from g join public.members m on m.id = g.member_id and m.deleted_at is null
+  left join lateral (
+    select at.id, at.check_in from public.attendance at
+    where at.member_id = m.id and at.batch_id = b.id and at.date = p_date and at.status = 'present' order by at.check_in limit 1
+  ) a on true
+  order by m.full_name;
+end $$;
+
+-- The coach's day (YDL trainer app home).
+create or replace function public.coach_day(p_date date default null)
+returns jsonb language plpgsql stable security definer set search_path = '' as $$
+declare s public.staff; v_date date; v_dow int;
+begin
+  select * into s from public.staff st where st.user_id = (select auth.uid()) and st.role = 'coach' and st.active order by st.created_at limit 1;
+  if s.id is null then raise exception 'Sign in as a coach'; end if;
+  v_date := coalesce(p_date, app.today(s.studio_id));
+  v_dow := extract(isodow from v_date)::int;
+  return jsonb_build_object(
+    'date', v_date,
+    'staff', jsonb_build_object('id', s.id, 'name', s.full_name),
+    'shift', (select jsonb_build_object('check_in', a.check_in, 'check_out', a.check_out) from public.staff_attendance a
+              where a.staff_id = s.id and a.date = v_date order by a.check_in desc limit 1),
+    'classes', (
+      select coalesce(jsonb_agg(x.j order by x.st, x.nm), '[]'::jsonb) from (
+        select coalesce(cs.start_time, b.start_time) as st, coalesce(cs.title, b.name) as nm,
+          jsonb_build_object('id', b.id, 'name', coalesce(cs.title, b.name), 'start_time', coalesce(cs.start_time, b.start_time),
+            'end_time', coalesce(cs.end_time, b.end_time), 'capacity', b.capacity,
+            'expected', (select count(*) from (
+                select bm.member_id from public.batch_members bm join public.members m on m.id = bm.member_id and m.deleted_at is null where bm.batch_id = b.id
+                union
+                select cb.member_id from public.class_bookings cb
+                where cb.batch_id = b.id and cb.class_date = v_date and cb.cancelled_at is null and cb.deleted_at is null and cb.status = 'booked') e),
+            'present', (select count(distinct at.member_id) from public.attendance at where at.batch_id = b.id and at.date = v_date and at.status = 'present')) as j
+        from public.batches b
+        left join public.class_sessions cs on cs.batch_id = b.id and cs.class_date = v_date
+        where b.studio_id = s.studio_id and b.active and v_dow = any (b.days) and s.id = any (coalesce(cs.trainer_ids, b.trainer_ids))
+      ) x),
+    'pt', (
+      select coalesce(jsonb_agg(jsonb_build_object('subscription_id', sub.id, 'member_id', m.id, 'name', m.full_name, 'plan_name', p.name,
+          'sessions_total', sub.sessions_total, 'sessions_used', sub.sessions_used, 'end_date', sub.end_date,
+          'done_today', exists (select 1 from public.attendance at where at.subscription_id = sub.id and at.date = v_date and at.source = 'pt' and at.status <> 'absent'),
+          'last_session', (select max(at.date) from public.attendance at where at.subscription_id = sub.id and at.source = 'pt'))
+        order by m.full_name), '[]'::jsonb)
+      from public.subscriptions sub
+      join public.members m on m.id = sub.member_id and m.deleted_at is null
+      join public.plans p on p.id = sub.plan_id
+      where sub.studio_id = s.studio_id and sub.kind = 'pt' and sub.status = 'live' and sub.deleted_at is null and sub.cancelled_at is null
+        and v_date between sub.start_date and sub.end_date and (sub.trainer_id = s.id or s.id = any (sub.second_trainer_ids))
+        and app.subscription_state(sub) = 'active'),
+    'appointments', (
+      select coalesce(jsonb_agg(jsonb_build_object('id', a.id, 'title', a.title, 'start_time', a.start_time, 'end_time', a.end_time,
+          'status', a.status, 'member_id', a.member_id, 'member_name', m.full_name, 'room_no', a.room_no) order by a.start_time), '[]'::jsonb)
+      from public.appointments a left join public.members m on m.id = a.member_id
+      where a.handled_by = s.id and a.appointment_date = v_date and a.status <> 'cancelled'),
+    'leave', (
+      select coalesce(jsonb_agg(jsonb_build_object('id', l.id, 'start_date', l.start_date, 'end_date', l.end_date, 'mode', l.mode, 'days', l.days,
+          'status', l.status, 'reason', l.reason) order by l.start_date), '[]'::jsonb)
+      from public.leave_requests l where l.staff_id = s.id and not l.cancelled and l.end_date >= v_date));
+end $$;
+
+revoke all on function public.coach_roster(uuid, date), public.coach_day(date) from public, anon;
+revoke all on function app.coaches_class(uuid, date) from public, anon;
+grant execute on function app.coaches_class(uuid, date) to authenticated, service_role;
+call app.apply_grants();
+
 -- ===== seed.sql =====
 -- Shaan Fitness starting setup: the studio and Sabir's owner and coach records.
 -- The studio insert also creates YDL's dropdown lists and service categories.
@@ -9373,6 +10122,9 @@ insert into app.schema_migrations (version) values ('20261011000014_training') o
 insert into app.schema_migrations (version) values ('20261011000015_messaging') on conflict do nothing;
 insert into app.schema_migrations (version) values ('20261012000016_community') on conflict do nothing;
 insert into app.schema_migrations (version) values ('20261012000017_wallet_store') on conflict do nothing;
+insert into app.schema_migrations (version) values ('20261016000018_member_app') on conflict do nothing;
+insert into app.schema_migrations (version) values ('20261016000019_health') on conflict do nothing;
+insert into app.schema_migrations (version) values ('20261016000020_coach_app') on conflict do nothing;
 
 commit;
 

@@ -20,6 +20,17 @@ export default function More() {
   const { theme, personal, defaults, setPersonal, setDefault } = useTheme()
   const s = studio?.settings
   const save = (p: Promise<void>, msg: string) => p.then(() => toast(msg)).catch((e: Error) => toast(e.message))
+  // Member menu entries the gym's App Settings › On/Off Permission switch on.
+  const app = (s?.app ?? {}) as Record<string, unknown>
+  const on = (k: string) => app[k] !== false
+  const health = ([
+    ...(on('allow_workout') || on('is_Diet_PlanAllowed') ? [['/app/analysis', t('analysis.title'), 'chart']] : []),
+    ...(on('is_woplan_allowed') || on('is_Diet_PlanAllowed') ? [['/app/free-plans', t('free.title'), 'dumbbell']] : []),
+    ...(on('allow_recipes') ? [['/app/recipes', t('recipes.title'), 'plate']] : []),
+    ...(on('show_diary') ? [['/app/diary', t('diary.title'), 'edit']] : []),
+    ...(on('can_view_parq_form') ? [['/app/health-form', t('parq.title'), 'doc']] : []),
+    ['/app/tools', t('tools.title'), 'sparkle'],
+  ] as [string, string, string][])
 
   return (
     <>
@@ -44,7 +55,8 @@ export default function More() {
       {isMember && (
         <Section>
           <nav aria-label={t('nav.more')} className="card flex flex-col">
-            {([['/app/memberships', t('account.memberships'), 'receipt'], ['/app/attendance', t('account.attendance'), 'calendar'], ['/app/notifications', t('app.notifications'), 'bell'], ['/app/community', t('community.title'), 'people'], ['/app/challenges', t('community.challenges'), 'trophy'],
+            {([['/app/memberships', t('account.memberships'), 'receipt'], ['/app/attendance', t('account.attendance'), 'calendar'], ['/app/notifications', t('app.notifications'), 'bell'],
+              ['/app/track', t('track.title'), 'heart'], ...health, ['/app/community', t('community.title'), 'people'], ['/app/challenges', t('community.challenges'), 'trophy'],
               ['/app/store', t('shop.title'), 'receipt'], ['/app/wallet', t('wallet.title'), 'rupee'], ['/app/appointments', t('appt.title'), 'clock'],
               ['/app/notices', t('app.notices'), 'doc'], ['/app/rules', t('app.rules'), 'doc'], ['/app/plans', t('app.plans'), 'list'],
               ['/app/coaches', t('app.coaches'), 'person'], ['/app/refer', t('refer.title'), 'userPlus'], ['/app/traffic', t('traffic.title'), 'chart'], ['/app/videos', t('help.videos'), 'help'], ['/app/feedback', t('app.feedback'), 'chat'], ['/app/contact', t('app.contact'), 'phone']] as const).map(([to, label, icon]) => (

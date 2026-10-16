@@ -20,15 +20,17 @@ import { useToast } from '../../components/toast'
 import { Avatar, Icon, Loading, Sheet } from '../../components/ui'
 
 // YDL member page: profile card, membership actions, biometric operations and the tabs
-// Information · Subscriptions · Attendance · Workout · Follow Up History · Client Document · Client Referrals.
+// Information · Subscriptions · Attendance · Workout · Follow Up History · Client Document · Client Referrals,
+// plus Tracking (what the client logs in the member app) and Wallet & Orders.
 
 const TABS: [string, string][] = [
-  ['', 'Information'], ['subscriptions', 'Subscriptions'], ['attendance', 'Attendance'], ['workout', 'Workout'],
+  ['', 'Information'], ['subscriptions', 'Subscriptions'], ['attendance', 'Attendance'], ['workout', 'Workout'], ['tracking', 'Tracking'],
   ['follow-ups', 'Follow Up History'], ['documents', 'Client Document'], ['referrals', 'Client Referrals'], ['wallet', 'Wallet & Orders'],
 ]
 const DESK_TABS = new Set(['wallet'])
 
 const ClientTrainingTab = lazy(() => import('./training/ClientTraining').then((m) => ({ default: m.ClientTrainingTab })))
+const ClientTrackingTab = lazy(() => import('./training/ClientTracking').then((m) => ({ default: m.ClientTrackingTab })))
 const ClientMoneyTab = lazy(() => import('./more/ClientMoney').then((m) => ({ default: m.ClientMoneyTab })))
 
 export default function ClientProfile() {
@@ -151,6 +153,7 @@ export default function ClientProfile() {
           {tab === 'subscriptions' && <SubscriptionsTab subs={all} loading={subs.isLoading} isDesk={isDesk} onEdit={(s) => open('edit', s)} />}
           {tab === 'attendance' && <AttendanceTab memberId={c.id} />}
           {tab === 'workout' && <Suspense fallback={<p className="text-muted">Loading…</p>}><ClientTrainingTab memberId={c.id} name={c.first_name ?? c.full_name} /></Suspense>}
+          {tab === 'tracking' && <Suspense fallback={<p className="text-muted">Loading…</p>}><ClientTrackingTab memberId={c.id} /></Suspense>}
           {tab === 'follow-ups' && <FollowUpsTab memberId={c.id} name={c.full_name} notes={c.notes} kind={c.kind} />}
           {tab === 'documents' && <DocumentsTab memberId={c.id} />}
           {tab === 'referrals' && <ReferralsTab memberId={c.id} />}

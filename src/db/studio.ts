@@ -57,9 +57,11 @@ export function useStaff() {
 
 /** Staff accounts (owner, front desk) and trainers, as YDL lists them separately. */
 export function useTeam() {
-  const { data = [] } = useStaff()
+  const q = useStaff()
+  const data = q.data ?? []
   const active = data.filter((s) => s.active)
   return {
+    ready: q.isSuccess,
     all: data,
     staffAccounts: active.filter((s) => s.role === 'owner' || s.role === 'front_desk'),
     trainers: active.filter((s) => s.role === 'coach'),

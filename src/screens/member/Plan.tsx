@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next'
 import { useMe } from '../../auth'
 import { useStudio } from '../../db/studio'
 import {
-  clock, dietForDay, getDietPlan, getWorkoutPlan, groupMeals, memberPlans, planDayFor, tickExercise, totals, workoutLogs, type WorkoutItem,
+  clock, dietForDay, getDietPlan, getWorkoutPlan, groupMeals, memberPlans, planDayFor, tickExercise, totals, workoutLogs, type DietItem, type WorkoutItem,
 } from '../../db/training'
 import { studioToday } from '../../lib/dates'
 import { isoWeekday } from '../../lib/format'
@@ -13,6 +13,8 @@ import { Notice } from '../../components/controls'
 import { useToast } from '../../components/toast'
 import { Icon, Loading, Sheet } from '../../components/ui'
 import { n1, useTrainingLists } from '../staff/training/common'
+import { foodLogs, logFood, untickPlanItem } from '../../db/health'
+import { FoodList, ProgressBar, useAppFlag } from './Health'
 import { LatestValues, MeasurementForm, MeasurementHistory, ProgressPhotos, useMeasurements, WeightChart } from '../staff/training/progress'
 
 // Member app › Plan: today's workout (tick each exercise off), the diet for each day of the week,
@@ -64,7 +66,8 @@ export default function MemberPlan() {
       {plans.isLoading ? <Loading /> : plans.error ? <Notice tone="error">{(plans.error as Error).message}</Notice> : (
         <>
           {tab === 'workout' && (w ? <WorkoutToday memberId={memberId} planId={w.plan_id} weekdays={w.weekdays} pdf={app.show_workout_pdf === true} /> : <Empty text={t('plan.noWorkout')} />)}
-          {tab === 'diet' && (d ? <DietWeek planId={d.plan_id} macros={app.show_calories_breakdown !== false} pdf={app.show_diet_pdf === true} /> : <Empty text={t('plan.noDiet')} />)}
+          {tab === 'diet' && (d ? <DietWeek memberId={memberId} planId={d.plan_id} macros={app.show_calories_breakdown !== false} pdf={app.show_diet_pdf === true} />
+            : <><Empty text={t('plan.noDiet')} /><TodayOtherFood memberId={memberId} title={t('food.today')} /></>)}
           {tab === 'progress' && <Progress memberId={memberId} />}
         </>
       )}
@@ -136,17 +139,42 @@ function WorkoutToday({ memberId, planId, weekdays, pdf }: { memberId: string; p
   )
 }
 
-function DietWeek({ planId, macros, pdf }: { planId: string; macros: boolean; pdf: boolean }) {
+/** Food I ate today outside my diet plan (or with no plan). */
+function TodayOtherFood({ memberId, title }: { memberId: string; title: string }) {
+  const today = studioToday()
+  const canAdd = useAppFlag('can_add_food', true)
+  const logs = useQuery({ queryKey: ['food-logs', memberId, today, today], queryFn: () => foodLogs(memberId, today, today) })
+  return <section className="card p-4"><FoodList memberId={memberId} date={today} rows={(logs.data ?? []).filter((l) => !l.plan_item_id)} canAdd={canAdd} title={title} /></section>
+}
+
+function DietWeek({ memberId, planId, macros, pdf }: { memberId: string; planId: string; macros: boolean; pdf: boolean }) {
   const { t } = useTranslation()
+  const toast = useToast()
+  const qc = useQueryClient()
   const lists = useTrainingLists()
-  const todayW = isoWeekday(studioToday())
+  const today = studioToday()
+  const todayW = isoWeekday(today)
   const [w, setW] = useState(todayW)
   const q = useQuery({ queryKey: ['diet-plan', planId], queryFn: () => getDietPlan(planId) })
+  const logs = useQuery({ queryKey: ['food-logs', memberId, today, today], queryFn: () => foodLogs(memberId, today, today) })
+  // "I ate this" shows at once; it is undone if saving fails.
+  const [optimistic, setOptimistic] = useState<Record<string, boolean>>({})
+  const settle = (id: string) => setOptimistic((o) => { const n = { ...o }; delete n[id]; return n })
+  const tick = useMutation({
+    mutationFn: ({ item, done }: { item: DietItem; done: boolean }) =>
+      done ? logFood({ memberId, date: today, meal: item.meal, planItemId: item.id, name: item.item_name }).then(() => undefined) : untickPlanItem(memberId, today, item.id),
+    onMutate: ({ item, done }) => setOptimistic((o) => ({ ...o, [item.id]: done })),
+    onSuccess: async (_, { item }) => { await qc.invalidateQueries({ queryKey: ['food-logs', memberId] }); settle(item.id) },
+    onError: (e: Error, { item }) => { settle(item.id); toast(e.message) },
+  })
   if (q.isLoading) return <Loading />
   if (!q.data) return <Notice tone="error">{(q.error as Error)?.message ?? t('plan.noDiet')}</Notice>
   const { plan, items } = q.data
   const list = dietForDay(items, w)
   const tot = totals(list)
+  const isToday = w === todayW
+  const ate = (i: DietItem) => optimistic[i.id] ?? !!logs.data?.some((l) => l.plan_item_id === i.id)
+  const eaten = totals((logs.data ?? []).filter((l) => !l.plan_item_id)).calories + list.filter(ate).reduce((a, i) => a + Number(i.calories), 0)
   const line = (x: { calories: number; protein: number; carbs: number; fats: number }) =>
     t('plan.macros', { kcal: Math.round(Number(x.calories)), p: n1(x.protein), c: n1(x.carbs), f: n1(x.fats) })
   return (
@@ -159,6 +187,13 @@ function DietWeek({ planId, macros, pdf }: { planId: string; macros: boolean; pd
       </div>
       <Chips items={WD.map((k, i) => ({ v: i + 1, label: t(`plan.${k}`) }))} value={w} onChange={setW} label={t('plan.diet')} mark={todayW} markLabel={t('plan.today')} fill />
       {macros && list.length > 0 && <p className="m-0 text-[14px] font-semibold">{line(tot)}</p>}
+      {isToday && (
+        <div className="flex flex-col gap-1.5" aria-live="polite">
+          <p className="m-0 text-[14px] font-semibold">{t('food.eatenOf', { eaten: Math.round(eaten), plan: Math.round(plan.calories_target ?? tot.calories) })}</p>
+          <ProgressBar value={eaten} max={plan.calories_target ?? tot.calories} label={t('track.food')} />
+        </div>
+      )}
+      {!isToday && list.length > 0 && <p className="m-0 text-[13px] text-muted">{t('food.onlyToday')}</p>}
       {list.length === 0 ? <Empty text={t('plan.noMeals')} /> : groupMeals(list, lists.meals).map((m) => (
         <section key={m.meal} className="card overflow-hidden" aria-label={m.meal}>
           <div className="flex items-baseline justify-between gap-2 border-b border-line px-4 py-3">
@@ -168,8 +203,10 @@ function DietWeek({ planId, macros, pdf }: { planId: string; macros: boolean; pd
           <ul className="m-0 flex list-none flex-col p-0">
             {m.items.map((i) => (
               <li key={i.id} className="flex items-start justify-between gap-3 border-b border-line-soft px-4 py-2.5 last:border-b-0">
-                <div className="min-w-0">
-                  <div className="font-semibold">{i.item_name}</div>
+                {isToday && <input type="checkbox" className="check mt-0.5" aria-label={`${t('food.ate')}: ${i.item_name}`} checked={ate(i)} disabled={i.id in optimistic}
+                  onChange={(e) => tick.mutate({ item: i, done: e.target.checked })} />}
+                <div className="min-w-0 flex-1">
+                  <div className={`font-semibold ${isToday && ate(i) ? 'line-through opacity-70' : ''}`}>{i.item_name}</div>
                   {i.notes && <div className="text-[12px] text-muted">{i.notes}</div>}
                   {macros && <div className="text-[12px] text-muted">{line(i)}</div>}
                 </div>
@@ -179,6 +216,7 @@ function DietWeek({ planId, macros, pdf }: { planId: string; macros: boolean; pd
           </ul>
         </section>
       ))}
+      {isToday && <TodayOtherFood memberId={memberId} title={t('food.other')} />}
     </div>
   )
 }

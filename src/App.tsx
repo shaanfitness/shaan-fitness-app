@@ -101,6 +101,13 @@ const memberShop = () => import('./screens/member/Shop')
 const memberServices = () => import('./screens/member/Services')
 const memberBook = () => import('./screens/member/Book')
 const memberAccount = () => import('./screens/member/Account')
+const memberHealth = () => import('./screens/member/Health')
+const memberTools = () => import('./screens/member/Tools')
+const HL = {
+  track: page(memberHealth, 'MemberTrack'), diary: page(memberHealth, 'MemberDiary'), parq: page(memberHealth, 'MemberHealthForm'),
+  tools: page(memberTools, 'MemberTools'), recipes: page(memberTools, 'MemberRecipes'), recipe: page(memberTools, 'MemberRecipe'),
+  freePlans: page(memberTools, 'MemberFreePlans'), analysis: page(memberTools, 'MemberAnalysis'),
+}
 const alertsP = () => import('./screens/staff/Alerts')
 const importsP = () => import('./screens/staff/Imports')
 const MA = {
@@ -421,6 +428,14 @@ export default function App() {
           <Route path="attendance" element={<Lazy c={MA.attendance} />} />
           <Route path="traffic" element={<Lazy c={MA.traffic} />} />
           <Route path="refer" element={<Lazy c={MA.refer} />} />
+          <Route path="track" element={<Lazy c={HL.track} />} />
+          <Route path="diary" element={<Lazy c={HL.diary} />} />
+          <Route path="health-form" element={<Lazy c={HL.parq} />} />
+          <Route path="tools" element={<Lazy c={HL.tools} />} />
+          <Route path="recipes" element={<Lazy c={HL.recipes} />} />
+          <Route path="recipes/:id" element={<Lazy c={HL.recipe} />} />
+          <Route path="free-plans" element={<Lazy c={HL.freePlans} />} />
+          <Route path="analysis" element={<Lazy c={HL.analysis} />} />
           <Route path="contact" element={<AppContact />} />
           <Route path="results" element={<AppResults />} />
         </Route>

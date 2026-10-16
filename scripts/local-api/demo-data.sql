@@ -202,6 +202,24 @@ begin
   from (select id from public.members where studio_id = st and kind = 'member' and first_name in ('Aarav', 'Diya', 'Kiran', 'Meera', 'Sneha', 'Vikram')) x
   cross join generate_series(0, 2) k;
 
+  -- Health tracking in the member app (Part 8b): a free diet plan, and Rohit's last week of water, steps, sleep, meals and diary.
+  insert into public.diet_plans (id, studio_id, name, goal, level, calories_target, instructions, is_public, created_by) values
+    ('00000000-0000-4000-8000-0000000d0003', st, '1500 kcal South Indian Veg (Free)', 'Fat Loss', 'Beginner', 1500, 'Eat slowly. Water before every meal.', true, coach1);
+  insert into public.diet_plan_items (plan_id, weekday, meal, meal_time, seq, recipe_id, item_name, quantity, unit, calories, protein, fats, carbs, fibre) values
+    ('00000000-0000-4000-8000-0000000d0003', 0, 'Breakfast', '08:00', 1, '00000000-0000-4000-8000-0000000c0001', 'Moong Dal Chilla', 2, 'pieces', 230, 12, 6, 30, 5),
+    ('00000000-0000-4000-8000-0000000d0003', 0, 'Lunch', '13:00', 1, null, 'Rice with sambar and vegetables', 1, 'plate', 520, 15, 10, 85, 9),
+    ('00000000-0000-4000-8000-0000000d0003', 0, 'Dinner', '20:00', 1, null, 'Phulka with dal and curd', 1, 'plate', 450, 20, 10, 65, 8);
+  insert into public.member_goals (member_id, water_ml, steps, sleep_hours) values (m, 3000, 8000, 7.5);
+  insert into public.daily_logs (member_id, date, water_ml, steps, sleep_hours, mood)
+  select m, d - k, 1500 + (k * 250) % 1750, 4200 + (k * 1370) % 5600, 6 + (k % 4) * 0.5, 3 + k % 3 from generate_series(1, 6) k;
+  insert into public.food_logs (member_id, date, meal, plan_item_id, name)
+  select m, d - k, i.meal, i.id, i.item_name from public.diet_plan_items i cross join generate_series(1, 5) k
+  where i.plan_id = '00000000-0000-4000-8000-0000000d0001' and i.weekday = 0 and abs(hashtext(i.id::text || k::text)) % 4 <> 0;
+  insert into public.food_logs (member_id, date, meal, name, calories, protein, carbs, fats) values
+    (m, d - 1, 'Evening Snack', 'Masala chai', 90, 3, 12, 3), (m, d - 2, 'Evening Snack', 'Samosa', 260, 4, 30, 14);
+  insert into public.diary_entries (member_id, date, body) values
+    (m, d - 2, 'Legs felt heavy after the squats. Slept early.'), (m, d - 1, 'Good session. Ravi added weight to the goblet squat.');
+
   -- Messages (Part 7b): the automatic WhatsApp of the last days, some sent, a few failed; app notifications for Rohit.
   perform app.queue_scheduled(st, k) from unnest(array['birthday', 'balance_due', 'before_expiry', 'on_expiry', 'after_expiry', 'irregular']) k;
   update public.messages set created_at = created_at - (abs(hashtext(id::text)) % 6) * interval '1 day' where studio_id = st;
@@ -294,5 +312,8 @@ begin
   select st, 'Fitness Test', 'Fitness Test', null, d, '17:00'::time, '17:45'::time, id, coach1, null, 'confirmed', desk from public.members where studio_id = st and first_name = 'Aarav';
   insert into public.appointments (studio_id, title, purpose, comments, appointment_date, start_time, end_time, member_id, status, requested_by_member)
   select st, 'BMI Check', 'BMI Check', 'Evening after 6 works best', d + 2, '18:00', '18:30', id, 'wait_list', true from public.members where studio_id = st and first_name = 'Diya';
+  -- The coach app (Part 8c): Ravi trains the current PT clients and has asked for a day off.
+  update public.subscriptions set trainer_id = coach1 where studio_id = st and kind = 'pt' and d between start_date and end_date;
+  insert into public.leave_requests (studio_id, staff_id, start_date, end_date, mode, reason) values (st, coach1, d + 9, d + 9, 'full', 'Cousin''s wedding');
   perform app.relink_existing_users();
 end $$;
