@@ -109,6 +109,7 @@ const HL = {
   freePlans: page(memberTools, 'MemberFreePlans'), analysis: page(memberTools, 'MemberAnalysis'),
 }
 const alertsP = () => import('./screens/staff/Alerts')
+const MoveFromYdl = lazy(() => import('./screens/staff/MoveFromYdl'))
 const importsP = () => import('./screens/staff/Imports')
 const MA = {
   book: lazy(memberBook), memberships: page(memberAccount, 'MemberMemberships'), attendance: page(memberAccount, 'MemberAttendance'),
@@ -297,6 +298,7 @@ const BUILT: Record<string, { el: ReactNode; roles: Role[] }> = {
   '/notifications': { el: <Lazy c={MA.alerts} />, roles: DESK },
   '/batches/import': { el: <Lazy c={MA.importBatches} />, roles: DESK },
   '/plans/import': { el: <Lazy c={MA.importPlans} />, roles: DESK },
+  '/migrate': { el: <Lazy c={MoveFromYdl} />, roles: ['owner'] },
   '/whatsapp/qr': { el: <Lazy c={MSG.qr} />, roles: ['owner'] },
   '/whatsapp/settings': { el: <Lazy c={MSG.waSettings} />, roles: ['owner'] },
   '/whatsapp/history': { el: <Lazy c={MSG.waHistory} />, roles: DESK },

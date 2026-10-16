@@ -179,6 +179,7 @@ export const NAV: NavNode[] = [
     p('Feedback', '/centers/feedback', '/fitness-centers/feedback/', D, { built: true }),
     p('Dropdown Lists', '/settings/lists', '(every YDL dropdown, made editable)', O, { built: true, extra: true }),
     p('Website', '/settings/website', '(public website: words, contact, what it shows)', O, { built: true, extra: true }),
+    p('Move from YDL', '/migrate', '(bring members, plans sold, receipts and history over from YDL’s CSV exports)', O, { built: true, extra: true }),
   ], 'settings'),
   g('Staff', [
     p('Add Staff Account', '/staff/new', '/fitness-center/account/basic-information/', D, { built: true }),
