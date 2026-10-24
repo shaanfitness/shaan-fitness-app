@@ -1,5 +1,5 @@
 import { Link, Navigate, Outlet, Route, Routes, useLocation } from 'react-router-dom'
-import { Suspense, lazy, useEffect, type ComponentType, type ReactNode } from 'react'
+import { Suspense, lazy, type ComponentType, type ReactNode } from 'react'
 import { AppShell, StaffMenu } from './components/AppShell'
 import { homeFor, useAuth } from './auth'
 import type { Role } from './db/types'
@@ -41,6 +41,7 @@ import ComingSoon from './screens/ComingSoon'
 import { PageHeader } from './components/ui'
 import { MemberShell } from './components/MemberShell'
 import Website from './site/Website'
+import { SITE_ROUTES, SitePage } from './site/pages'
 import Privacy from './site/Privacy'
 import { ForgotPassword, Join, Login, ResetPassword } from './site/Auth'
 import WebsiteSettings from './screens/staff/WebsiteSettings'
@@ -370,14 +371,6 @@ function SignedOutOnly({ children }: { children: ReactNode }) {
 }
 
 // A new page starts at the top (links to #sections on the same page still scroll to them).
-function ScrollToTop() {
-  const { pathname, hash } = useLocation()
-  useEffect(() => {
-    if (hash) document.getElementById(hash.slice(1))?.scrollIntoView()
-    else window.scrollTo(0, 0)
-  }, [pathname, hash])
-  return null
-}
 
 // One address for everything:
 //   /              the public website (plans, timings, coaches, contact, Log in and Join)
@@ -389,9 +382,9 @@ export default function App() {
   const { user } = useAuth()
   return (
     <>
-    <ScrollToTop />
     <Routes>
       <Route path="/" element={<Website />} />
+      {SITE_ROUTES.filter((r) => r.id !== 'home').map((r) => <Route key={r.id} path={r.path} element={<SitePage id={r.id} />} />)}
       <Route path="/privacy" element={<Privacy />} />
       <Route path="/reset-password" element={<ResetPassword />} />
       <Route element={<Gate />}>

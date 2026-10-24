@@ -1,8 +1,9 @@
-"""Click-through of the one-address structure: public website, join (sign-up with email
-confirmation), sign-in that sends each person to their own place, the member app's welcome
+"""Click-through of the one-address structure: the public website (every page, the free trial form), join
+(sign-up with email confirmation), sign-in that sends each person to their own place, the member app's welcome
 view, forgot password, and the owner's website settings — at phone and desktop sizes.
 Runs against the local test stack (fresh stack).
 Usage: python3 scripts/e2e-site.py <base-url> <out-dir>"""
+import re
 import sys
 from pathlib import Path
 
@@ -45,15 +46,59 @@ with sync_playwright() as p:
     page = ctx.new_page()
     watch(page)
     page.goto(BASE + "/")
-    expect(page.get_by_role("heading", level=1)).to_contain_text("Your trusted health partner")
-    expect(page.get_by_role("heading", name="Plans & prices")).to_be_visible()
-    expect(page.get_by_role("heading", name="Timings")).to_be_visible()
-    expect(page.get_by_role("heading", name="Coaches")).to_be_visible()
-    expect(page.get_by_role("heading", name="Visit us")).to_be_visible()
+    expect(page.get_by_role("heading", level=1)).to_contain_text("Kakinada’s coached gym")
+    for h in ["Choose how you train", "The Shaan method", "A day at Shaan", "How joining works", "Questions people ask", "Train with Shaan."]:
+        expect(page.get_by_role("heading", name=h)).to_be_visible()
     expect(page.get_by_role("banner").get_by_role("link", name="Log in")).to_be_visible()
+    expect(page.locator('script[type="application/ld+json"]').first).to_be_attached()
     shot(page, "website-desktop")
-    page.get_by_role("link", name="Choose this plan").first.click()
+
+    # The free trial form: no account needed --------------------------------------------------------------
+    page.get_by_role("button", name="Request my free trial").click()
+    expect(page.get_by_text("Enter your name.")).to_be_visible()
+    page.fill("#sf-l-name", "Kavya Lakshmi")
+    page.fill("#sf-l-phone", "12345")
+    page.get_by_role("button", name="Request my free trial").click()
+    expect(page.get_by_text("Enter a 10-digit mobile number.")).to_be_visible()
+    page.fill("#sf-l-phone", "98480 70101")
+    page.locator("form.sf-form").get_by_text("Weight loss", exact=True).click()
+    page.locator("form.sf-form").get_by_text("Evening", exact=True).click()
+    page.fill("#sf-l-msg", "Knee pain sometimes")
+    page.get_by_role("button", name="Request my free trial").click()
+    expect(page.get_by_text("Thank you, Kavya. We’ll call you soon to fix your trial.")).to_be_visible()
+    shot(page, "free-trial-sent", full=False)
+    page.goto(BASE + "/contact")
+    page.fill("#sf-l-name", "Kavya")
+    page.fill("#sf-l-phone", "9848070101")
+    page.get_by_role("button", name="Request my free trial").click()
+    expect(page.get_by_text("We already have your request")).to_be_visible()
+
+    # Every page answers its own search, with its own title --------------------------------------------------
+    pages = {"/personal-training-kakinada": ("Personal training in Kakinada", "Personal Trainer in Kakinada"),
+             "/group-training-kakinada": ("Coached group training in Kakinada", "Group Fitness Classes in Kakinada"),
+             "/weight-loss-kakinada": ("Weight loss program in Kakinada", "Weight Loss Program in Kakinada"),
+             "/gym-timings": ("Gym timings and batches", "Gym Timings in Kakinada"),
+             "/coaches": ("Meet your coaches", "Fitness Coaches in Kakinada"),
+             "/transformations": ("Real results from real members", "Body Transformations in Kakinada"),
+             "/about": ("About Shaan Fitness", "About Shaan Fitness"),
+             "/contact": ("Visit Shaan Fitness in Kakinada", "Contact Shaan Fitness")}
+    for path, (h1, title) in pages.items():
+        page.goto(BASE + path)
+        expect(page.get_by_role("heading", level=1)).to_have_text(h1)
+        expect(page).to_have_title(re.compile("^" + re.escape(title)))
+    page.get_by_role("button", name="Show the map").click()
+    expect(page.locator("iframe[title^='Map']")).to_be_attached()
+    page.get_by_role("banner").get_by_role("button", name="Training").click()
+    page.get_by_role("banner").get_by_role("link", name="Weight loss").click()
+    page.wait_for_url("**/weight-loss-kakinada")
+    page.get_by_role("banner").get_by_role("link", name="Plans & fees").click()
+    page.wait_for_url("**/membership-plans")
+    expect(page.get_by_role("heading", name="Every plan and fee")).to_be_visible()
+    expect(page.get_by_role("heading", name="Compare the plans")).to_be_visible()
+    shot(page, "plans-desktop")
+    page.get_by_role("link", name="Join online").first.click()
     page.wait_for_url("**/join?plan=*")
+    expect(page.locator("#jfirst")).to_be_visible(timeout=15000)
     expect(page.get_by_text("Plan", exact=True)).to_be_visible()
     shot(page, "join-desktop", full=False)
     page.get_by_role("button", name="Create my account").click()
@@ -100,6 +145,7 @@ with sync_playwright() as p:
     page.wait_for_url("**/dashboard")
     page.goto(BASE + "/follow-ups")
     expect(page.get_by_text("Lakshmi Devi").first).to_be_visible(timeout=8000)
+    expect(page.get_by_text("Kavya Lakshmi").first).to_be_visible()
     page.goto(BASE + "/settings/website")
     expect(page.get_by_role("heading", name="Website", exact=True)).to_be_visible()
     page.fill("#ws-title", "Strong at every age")
@@ -115,7 +161,7 @@ with sync_playwright() as p:
     page.goto(BASE + "/")
     expect(page.get_by_role("heading", level=1)).to_contain_text("Strong at every age")
     expect(page.get_by_role("banner").get_by_role("link", name="Open dashboard")).to_be_visible()
-    expect(page.get_by_text("Main Road, Godari Gunta").first).to_be_visible()
+    expect(page.locator(".sf-foot address")).to_contain_text("Main Road, Godari Gunta")
     page.goto(BASE + "/login")
     page.wait_for_url("**/dashboard")
     ctx.close()
@@ -137,10 +183,17 @@ with sync_playwright() as p:
     page.goto(BASE + "/")
     expect(page.get_by_role("heading", level=1)).to_be_visible()
     shot(page, "website-phone")
+    page.mouse.wheel(0, 1600)
+    page.wait_for_timeout(400)
+    expect(page.locator(".sf-dock")).to_have_class(re.compile("is-up"))
     page.get_by_role("button", name="Menu").click()
-    expect(page.locator("#site-menu").get_by_role("link", name="Join now")).to_be_visible()
+    expect(page.locator("#sf-menu").get_by_role("link", name="Personal training")).to_be_visible()
     shot(page, "website-phone-menu", full=False)
-    page.locator("#site-menu").get_by_role("link", name="Log in").click()
+    page.locator("#sf-menu").get_by_role("link", name="Timings").click()
+    page.wait_for_url("**/gym-timings")
+    expect(page.get_by_role("heading", level=1)).to_have_text("Gym timings and batches")
+    page.get_by_role("button", name="Menu").click()
+    page.locator("#sf-menu").get_by_role("link", name="Log in").click()
     page.wait_for_url("**/login")
     shot(page, "login-phone", full=False)
     page.get_by_role("link", name="Forgot password?").click()
@@ -162,8 +215,15 @@ with sync_playwright() as p:
     ctx = browser.new_context(viewport=PHONE, is_mobile=True, has_touch=True)
     page = ctx.new_page()
     watch(page)
+    page.goto(BASE + "/")
+    page.get_by_role("button", name="Menu").click()
+    page.locator("#sf-menu").get_by_role("button", name="తెలుగు").click()
+    page.locator("#sf-menu").get_by_role("button", name="మెనూ మూసివేయండి").click()
+    expect(page.get_by_role("heading", name="షాన్ పద్ధతి")).to_be_visible()
+    shot(page, "website-telugu", full=False)
+    page.goto(BASE + "/membership-plans")
+    expect(page.get_by_role("heading", level=1)).to_have_text("మెంబర్‌షిప్ ప్లాన్లు, ఫీజులు")
     page.goto(BASE + "/join")
-    page.get_by_role("button", name="తెలుగు").click()
     expect(page.get_by_role("heading", name="Shaan Fitness లో చేరండి")).to_be_visible()
     shot(page, "join-telugu", full=False)
     browser.close()

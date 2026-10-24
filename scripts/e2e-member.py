@@ -57,7 +57,9 @@ def row(text):
 
 ROHIT = sql("select id from members where email = 'member@example.com'")
 COACH = sql("select id from staff where first_name = 'Ravi' and role = 'coach' limit 1")
-TOMORROW = sql("select app.today('00000000-0000-4000-8000-000000000001') + 1")
+# The next day with classes: the demo gym is closed on Sundays.
+TOMORROW = sql("select min(d)::date from generate_series(app.today('00000000-0000-4000-8000-000000000001') + 1, app.today('00000000-0000-4000-8000-000000000001') + 7, interval '1 day') d where extract(isodow from d) <> 7")
+AHEAD = int(sql(f"select '{TOMORROW}'::date - app.today('00000000-0000-4000-8000-000000000001')"))
 
 
 def run(p):
@@ -73,7 +75,7 @@ def run(p):
     # Book a class tomorrow, see it in My bookings, cancel it -----------------------------------------------------------------
     page.get_by_role("link", name="Book").last.click()
     page.wait_for_url("**/app/book")
-    page.get_by_role("tablist", name="Days").get_by_role("tab").nth(1).click()
+    page.get_by_role("tablist", name="Days").get_by_role("tab").nth(AHEAD).click()
     bookable = page.get_by_role("button", name=re.compile(r"^Book "))
     expect(bookable.first).to_be_visible()
     label = bookable.first.get_attribute("aria-label")
