@@ -1,8 +1,9 @@
 // Writes every website page as finished HTML after `vite build` (see the "build" script):
-//   dist/index.html, dist/personal-training-kakinada/index.html, …  the website, with its title, description,
-//                                                                   Open Graph tags and structured data
-//   dist/app.html                                                   the app shell for everything else (/login, /app, /dashboard …)
+//   dist/index.html, dist/personal-training-kakinada.html, …  the website, with its title, description, Open Graph tags
+//                                                             and structured data; hosts serve them at /personal-training-kakinada
+//   dist/app.html, dist/404.html                              the app shell for everything else (/login, /app, /dashboard …)
 //   dist/sitemap.xml, dist/robots.txt
+// Hosting: Cloudflare Pages (public/_worker.js sends unknown addresses to the app shell) or Netlify (netlify.toml).
 // The pages use the gym's live public summary (plans, timings, coaches) read with the public anon key at build time.
 // If it can't be read, the pages are still written, just without those details, and the build carries on.
 import { mkdir, readFile, readdir, writeFile } from 'node:fs/promises'
@@ -12,7 +13,10 @@ import { pathToFileURL } from 'node:url'
 const root = path.resolve(import.meta.dirname, '..')
 const dist = path.join(root, 'dist')
 const ssr = await import(pathToFileURL(path.join(root, 'dist-ssr', 'ssr.js')).href)
-const origin = (process.env.SITE_URL || process.env.URL || ssr.DEFAULT_ORIGIN).replace(/\/+$/, '')
+// The site's public address, for canonical links and the sitemap: SITE_URL if set, else the host's own address.
+// Cloudflare gives each build its own address (https://<build>.<project>.pages.dev); the live one drops the first part.
+const cfLive = process.env.CF_PAGES_URL && process.env.CF_PAGES_BRANCH === 'main' ? process.env.CF_PAGES_URL.replace(/^https:\/\/[^.]+\./, 'https://') : null
+const origin = (process.env.SITE_URL || cfLive || process.env.URL || ssr.DEFAULT_ORIGIN).replace(/\/+$/, '')
 
 async function readSite() {
   if (process.env.PRERENDER_SITE_JSON) return JSON.parse(await readFile(process.env.PRERENDER_SITE_JSON, 'utf8'))
@@ -35,8 +39,10 @@ const site = await readSite()
 const template = await readFile(path.join(dist, 'index.html'), 'utf8')
 const json = (v) => JSON.stringify(v).replace(/[<\u2028\u2029]/g, (ch) => '\\u' + ch.charCodeAt(0).toString(16).padStart(4, '0'))
 
-// The app shell: never indexed by search engines.
-await writeFile(path.join(dist, 'app.html'), template.replace('<head>', '<head>\n    <meta name="robots" content="noindex" />'))
+// The app shell: never indexed by search engines. 404.html is the same shell, so an unknown address still opens the app.
+const shell = template.replace('<head>', '<head>\n    <meta name="robots" content="noindex" />')
+await writeFile(path.join(dist, 'app.html'), shell)
+await writeFile(path.join(dist, '404.html'), shell)
 
 // The website's own font, preloaded so the headline paints in it straight away.
 const assets = await readdir(path.join(dist, 'assets'))
@@ -55,7 +61,7 @@ for (const id of ssr.PAGE_IDS) {
     // The app's theme fonts load without holding up the page.
     .replace(/<link rel="stylesheet" href="(https:\/\/fonts\.googleapis\.com[^"]+)" \/>/, '<link rel="stylesheet" href="$1" media="print" onload="this.media=\'all\'" />')
     .replace('<div id="root"></div>', `<div id="root">${page.html}</div>\n    <script>window.__SITE__ = ${json(site)}</script>`)
-  const file = ssr.PATHS[id] === '/' ? path.join(dist, 'index.html') : path.join(dist, ssr.PATHS[id].slice(1), 'index.html')
+  const file = ssr.PATHS[id] === '/' ? path.join(dist, 'index.html') : path.join(dist, `${ssr.PATHS[id].slice(1)}.html`)
   await mkdir(path.dirname(file), { recursive: true })
   await writeFile(file, html)
   count++
@@ -82,5 +88,5 @@ Disallow: /print/
 
 Sitemap: ${origin}/sitemap.xml
 `)
-console.log(`prerender: ${count} pages for ${origin}${site ? '' : ' (without the gym\'s details)'}, sitemap.xml, robots.txt, app.html`)
+console.log(`prerender: ${count} pages for ${origin}${site ? '' : ' (without the gym\'s details)'}, sitemap.xml, robots.txt, app.html, 404.html`)
 process.exit(0)

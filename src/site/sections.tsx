@@ -14,8 +14,8 @@ const useIsoLayoutEffect = canUseDom ? useLayoutEffect : useEffect
 
 // Hero ---------------------------------------------------------------------------------------------------------------
 /** SHAAN, edge to edge. Letters widen near the pointer (desktop) and condense as you scroll away (phones). */
-function KineticWord({ hostRef }: { hostRef: React.RefObject<HTMLElement | null> }) {
-  const ref = useRef<HTMLDivElement>(null)
+function KineticWord({ hostRef, wordRef }: { hostRef: React.RefObject<HTMLElement | null>; wordRef: React.RefObject<HTMLDivElement | null> }) {
+  const ref = wordRef
   useIsoLayoutEffect(() => {
     const el = ref.current
     if (!el) return
@@ -41,7 +41,7 @@ function KineticWord({ hostRef }: { hostRef: React.RefObject<HTMLElement | null>
     fonts?.load(`${getComputedStyle(el).fontWeight} 100px "Archivo Variable"`).then(fit).catch(() => {})
     fonts?.addEventListener?.('loadingdone', fit)
     return () => { ro.disconnect(); fonts?.removeEventListener?.('loadingdone', fit) }
-  }, [])
+  }, [ref])
   useEffect(() => {
     const host = hostRef.current
     const el = ref.current
@@ -75,7 +75,7 @@ function KineticWord({ hostRef }: { hostRef: React.RefObject<HTMLElement | null>
     }
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => { window.removeEventListener('scroll', onScroll); cancelAnimationFrame(raf) }
-  }, [hostRef])
+  }, [hostRef, ref])
   return (
     <div ref={ref} className="sf-word" aria-hidden="true">
       {'SHAAN'.split('').map((ch, i) => <span key={i} style={{ '--i': i } as CSSProperties}>{ch}</span>)}
@@ -94,25 +94,43 @@ export function LiveChip({ site }: { site: SiteInfo }) {
 export function HomeHero({ site }: { site: SiteInfo | null }) {
   const { c } = useCopy()
   const host = useRef<HTMLElement>(null)
+  const word = useRef<HTMLDivElement>(null)
+  const canvas = useRef<HTMLCanvasElement>(null)
   const wa = whatsappLink(site?.website.whatsapp || site?.studio.mobile, c.lead.waText)
+  // The stage lights start once the page has painted, so they never hold up the first view.
+  useEffect(() => {
+    const cv = canvas.current, h = host.current, w = word.current
+    if (!cv || !h || !w) return
+    let rig: { stop: () => void } | null = null, cancelled = false
+    const begin = () => import('./light').then(({ startLightRig }) => {
+      if (!cancelled) rig = startLightRig(cv, h, [...w.children] as HTMLElement[], prefersReducedMotion())
+    })
+    const ric = (window as { requestIdleCallback?: (f: () => void, o?: { timeout: number }) => number }).requestIdleCallback
+    const id = ric ? ric(begin, { timeout: 900 }) : window.setTimeout(begin, 250)
+    return () => {
+      cancelled = true
+      const cic = (window as { cancelIdleCallback?: (n: number) => void }).cancelIdleCallback
+      if (ric && cic) cic(id); else window.clearTimeout(id)
+      rig?.stop()
+    }
+  }, [])
   return (
     <section ref={host} className="sf-hero sf-intro" aria-labelledby="sf-h1">
       <div className="sf-hero-bg" />
+      <canvas ref={canvas} className="sf-light" aria-hidden="true" />
       {site?.website.hero_image_url && /^https:\/\//.test(site.website.hero_image_url) && <img className="sf-hero-photo" src={site.website.hero_image_url} alt="" />}
-      <Crest className="sf-crest" />
-      <div className="sf-wrap" style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
+      <div className="sf-wrap sf-hero-inner">
         <div className="sf-hero-body">
           {site ? <div style={{ '--d': 0 } as CSSProperties}><LiveChip site={site} /></div> : null}
           <h1 id="sf-h1" className="sf-h1" style={{ '--d': 1 } as CSSProperties}>{site?.website.hero_title || c.hero.h1}</h1>
           <p className="sf-lede" style={{ '--d': 2 } as CSSProperties}>{site?.website.hero_text || c.hero.sub}</p>
           <div className="sf-ctas" style={{ '--d': 3 } as CSSProperties}>
             <a href="#free-trial" className="sf-btn sf-btn-red sf-magnet">{c.nav.trial}</a>
-            {wa ? <a href={wa} target="_blank" rel="noreferrer" className="sf-btn sf-magnet">{Ic.whatsapp(18)}{c.nav.whatsapp}</a>
-              : <Link to={PATHS.plans} viewTransition className="sf-btn sf-magnet">{c.common.seePlans}</Link>}
+            {wa ? <a href={wa} target="_blank" rel="noreferrer" className="sf-btn sf-btn-glass sf-magnet">{Ic.whatsapp(18)}{c.nav.whatsapp}</a>
+              : <Link to={PATHS.plans} viewTransition className="sf-btn sf-btn-glass sf-magnet">{c.common.seePlans}</Link>}
           </div>
         </div>
-        <KineticWord hostRef={host} />
-        {site && <Facts site={site} />}
+        <KineticWord hostRef={host} wordRef={word} />
       </div>
     </section>
   )
@@ -287,31 +305,145 @@ export function PlanTable({ site }: { site: SiteInfo }) {
   )
 }
 
-// Method -----------------------------------------------------------------------------------------------------------------
+// Method: a filmstrip. On a computer the strip slides sideways as you scroll down; on a phone you swipe it. -----------
 export function Method() {
   const { c } = useCopy()
-  const [open, setOpen] = useState(0)
+  const section = useRef<HTMLElement>(null)
+  const track = useRef<HTMLDivElement>(null)
+  const [active, setActive] = useState(0)
+  const n = c.method.pillars.length
+  useEffect(() => {
+    const sec = section.current, tr = track.current
+    if (!sec || !tr) return
+    const pinned = () => window.matchMedia('(min-width: 900px) and (prefers-reduced-motion: no-preference)').matches
+    let raf = 0
+    const update = () => {
+      raf = 0
+      if (!pinned()) { tr.style.transform = ''; return }
+      const r = sec.getBoundingClientRect()
+      const span = Math.max(1, r.height - window.innerHeight)
+      const p = Math.min(1, Math.max(0, -r.top / span))
+      const win = tr.parentElement!, cs = getComputedStyle(win)
+      const max = Math.max(0, tr.scrollWidth - (win.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight)))
+      tr.style.transform = `translate3d(${(-p * max).toFixed(1)}px, 0, 0)`
+      sec.style.setProperty('--p', p.toFixed(4))
+      setActive(Math.min(n - 1, Math.round(p * (n - 1))))
+    }
+    const on = () => { if (!raf) raf = requestAnimationFrame(update) }
+    update()
+    window.addEventListener('scroll', on, { passive: true })
+    window.addEventListener('resize', on)
+    // Phones: the frame in the middle of the swipe is the one lit.
+    const io = new IntersectionObserver((es) => {
+      if (pinned()) return
+      es.forEach((e) => { if (e.isIntersecting) setActive(Number((e.target as HTMLElement).dataset.i)) })
+    }, { root: tr.parentElement, threshold: 0.6 })
+    ;[...tr.children].forEach((el) => io.observe(el))
+    return () => { window.removeEventListener('scroll', on); window.removeEventListener('resize', on); cancelAnimationFrame(raf); io.disconnect() }
+  }, [n])
   return (
-    <section className="sf-section is-ink" aria-labelledby="sf-method">
-      <div className="sf-wrap">
-        <div className="sf-head-split">
+    <section ref={section} className="sf-film" style={{ '--n': n } as CSSProperties} aria-labelledby="sf-method">
+      <div className="sf-film-stage">
+        <div className="sf-wrap sf-film-head">
           <h2 id="sf-method" className="sf-h2">{c.method.title}</h2>
           <p className="sf-lede">{c.method.sub}</p>
         </div>
-        <div className="sf-pillars">
-          {c.method.pillars.map((p, i) => (
-            <div key={p.name} className={`sf-pillar ${open === i ? 'is-open' : ''}`}>
-              <h3 style={{ margin: 0 }}>
-                <button type="button" aria-expanded={open === i} aria-controls={`sf-pillar-${i}`} onClick={() => setOpen(i)}>
-                  <span className="sf-pillar-word">{p.name}</span><span className="sf-pillar-label">{p.label}</span>
-                </button>
-              </h3>
-              <div className="sf-pillar-body" id={`sf-pillar-${i}`} role="region" aria-label={p.name}>
-                <div><div className="sf-pillar-inner">{GLYPHS[p.name]}<p>{p.text}</p></div></div>
-              </div>
-            </div>
-          ))}
+        <div className="sf-film-window">
+          <div ref={track} className="sf-film-track">
+            {c.method.pillars.map((p, i) => (
+              <article key={p.name} data-i={i} className={`sf-frame ${active === i ? 'is-on' : ''}`} aria-label={`${p.name}: ${p.label}`}>
+                <div className="sf-frame-top"><span className="sf-frame-label">{p.label}</span>{GLYPHS[p.name]}</div>
+                <h3 className="sf-frame-word">{p.name}</h3>
+                <p>{p.text}</p>
+              </article>
+            ))}
+          </div>
         </div>
+        <div className="sf-wrap"><div className="sf-film-progress" aria-hidden="true"><i /></div></div>
+      </div>
+    </section>
+  )
+}
+
+// The studio, drawn as an isometric floor with five zones that light up in turn. -------------------------------------
+const ISO = (x: number, y: number, z = 0) => [(x - y) * 0.866 + 60, (x + y) * 0.5 - z + 8] as const
+const ZONES: [number, number, number, number][] = [[0, 0, 46, 38], [46, 0, 100, 26], [46, 26, 76, 64], [76, 26, 100, 64], [0, 38, 46, 64]]
+const pts = (list: (readonly [number, number])[]) => list.map(([x, y]) => `${Math.round(x * 100) / 100},${Math.round(y * 100) / 100}`).join(' ')
+function StudioArt() {
+  const H = 5, g = 1.4
+  return (
+    <svg className="sf-iso" viewBox="0 0 150 104" aria-hidden="true" focusable="false">
+      <defs>
+        <linearGradient id="sf-zone-lit" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#FF4659" /><stop offset="1" stopColor="#7A1020" /></linearGradient>
+        <linearGradient id="sf-zone-rim" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#5C7DFF" /><stop offset="1" stopColor="#14246E" /></linearGradient>
+      </defs>
+      <polygon points={pts([ISO(-2, -2), ISO(102, -2), ISO(102, 66), ISO(-2, 66)])} fill="#0E0E16" stroke="rgba(242,239,233,.16)" strokeWidth=".4" />
+      {ZONES.map(([x0, y0, x1, y1], i) => {
+        const a = x0 + g, b = y0 + g, cx = x1 - g, cy = y1 - g
+        return (
+          <g key={i} className={`sf-zone ${i % 2 ? 'is-rim' : ''}`} style={{ '--z': i } as CSSProperties}>
+            <polygon className="sf-zone-side" points={pts([ISO(a, cy, H), ISO(cx, cy, H), ISO(cx, cy, 0), ISO(a, cy, 0)])} />
+            <polygon className="sf-zone-side is-r" points={pts([ISO(cx, b, H), ISO(cx, cy, H), ISO(cx, cy, 0), ISO(cx, b, 0)])} />
+            <polygon className="sf-zone-top" points={pts([ISO(a, b, H), ISO(cx, b, H), ISO(cx, cy, H), ISO(a, cy, H)])} />
+            <polygon className="sf-zone-glow" points={pts([ISO(a, b, H), ISO(cx, b, H), ISO(cx, cy, H), ISO(a, cy, H)])} />
+          </g>
+        )
+      })}
+    </svg>
+  )
+}
+
+export function Studio({ site }: { site: SiteInfo }) {
+  const { c } = useCopy()
+  const ref = useRef<HTMLElement>(null)
+  const seen = useInView(ref)
+  const spans = openSpans(site)
+  const days = [1, 2, 3, 4, 5, 6, 7].filter((d) => spans[d].length).length
+  const facts: [string, string][] = [['2,200', c.studio.size], ['5', c.studio.zones]]
+  // What a visitor cares about; everyday items (toilet, wifi, the biometric reader) stay off the list.
+  const amenities = site.studio.facilities.filter((f) => !/toilet|wifi|wi-fi|biometric|^training$/i.test(f.trim())).slice(0, 10)
+  if (days) facts.push([String(days), c.facts.days])
+  if (site.batches.length) facts.push([String(site.batches.length), c.facts.batches])
+  return (
+    <section ref={ref} className={`sf-section sf-studio ${seen ? 'is-in' : ''}`} aria-labelledby="sf-studio">
+      <div className="sf-wrap sf-studio-grid">
+        <div className="sf-studio-copy">
+          <h2 id="sf-studio" className="sf-h2">{c.studio.title}</h2>
+          <p className="sf-lede">{c.studio.text}</p>
+          <dl className="sf-stats">{facts.map(([v, l]) => <div key={l}><dt>{l}</dt><dd>{v}</dd></div>)}</dl>
+          {amenities.length > 0 && <ul className="sf-tags sf-tags-lg">{amenities.map((f) => <li key={f}>{f}</li>)}</ul>}
+        </div>
+        <StudioArt />
+      </div>
+    </section>
+  )
+}
+
+// Absolute Athleticism: 18 weeks, three phases, drawn as three rising steps. ---------------------------------------------
+export function Athletic() {
+  const { c } = useCopy()
+  const ref = useRef<HTMLElement>(null)
+  const seen = useInView(ref)
+  const a = c.athletic
+  return (
+    <section ref={ref} className={`sf-section sf-athletic ${seen ? 'is-in' : ''}`} aria-labelledby="sf-athletic">
+      <div className="sf-wrap sf-athletic-grid">
+        <div className="sf-athletic-copy">
+          <h2 id="sf-athletic" className="sf-h2">{a.title}</h2>
+          <p className="sf-lede">{a.sub}</p>
+          <p className="sf-athletic-weeks"><b>18</b><span>{a.weeks}</span></p>
+          <p className="sf-small">{a.note}</p>
+          <div><a href="#free-trial" className="sf-btn sf-btn-red sf-magnet" data-plan="Absolute Athleticism" data-tier="elite">{a.cta}</a></div>
+        </div>
+        <ol className="sf-phases">
+          {a.phases.map((p, i) => (
+            <li key={p.t} style={{ '--k': i } as CSSProperties}>
+              <div className="sf-phase-bar" />
+              <h3>{p.t}</h3>
+              <p>{p.d}</p>
+            </li>
+          ))}
+        </ol>
       </div>
     </section>
   )
@@ -452,7 +584,7 @@ export function CoachGrid({ site, limit, heading = true }: { site: SiteInfo; lim
             <p className="sf-lede">{c.coaches.sub}</p>
           </div>
         )}
-        <div className="sf-coaches">
+        <div className={`sf-coaches ${list.length === 1 ? 'is-one' : ''}`}>
           {list.map((t, i) => (
             <article key={t.id} className="sf-coach sf-spot">
               <div className="sf-coach-pic">
@@ -642,12 +774,13 @@ export function Cta({ site, page }: { site: SiteInfo | null; page: PageId }) {
   const phone = site?.studio.mobile
   return (
     <section id="free-trial" className="sf-cta" aria-labelledby="sf-cta-h">
+      <Crest className="sf-cta-crest" />
       <div className="sf-wrap sf-cta-row">
         <div style={{ display: 'grid', gap: 24, alignSelf: 'center' }}>
           <h2 id="sf-cta-h">{c.cta.title}</h2>
           <p>{c.cta.text}</p>
           <p style={{ fontSize: 16 }}>{c.lead.sub}</p>
-          {phone && <div><a href={telLink(phone) ?? undefined} className="sf-btn sf-magnet">{Ic.phone(18)}{prettyPhone(phone)}</a></div>}
+          {phone && <div><a href={telLink(phone) ?? undefined} className="sf-btn sf-btn-glass sf-magnet">{Ic.phone(18)}{prettyPhone(phone)}</a></div>}
         </div>
         <LeadForm site={site} page={page} />
       </div>

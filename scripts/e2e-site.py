@@ -47,7 +47,7 @@ with sync_playwright() as p:
     watch(page)
     page.goto(BASE + "/")
     expect(page.get_by_role("heading", level=1)).to_contain_text("Kakinada’s coached gym")
-    for h in ["Choose how you train", "The Shaan method", "A day at Shaan", "How joining works", "Questions people ask", "Train with Shaan."]:
+    for h in ["The Shaan method", "Choose how you train", "2,200 sq ft. Five zones.", "Absolute Athleticism", "A day at Shaan", "Questions people ask", "Train with Shaan."]:
         expect(page.get_by_role("heading", name=h)).to_be_visible()
     expect(page.get_by_role("banner").get_by_role("link", name="Log in")).to_be_visible()
     expect(page.locator('script[type="application/ld+json"]').first).to_be_attached()

@@ -4,19 +4,13 @@ import { PATHS, type Copy, type PageId } from './content'
 import { faqFor, openSpans, tierGroups } from './data'
 import { SiteLayout, useCopy } from './layout'
 import {
-  AppShowcase, BmiCheck, Cards, Checks, CoachGrid, CompareTable, ContactBlock, Cta, DayRail, Faq, HomeHero, HoursTable, JoinSteps,
-  Manifesto, Marquee, Method, PageHero, PlanTable, ResultsGrid, Section, Tiers,
+  AppShowcase, Athletic, BmiCheck, Cards, Checks, CoachGrid, CompareTable, ContactBlock, Cta, DayRail, Faq, HomeHero, HoursTable, JoinSteps,
+  Manifesto, Marquee, Method, PageHero, PlanTable, ResultsGrid, Section, Studio, Tiers,
 } from './sections'
 import { useHead } from './seo'
 
 // One component per page. Each page answers one search ("personal trainer in Kakinada", "gym timings", …), ends with
 // its own questions (also sent to Google as FAQ data) and the free trial form.
-
-function Facilities({ site }: { site: SiteInfo }) {
-  const list = site.studio.facilities
-  if (!list.length) return null
-  return <ul className="sf-tags sf-tags-lg">{list.map((f) => <li key={f}>{f}</li>)}</ul>
-}
 
 function Story({ title, text, aside }: { title: string; text: string; aside?: ReactNode }) {
   return (
@@ -43,14 +37,13 @@ function Body({ id, site }: { id: PageId; site: SiteInfo | null }) {
         <HomeHero site={site} />
         {site && <Marquee site={site} />}
         <Manifesto />
-        {site && <Tiers site={site} />}
         <Method />
-        {site && <DayRail site={site} />}
+        {site && <Tiers site={site} />}
+        {site && <Studio site={site} />}
+        <Athletic />
         {site && <CoachGrid site={site} limit={3} />}
-        <JoinSteps />
-        <AppShowcase />
         {site && <ResultsGrid site={site} />}
-        <BmiCheck />
+        {site && <DayRail site={site} />}
       </>
     )
   }
@@ -66,6 +59,7 @@ function Body({ id, site }: { id: PageId; site: SiteInfo | null }) {
           <Section title={c.personal.forTitle} tone="deep"><Cards items={c.personal.for} /></Section>
           {site && <Tiers site={site} only={['semi', 'elite']} title={c.nav.personal} max={6} />}
           {semi && <Section tone="ink"><Story title={c.personal.semiTitle} text={c.personal.semiText} /></Section>}
+          <Athletic />
           {site && <CoachGrid site={site} limit={3} />}
           <AppShowcase />
         </>
@@ -156,7 +150,7 @@ function Body({ id, site }: { id: PageId; site: SiteInfo | null }) {
           {top}
           <Section><Story title={c.about.storyTitle} text={c.about.story} /></Section>
           <Manifesto />
-          <Section title={c.about.spaceTitle} sub={c.about.space}>{site && <Facilities site={site} />}</Section>
+          {site ? <Studio site={site} /> : <Section title={c.about.spaceTitle} sub={c.about.space}><span /></Section>}
           <Section title={c.about.valuesTitle} tone="deep"><Cards items={c.about.values} /></Section>
           {site && <CoachGrid site={site} limit={3} />}
         </>
