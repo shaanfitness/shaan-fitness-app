@@ -49,6 +49,10 @@ const assets = await readdir(path.join(dist, 'assets'))
 const font = assets.find((f) => /^archivo-latin-wdth-normal.*\.woff2$/.test(f))
 const preload = font ? `<link rel="preload" href="/assets/${font}" as="font" type="font/woff2" crossorigin />` : ''
 
+// Home only: on the first visit in a session, a black screen covers the page until the opening loader takes over
+// (hero/CineHero.tsx), so the static page never flashes first. It lifts itself after 9 seconds whatever happens.
+const introVeil = `<script>(function(){try{var d=document.documentElement;if(sessionStorage.getItem('sf.intro'))return;if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;d.setAttribute('data-intro','1');setTimeout(function(){d.removeAttribute('data-intro')},9000)}catch(e){}})()</script>`
+
 let count = 0
 for (const id of ssr.PAGE_IDS) {
   const page = ssr.renderPage(id, site, origin)
@@ -57,7 +61,7 @@ for (const id of ssr.PAGE_IDS) {
     .replace('<html lang="en">', '<html lang="en" data-prerendered="1">')
     .replace(/<title>[^<]*<\/title>/, '')
     .replace(/<meta name="description"[^>]*>/, '')
-    .replace('</head>', `    ${page.head}\n    ${preload}\n  </head>`)
+    .replace('</head>', `    ${page.head}\n    ${preload}\n    ${id === 'home' ? introVeil : ''}\n  </head>`)
     // The app's theme fonts load without holding up the page.
     .replace(/<link rel="stylesheet" href="(https:\/\/fonts\.googleapis\.com[^"]+)" \/>/, '<link rel="stylesheet" href="$1" media="print" onload="this.media=\'all\'" />')
     .replace('<div id="root"></div>', `<div id="root">${page.html}</div>\n    <script>window.__SITE__ = ${json(site)}</script>`)

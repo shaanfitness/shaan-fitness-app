@@ -1,160 +1,22 @@
-import { useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react'
+import { useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import { siteHours, telLink, whatsappLink, prettyPhone, mapsLink, type SiteInfo } from '../db/site'
 import { supabase } from '../lib/supabase'
 import { Crest, GLYPHS, Ic, PAGE_ART, RatioArt, cosd, sind } from './art'
 import { PATHS, fill, type PageId } from './content'
-import { MEMBERS, addressText, batchTier, clock, cycle, liveStatus, openSpans, rupees, salePlans, services, term, tierGroups, tierOf, type Tier } from './data'
-import { canUseDom, prefersReducedMotion, useCountUp, useInView, useNow } from './motion'
+import { MEMBERS, addressText, batchTier, clock, liveStatus, openSpans, rupees, services, term, tierGroups, tierOf, type Tier } from './data'
+import { prefersReducedMotion, useInView, useNow } from './motion'
 import { useCopy } from './layout'
 
 // The website's sections. Data comes from the CRM's public summary (site); copy from content.ts.
 
-const useIsoLayoutEffect = canUseDom ? useLayoutEffect : useEffect
-
-// Hero ---------------------------------------------------------------------------------------------------------------
-/** SHAAN, edge to edge. Letters widen near the pointer (desktop) and condense as you scroll away (phones). */
-function KineticWord({ hostRef, wordRef }: { hostRef: React.RefObject<HTMLElement | null>; wordRef: React.RefObject<HTMLDivElement | null> }) {
-  const ref = wordRef
-  useIsoLayoutEffect(() => {
-    const el = ref.current
-    if (!el) return
-    // Measure "SHAAN" at rest (no animation, normal width) with a hidden copy, so a letter that is mid-animation
-    // or a font still loading never throws the size off. The stylesheet has a close first guess for the static page.
-    const fit = () => {
-      const cs = getComputedStyle(el)
-      const probe = document.createElement('span')
-      probe.textContent = 'SHAAN'
-      probe.style.cssText = 'position:absolute;left:-9999px;top:0;visibility:hidden;white-space:nowrap;font-size:100px;font-stretch:100%;line-height:1'
-      probe.style.fontFamily = cs.fontFamily
-      probe.style.fontWeight = cs.fontWeight
-      probe.style.letterSpacing = '-2px'
-      document.body.appendChild(probe)
-      const used = probe.getBoundingClientRect().width
-      probe.remove()
-      if (used > 0 && el.clientWidth > 0) el.style.setProperty('--word-size', `${Math.floor((el.clientWidth / used) * 100 * 0.97)}px`)
-    }
-    fit()
-    const ro = new ResizeObserver(fit)
-    ro.observe(el)
-    const fonts = document.fonts
-    fonts?.load(`${getComputedStyle(el).fontWeight} 100px "Archivo Variable"`).then(fit).catch(() => {})
-    fonts?.addEventListener?.('loadingdone', fit)
-    return () => { ro.disconnect(); fonts?.removeEventListener?.('loadingdone', fit) }
-  }, [ref])
-  useEffect(() => {
-    const host = hostRef.current
-    const el = ref.current
-    if (!host || !el || prefersReducedMotion()) return
-    const letters = [...el.children] as HTMLElement[]
-    const fine = window.matchMedia('(hover: hover) and (pointer: fine)').matches
-    const reset = () => letters.forEach((l) => { l.style.setProperty('--w', '100%'); l.classList.remove('is-hot') })
-    if (fine) {
-      const onMove = (e: PointerEvent) => {
-        let best = -1, bestD = Infinity
-        letters.forEach((l, i) => {
-          const r = l.getBoundingClientRect()
-          const d = (e.clientX - (r.left + r.width / 2)) / r.width
-          const w = 74 + 51 * Math.exp(-(d * d) / 0.9)
-          l.style.setProperty('--w', `${w.toFixed(1)}%`)
-          if (Math.abs(d) < bestD) { bestD = Math.abs(d); best = i }
-        })
-        letters.forEach((l, i) => l.classList.toggle('is-hot', i === best && bestD < .6))
-      }
-      host.addEventListener('pointermove', onMove)
-      host.addEventListener('pointerleave', reset)
-      return () => { host.removeEventListener('pointermove', onMove); host.removeEventListener('pointerleave', reset) }
-    }
-    let raf = 0
-    const onScroll = () => {
-      cancelAnimationFrame(raf)
-      raf = requestAnimationFrame(() => {
-        const p = Math.min(1, Math.max(0, window.scrollY / Math.max(1, host.clientHeight * .8)))
-        letters.forEach((l, i) => l.style.setProperty('--w', `${(100 - p * (26 + i * 4)).toFixed(1)}%`))
-      })
-    }
-    window.addEventListener('scroll', onScroll, { passive: true })
-    return () => { window.removeEventListener('scroll', onScroll); cancelAnimationFrame(raf) }
-  }, [hostRef, ref])
-  return (
-    <div ref={ref} className="sf-word" aria-hidden="true">
-      {'SHAAN'.split('').map((ch, i) => <span key={i} style={{ '--i': i } as CSSProperties}>{ch}</span>)}
-    </div>
-  )
-}
-
+// Live status ---------------------------------------------------------------------------------------------------------
 export function LiveChip({ site }: { site: SiteInfo }) {
   const { c } = useCopy()
   const now = useNow()
   if (!now) return <span className="sf-live" aria-hidden="true" style={{ visibility: 'hidden' }}><span className="sf-dot" />&nbsp;</span>
   const st = liveStatus(site, now, c)
   return <span className="sf-live" role="status"><span className={`sf-dot ${st.open ? 'is-open' : ''}`} />{st.text}</span>
-}
-
-export function HomeHero({ site }: { site: SiteInfo | null }) {
-  const { c } = useCopy()
-  const host = useRef<HTMLElement>(null)
-  const word = useRef<HTMLDivElement>(null)
-  const canvas = useRef<HTMLCanvasElement>(null)
-  const wa = whatsappLink(site?.website.whatsapp || site?.studio.mobile, c.lead.waText)
-  // The stage lights start once the page has painted, so they never hold up the first view.
-  useEffect(() => {
-    const cv = canvas.current, h = host.current, w = word.current
-    if (!cv || !h || !w) return
-    let rig: { stop: () => void } | null = null, cancelled = false
-    const begin = () => import('./light').then(({ startLightRig }) => {
-      if (!cancelled) rig = startLightRig(cv, h, [...w.children] as HTMLElement[], prefersReducedMotion())
-    })
-    const ric = (window as { requestIdleCallback?: (f: () => void, o?: { timeout: number }) => number }).requestIdleCallback
-    const id = ric ? ric(begin, { timeout: 900 }) : window.setTimeout(begin, 250)
-    return () => {
-      cancelled = true
-      const cic = (window as { cancelIdleCallback?: (n: number) => void }).cancelIdleCallback
-      if (ric && cic) cic(id); else window.clearTimeout(id)
-      rig?.stop()
-    }
-  }, [])
-  return (
-    <section ref={host} className="sf-hero sf-intro" aria-labelledby="sf-h1">
-      <div className="sf-hero-bg" />
-      <canvas ref={canvas} className="sf-light" aria-hidden="true" />
-      {site?.website.hero_image_url && /^https:\/\//.test(site.website.hero_image_url) && <img className="sf-hero-photo" src={site.website.hero_image_url} alt="" />}
-      <div className="sf-wrap sf-hero-inner">
-        <div className="sf-hero-body">
-          {site ? <div style={{ '--d': 0 } as CSSProperties}><LiveChip site={site} /></div> : null}
-          <h1 id="sf-h1" className="sf-h1" style={{ '--d': 1 } as CSSProperties}>{site?.website.hero_title || c.hero.h1}</h1>
-          <p className="sf-lede" style={{ '--d': 2 } as CSSProperties}>{site?.website.hero_text || c.hero.sub}</p>
-          <div className="sf-ctas" style={{ '--d': 3 } as CSSProperties}>
-            <a href="#free-trial" className="sf-btn sf-btn-red sf-magnet">{c.nav.trial}</a>
-            {wa ? <a href={wa} target="_blank" rel="noreferrer" className="sf-btn sf-btn-glass sf-magnet">{Ic.whatsapp(18)}{c.nav.whatsapp}</a>
-              : <Link to={PATHS.plans} viewTransition className="sf-btn sf-btn-glass sf-magnet">{c.common.seePlans}</Link>}
-          </div>
-        </div>
-        <KineticWord hostRef={host} wordRef={word} />
-      </div>
-    </section>
-  )
-}
-
-function Fact({ value, label, run, box }: { value: number; label: string; run: boolean; box: React.RefObject<HTMLDivElement | null> }) {
-  const n = useCountUp(value, run, 1200, box)
-  return <div><b>{n}</b><span>{label}</span></div>
-}
-export function Facts({ site }: { site: SiteInfo }) {
-  const { c } = useCopy()
-  const ref = useRef<HTMLDivElement>(null)
-  const seen = useInView(ref)
-  const spans = openSpans(site)
-  const days = [1, 2, 3, 4, 5, 6, 7].filter((d) => spans[d].length).length
-  const cy = cycle(site)
-  const tiers = new Set(salePlans(site).map(tierOf)).size
-  const items: [number, string][] = []
-  if (days) items.push([days, c.facts.days])
-  if (site.batches.length) items.push([site.batches.length, c.facts.batches])
-  if (cy?.sessions) items.push([cy.sessions, c.facts.sessions])
-  if (tiers) items.push([tiers, c.facts.ways])
-  if (!items.length) return null
-  return <div ref={ref} className="sf-facts">{items.map(([v, l]) => <Fact key={l} value={v} label={l} run={seen} box={ref} />)}</div>
 }
 
 export function Marquee({ site }: { site: SiteInfo }) {

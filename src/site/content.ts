@@ -133,6 +133,16 @@ const en = {
     screens: ['Today’s workout', 'Diet', 'Water', 'Progress'],
     w1: 'Goblet squat', w2: 'Bench press', w3: 'Lat pull-down', w4: 'Plank', done: '3 of 4 done', glasses: '6 of 12 glasses', lost: '−3.6 kg in 40 days',
   },
+  cine: {
+    place: 'Shaan Fitness // Kakinada', scroll: 'Scroll',
+    chapters: ['Pride', 'Coached', 'Planned', 'Ignite'],
+    h1a: 'Kakinada’s', h1b: 'coached gym.',
+    lede: 'Personal training, group training and fat loss, six days a week at Godari Gunta. Scroll to step inside.',
+    c2a: 'Every rep,', c2b: 'coached.', c2: 'Your coach plans your block, watches every set and tracks your progress week by week.',
+    quote: 'Shaan means pride. The quiet kind you earn before sunrise.',
+    c3a: 'Planned for', c3b: 'your body.', c3: 'An assessment first, then a written plan, a diet built around home food, and every session logged in the Shaan app.',
+    c4a: 'Train with', c4b: 'Shaan.', c4: 'Your first session is on us.',
+  },
   studio: {
     title: '2,200 sq ft. Five zones.',
     text: 'One floor at PNR Enclave, Godari Gunta, with five training zones, and steam and sauna to finish.',
@@ -345,6 +355,16 @@ const te: Copy = {
     sub: 'సభ్యులకు షాన్ యాప్: ఈరోజు వర్కౌట్ టిక్ చేయడం, “ఇది తిన్నాను”తో డైట్ ప్లాన్, నీళ్లు, నిద్ర ట్రాకింగ్, క్లాస్ బుకింగ్, ప్రోగ్రెస్ చార్టులు.',
     screens: ['ఈరోజు వర్కౌట్', 'డైట్', 'నీళ్లు', 'ప్రోగ్రెస్'],
     w1: 'గాబ్లెట్ స్క్వాట్', w2: 'బెంచ్ ప్రెస్', w3: 'లాట్ పుల్-డౌన్', w4: 'ప్లాంక్', done: '4లో 3 పూర్తి', glasses: '12లో 6 గ్లాసులు', lost: '40 రోజుల్లో −3.6 కేజీ',
+  },
+  cine: {
+    place: 'షాన్ ఫిట్‌నెస్ // కాకినాడ', scroll: 'స్క్రోల్ చేయండి',
+    chapters: ['గర్వం', 'కోచింగ్', 'ప్లాన్', 'మొదలు'],
+    h1a: 'కాకినాడలో', h1b: 'కోచ్ నడిపించే జిమ్.',
+    lede: 'పర్సనల్ ట్రైనింగ్, గ్రూప్ ట్రైనింగ్, ఫ్యాట్ లాస్. గోదారి గుంటలో వారానికి ఆరు రోజులు. లోపలికి రావడానికి స్క్రోల్ చేయండి.',
+    c2a: 'ప్రతి రెప్‌కూ', c2b: 'కోచ్.', c2: 'మీ కోచ్ మీ బ్లాక్ ప్లాన్ చేస్తారు, ప్రతి సెట్ చూస్తారు, వారం వారం మీ ప్రగతి ట్రాక్ చేస్తారు.',
+    quote: 'షాన్ అంటే గర్వం. సూర్యోదయానికి ముందే సంపాదించే నిశ్శబ్ద గర్వం.',
+    c3a: 'మీ శరీరానికి', c3b: 'ప్లాన్.', c3: 'ముందు అసెస్‌మెంట్, తర్వాత రాసిన ప్లాన్, ఇంటి భోజనంతో డైట్, ప్రతి సెషన్ షాన్ యాప్‌లో నమోదు.',
+    c4a: 'షాన్‌తో', c4b: 'ట్రైన్ అవ్వండి.', c4: 'మీ మొదటి సెషన్ ఉచితం.',
   },
   studio: {
     title: '2,200 చ.అ. ఐదు జోన్లు.',
