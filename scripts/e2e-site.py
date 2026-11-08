@@ -39,22 +39,20 @@ def sign_in(page, email):
 
 
 with sync_playwright() as p:
-    # No WebGL: the home hero shows its flat logo, the path for phones without 3D. (The 3D sequence is checked by eye;
-    # in a software renderer it is too slow for a test.)
-    browser = p.chromium.launch(args=["--disable-3d-apis"])
+    browser = p.chromium.launch()
 
     # Website on a computer ---------------------------------------------------------------------------
     ctx = browser.new_context(viewport=DESKTOP)
     page = ctx.new_page()
     watch(page)
     page.goto(BASE + "/")
-    expect(page.get_by_role("heading", level=1)).to_contain_text("Kakinada’s coached gym")
-    for h in ["The Shaan method", "Choose how you train", "2,200 sq ft. Five zones.", "Absolute Athleticism", "A day at Shaan", "Questions people ask"]:
+    expect(page.get_by_role("heading", level=1)).to_contain_text("Your trusted health partner")
+    for h in ["The Shaan method", "Choose how you train", "2,200 sq ft. Five training zones.", "Absolute Athleticism", "Outside the studio", "A day at Shaan", "Questions people ask"]:
         expect(page.get_by_role("heading", name=h)).to_be_visible()
-    # The hero's four chapters are all in the page; its last one shares the closing section's line.
-    expect(page.locator(".sf-cine-title")).to_have_count(4)
-    expect(page.get_by_role("heading", name="Train with Shaan.")).to_have_count(2)
-    expect(page.locator(".sf-cine-poster")).to_be_visible()
+    # The film's four chapters are all in the page, and its first frame is a plain image.
+    expect(page.locator(".sf-film-title")).to_have_count(4)
+    expect(page.get_by_role("heading", name="Train with Shaan.")).to_be_visible()
+    expect(page.locator(".sf-film-poster img")).to_be_visible()
     expect(page.get_by_role("banner").get_by_role("link", name="Log in")).to_be_visible()
     expect(page.locator('script[type="application/ld+json"]').first).to_be_attached()
     shot(page, "website-desktop")

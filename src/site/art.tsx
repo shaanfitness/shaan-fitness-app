@@ -31,7 +31,7 @@ export function Crest({ className }: { className?: string }) {
           return <line key={i} x1="300" y1={long ? 14 : 18} x2="300" y2={long ? 38 : 30} stroke={i === 0 ? '#E8283B' : '#EEF0F7'} strokeOpacity={long ? .55 : .25}
             strokeWidth={long ? 2 : 1} transform={`rotate(${i * 6} 300 300)`} />
         })}
-        <text fill="#D9B97A" fillOpacity=".75" fontSize="17" letterSpacing="6.2" fontFamily="'Archivo Variable', sans-serif" fontWeight="600">
+        <text fill="#D9B97A" fillOpacity=".75" fontSize="17" letterSpacing="6.2" fontFamily="'Manrope Variable', sans-serif" fontWeight="600">
           <textPath href="#sf-crest-text">{text}{text}</textPath>
         </text>
       </g>

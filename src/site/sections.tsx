@@ -62,7 +62,7 @@ export function Manifesto() {
     <section className="sf-section is-deep" aria-label="Shaan">
       <div ref={ref} className={`sf-wrap sf-manifesto ${still ? 'is-still' : ''}`}>
         <p>{words.map((w, i) => <span key={i} className={`${i < lit ? 'is-lit' : ''} ${key.test(w) ? 'is-key' : ''}`}>{w}{i < words.length - 1 ? ' ' : ''}</span>)}</p>
-        <footer>{c.manifesto.sign}</footer>
+        {c.manifesto.sign && <footer>{c.manifesto.sign}</footer>}
       </div>
     </section>
   )
@@ -790,5 +790,18 @@ export function ContactBlock({ site }: { site: SiteInfo }) {
           : <div className="sf-map-cover">{PAGE_ART.contact}<button type="button" className="sf-btn" onClick={() => setMap(true)}>{c.common.showMap}</button></div>}
       </div>
     </div>
+  )
+}
+
+// Community ------------------------------------------------------------------------------------------------------
+/** What the studio does outside the training floor: real events and the weekly series. */
+export function Community({ site }: { site: SiteInfo | null }) {
+  const { c } = useCopy()
+  const ig = site?.website.instagram || 'https://www.instagram.com/shaanfitness.in/'
+  return (
+    <Section title={c.community.title} sub={c.community.sub} tone="deep">
+      <Cards items={c.community.items} />
+      <p style={{ marginTop: 28 }}><a className="sf-btn sf-btn-glass" href={ig} target="_blank" rel="noreferrer">{Ic.instagram(18)}{c.community.follow}</a></p>
+    </Section>
   )
 }

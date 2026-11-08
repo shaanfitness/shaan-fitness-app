@@ -4,11 +4,11 @@ import { PATHS, type Copy, type PageId } from './content'
 import { faqFor, openSpans, tierGroups } from './data'
 import { SiteLayout, useCopy } from './layout'
 import {
-  AppShowcase, Athletic, BmiCheck, Cards, Checks, CoachGrid, CompareTable, ContactBlock, Cta, DayRail, Faq, HoursTable, JoinSteps,
+  AppShowcase, Athletic, BmiCheck, Cards, Checks, CoachGrid, Community, CompareTable, ContactBlock, Cta, DayRail, Faq, HoursTable, JoinSteps,
   Manifesto, Marquee, Method, PageHero, PlanTable, ResultsGrid, Section, Studio, Tiers,
 } from './sections'
 import { useHead } from './seo'
-import { CineHero } from './hero/CineHero'
+import { FilmHero } from './hero/FilmHero'
 
 // One component per page. Each page answers one search ("personal trainer in Kakinada", "gym timings", …), ends with
 // its own questions (also sent to Google as FAQ data) and the free trial form.
@@ -35,15 +35,15 @@ function Body({ id, site }: { id: PageId; site: SiteInfo | null }) {
   if (id === 'home') {
     return (
       <>
-        <CineHero site={site} />
+        <FilmHero site={site} />
         {site && <Marquee site={site} />}
         <Manifesto />
-        <Method />
         {site && <Tiers site={site} />}
-        {site && <Studio site={site} />}
+        <Method />
         <Athletic />
         {site && <CoachGrid site={site} limit={3} />}
         {site && <ResultsGrid site={site} />}
+        <Community site={site} />
         {site && <DayRail site={site} />}
       </>
     )

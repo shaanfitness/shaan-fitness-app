@@ -25,3 +25,4 @@ dist-ssr
 .local-stack/
 db-status.json
 migrate.log
+tools/film/out/
