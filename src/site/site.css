@@ -624,9 +624,9 @@
 .sf-film-place { font-size: 13px; font-weight: 600; letter-spacing: .03em; color: var(--sf-champagne); }
 .sf-film-copy { position: absolute; left: 0; right: 0; bottom: clamp(104px, 15vh, 150px); }
 .sf-film-ch { position: absolute; left: var(--sf-gutter); bottom: 0; width: min(620px, calc(100% - 2 * var(--sf-gutter))); display: grid; gap: 20px;
-  opacity: 0; transform: translateY(18px); transition: opacity .7s var(--sf-ease-out), transform .9s var(--sf-ease-out); pointer-events: none; }
+  opacity: 0; transform: translateY(18px); transition: opacity .3s ease, transform .5s ease; pointer-events: none; }
 @media (min-width: 1280px) { .sf-film-ch { left: calc((100% - 1280px) / 2 + var(--sf-gutter)); } }
-.sf-film-ch.is-on { opacity: 1; transform: none; pointer-events: auto; }
+.sf-film-ch.is-on { opacity: 1; transform: none; pointer-events: auto; transition: opacity .7s var(--sf-ease-out) .22s, transform .9s var(--sf-ease-out) .22s; }
 /* While the logo assembles (first visit), only the film shows; the words arrive as the emblem locks. */
 .sf-film-hud, .sf-film-foot { transition: opacity .8s ease; }
 .sf-film.is-assembling :is(.sf-film-ch, .sf-film-hud, .sf-film-foot) { opacity: 0; }
