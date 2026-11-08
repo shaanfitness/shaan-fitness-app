@@ -50,7 +50,7 @@ with sync_playwright() as p:
     for h in ["The Shaan method", "Choose how you train", "2,200 sq ft. Five training zones.", "Absolute Athleticism", "Outside the studio", "A day at Shaan", "Questions people ask"]:
         expect(page.get_by_role("heading", name=h)).to_be_visible()
     # The film's four chapters are all in the page, and its first frame is a plain image.
-    expect(page.locator(".sf-film-title")).to_have_count(4)
+    expect(page.locator(".sf-film-title")).to_have_count(5)
     expect(page.get_by_role("heading", name="Train with Shaan.")).to_be_visible()
     expect(page.locator(".sf-film-poster img")).to_be_visible()
     expect(page.get_by_role("banner").get_by_role("link", name="Log in")).to_be_visible()

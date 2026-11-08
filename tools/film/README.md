@@ -1,12 +1,15 @@
 # Home page film
 
-The home page hero is a short film rendered ahead of time in Blender (Cycles) and scrubbed by scroll in the browser
-(`src/site/hero/FilmHero.tsx`). One continuous shot: the street at blue hour, up PNR Enclave to the 5th floor sign,
-through the glass into reception, across the gym floor, and into the assessment scan.
+The home page hero is a short film rendered ahead of time in Blender (Cycles) and played in the browser
+(`src/site/hero/FilmHero.tsx`): 224 frames per screen shape. It opens on the logo (frames 0-63): gold blueprint lines,
+then the 15 metal pieces fly in and lock; that part plays by itself on the first visit. From frame 48 scrolling
+drives it: through the ring to the street at blue hour, up PNR Enclave to the 5th floor sign, through the glass into
+reception, across the gym floor, and into the assessment scan.
 
-- `scene.py` builds the whole scene in code (building, reception, gym floor, lights, camera path, scan) and renders
-  any frames: `python3 scene.py --fmt land|port --frames 0-159 --scale 1 --spp 8 --out out/land`
-- `encode.py` turns the PNG frames into WebP in `public/film/{land,port}/NNN.webp` (160 frames each).
+- `opening.py` renders the logo opening: `python3 opening.py --fmt land|port --frames 0-63 --scale 1 --spp 8 --out out/pland`
+- `scene.py` builds the walk-through in code (building, reception, gym floor, lights, camera path, scan):
+  `python3 scene.py --fmt land|port --frames 0-159 --scale 1 --spp 8 --out out/land`
+- `combine.py` joins both into `public/film/{land,port}/000-223.webp`, dissolving the opening into the street.
 - `logo.json` is the traced logo (same paths as `src/site/hero/logoPaths.ts`).
 
 Needs `pip install bpy` (Blender as a Python module, 5.x) and, next to this folder in `../fonts` and `../mh`:

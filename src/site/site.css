@@ -627,6 +627,9 @@
   opacity: 0; transform: translateY(18px); transition: opacity .7s var(--sf-ease-out), transform .9s var(--sf-ease-out); pointer-events: none; }
 @media (min-width: 1280px) { .sf-film-ch { left: calc((100% - 1280px) / 2 + var(--sf-gutter)); } }
 .sf-film-ch.is-on { opacity: 1; transform: none; pointer-events: auto; }
+/* While the logo assembles (first visit), only the film shows; the words arrive as the emblem locks. */
+.sf-film-hud, .sf-film-foot { transition: opacity .8s ease; }
+.sf-film.is-assembling :is(.sf-film-ch, .sf-film-hud, .sf-film-foot) { opacity: 0; }
 .sf-film-title { font-family: var(--sf-display); font-weight: 500; font-size: clamp(42px, 5.6vw, 88px); line-height: 1.02; letter-spacing: -.02em; text-wrap: balance; text-shadow: 0 2px 30px rgba(0, 0, 0, .5); }
 .sf-film-ch p { font-size: clamp(16px, 1.25vw, 18px); line-height: 1.65; color: #DAD5CA; max-width: 46ch; text-wrap: pretty; text-shadow: 0 1px 14px rgba(0, 0, 0, .6); }
 .sf:lang(te) .sf-film-title { font-size: clamp(32px, 4.2vw, 64px); line-height: 1.22; letter-spacing: 0; }

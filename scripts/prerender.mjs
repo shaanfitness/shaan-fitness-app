@@ -48,9 +48,9 @@ await writeFile(path.join(dist, '404.html'), shell)
 const assets = await readdir(path.join(dist, 'assets'))
 const font = assets.find((f) => /^bodoni-moda-latin-opsz-normal.*\.woff2$/.test(f))
 const preload = font ? `<link rel="preload" href="/assets/${font}" as="font" type="font/woff2" crossorigin />` : ''
-// Home only: the film's first frame is the first thing anyone sees, so it loads first (one size per screen shape).
-const filmPreload = `<link rel="preload" as="image" href="/film/land/000.webp" media="(min-aspect-ratio: 4/5)" fetchpriority="high" />
-    <link rel="preload" as="image" href="/film/port/000.webp" media="(max-aspect-ratio: 4/5)" fetchpriority="high" />`
+// Home only: the finished emblem (frame 48) is the first thing anyone sees, so it loads first (one size per screen shape).
+const filmPreload = `<link rel="preload" as="image" href="/film/land/048.webp" media="(min-aspect-ratio: 4/5)" fetchpriority="high" />
+    <link rel="preload" as="image" href="/film/port/048.webp" media="(max-aspect-ratio: 4/5)" fetchpriority="high" />`
 
 // Home only: on the first visit in a session, a black screen covers the page until the opening loader takes over
 // (hero/CineHero.tsx), so the static page never flashes first. It lifts itself after 9 seconds whatever happens.
