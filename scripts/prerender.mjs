@@ -67,7 +67,7 @@ for (const id of ssr.PAGE_IDS) {
     .replace('</head>', `    ${page.head}\n    ${preload}\n    ${id === 'home' ? `${filmPreload}\n    ${introVeil}` : ''}\n  </head>`)
     // The app's theme fonts load without holding up the page.
     .replace(/<link rel="stylesheet" href="(https:\/\/fonts\.googleapis\.com[^"]+)" \/>/, '<link rel="stylesheet" href="$1" media="print" onload="this.media=\'all\'" />')
-    .replace('<div id="root"></div>', `<div id="root">${page.html}</div>\n    <script>window.__SITE__ = ${json(site)}</script>`)
+    .replace('<div id="root"></div>', `<div id="root">${page.html}</div>\n    <script>window.__SITE__ = ${json(ssr.normalizeSite(site))}</script>`)
   const file = ssr.PATHS[id] === '/' ? path.join(dist, 'index.html') : path.join(dist, `${ssr.PATHS[id].slice(1)}.html`)
   await mkdir(path.dirname(file), { recursive: true })
   await writeFile(file, html)

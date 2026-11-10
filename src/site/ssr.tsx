@@ -6,7 +6,7 @@ import Root from '../Root'
 import { AuthProvider } from '../auth'
 import { ThemeProvider } from '../theme'
 import { ToastProvider } from '../components/toast'
-import type { SiteInfo } from '../db/site'
+import { normalizeSite, type SiteInfo } from '../db/site'
 import { PAGE_IDS, PATHS, type PageId } from './content'
 import { DEFAULT_ORIGIN, headFor, headHtml } from './seo'
 export { SUPABASE_ANON_KEY, SUPABASE_URL } from '../lib/supabase'
@@ -15,10 +15,11 @@ export { SUPABASE_ANON_KEY, SUPABASE_URL } from '../lib/supabase'
 // link previews see the full page and visitors see it before the JavaScript loads. The tree matches main.tsx,
 // so the browser picks the page up where the HTML left off.
 
-export { DEFAULT_ORIGIN, PAGE_IDS, PATHS }
+export { DEFAULT_ORIGIN, PAGE_IDS, PATHS, normalizeSite }
 export type { PageId }
 
-export function renderPage(id: PageId, site: SiteInfo | null, origin: string) {
+export function renderPage(id: PageId, raw: SiteInfo | null, origin: string) {
+  const site = normalizeSite(raw)
   const qc = new QueryClient({ defaultOptions: { queries: { staleTime: Infinity, retry: false, enabled: false } } })
   qc.setQueryData(['site'], site)
   const html = renderToString(

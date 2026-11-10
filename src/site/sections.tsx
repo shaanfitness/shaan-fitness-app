@@ -261,7 +261,7 @@ export function Studio({ site }: { site: SiteInfo }) {
   const seen = useInView(ref)
   const spans = openSpans(site)
   const days = [1, 2, 3, 4, 5, 6, 7].filter((d) => spans[d].length).length
-  const facts: [string, string][] = [['2,200', c.studio.size], ['5', c.studio.zones]]
+  const facts: [string, string][] = [['5', c.studio.zones]]
   // What a visitor cares about; everyday items (toilet, wifi, the biometric reader) stay off the list.
   const amenities = site.studio.facilities.filter((f) => !/toilet|wifi|wi-fi|biometric|^training$/i.test(f.trim())).slice(0, 10)
   if (days) facts.push([String(days), c.facts.days])

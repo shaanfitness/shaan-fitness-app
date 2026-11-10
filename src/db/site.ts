@@ -17,6 +17,8 @@ export interface SiteSettings {
   opening_hours: string | null; whatsapp: string | null; instagram: string | null; facebook: string | null; youtube: string | null
   map_url: string | null; show_prices: boolean; show_timings: boolean; show_trainers: boolean; show_results: boolean
   twitter?: string | null; linkedin?: string | null; video?: string | null
+  /** The number on the website's call buttons (Settings › Website). */
+  phone?: string | null
 }
 export interface SitePlan {
   id: string; name: string; kind: 'gym' | 'pt'; tenure_value: number; tenure_unit: 'days' | 'months' | 'years'
@@ -31,10 +33,24 @@ export interface SiteInfo {
   plans: SitePlan[]; batches: SiteBatch[]; trainers: SiteTrainer[]; results: SiteResult[]
 }
 
+/** The studio's public numbers: one for calls, one for WhatsApp. */
+const CONTACT = { call: '+919642467896', whatsapp: '+919963547869' }
+
+/** The summary as every screen uses it. Calls and WhatsApp go to the studio's public numbers: the ones set in
+ *  Settings › Website once the database has that screen's call number (the `phone` field), and the studio's stated
+ *  numbers until then. The studio mobile kept for invoices is never shown to visitors. */
+export function normalizeSite(d: SiteInfo | null): SiteInfo | null {
+  if (!d) return d
+  const managed = 'phone' in d.website
+  const call = (managed && d.website.phone) || CONTACT.call
+  const whatsapp = (managed && d.website.whatsapp) || CONTACT.whatsapp
+  return { ...d, studio: { ...d.studio, mobile: call }, website: { ...d.website, whatsapp } }
+}
+
 export async function siteInfo(slug?: string) {
   const res = await supabase.rpc('site_info', { p_slug: slug ?? null })
   if (res.error) throw new Error(res.error.message)
-  return res.data as SiteInfo | null
+  return normalizeSite(res.data as SiteInfo | null)
 }
 
 export const useSite = () => useQuery({ queryKey: ['site'], queryFn: () => siteInfo(), staleTime: 5 * 60_000 })

@@ -140,7 +140,7 @@ const en = {
     lede: 'A coach-led training studio for strength, fat loss and fitness.',
     c1: '5th floor, PNR Enclave.',
     c1t: 'Near D-Mart on RTO Office Road, Kakinada. Open six days a week, with open gym hours alongside coached batches.',
-    c2: '2,200 sq ft. Five training zones.',
+    c2: 'Five training zones.',
     c2t: 'One floor, with steam and sauna, lockers and showers.',
     c3: 'Coached, every session.',
     c3t: 'Group batches, semi-private training for two, and one-to-one personal training. Every plan draws on five pillars: FORGE, BLAZE, FLOW, STRIKE and TRIBE.',
@@ -161,9 +161,9 @@ const en = {
     follow: 'Follow @shaanfitness.in',
   },
   studio: {
-    title: '2,200 sq ft. Five zones.',
+    title: 'Five training zones.',
     text: 'One floor at PNR Enclave, Godari Gunta, with five training zones, and steam and sauna to finish.',
-    size: 'square feet', zones: 'training zones',
+    zones: 'training zones',
   },
   athletic: {
     title: 'Absolute Athleticism',
@@ -268,7 +268,7 @@ const en = {
     storyTitle: 'Why every session is coached',
     story: 'Most people don’t quit the gym because they are lazy. They quit because nobody showed them what to do, nobody noticed when they stopped coming, and nothing seemed to change. So at Shaan, a coach plans your block, watches your sets, tracks your progress and calls you when you miss a day.',
     spaceTitle: 'The space',
-    space: 'A 2,200 square foot studio with five training zones, steam and sauna, lockers, showers and changing rooms, on the 5th floor of PNR Enclave at Godari Gunta.',
+    space: 'Five training zones, steam and sauna, lockers, showers and changing rooms, on the 5th floor of PNR Enclave at Godari Gunta.',
     valuesTitle: 'What we stand for',
     values: [
       { t: 'Honest coaching', d: 'We tell you what works for your body, even when it is not what you hoped to hear.' },
@@ -380,7 +380,7 @@ const te: Copy = {
     lede: 'బలం, ఫ్యాట్ లాస్, ఫిట్‌నెస్ కోసం కోచ్ నడిపించే ట్రైనింగ్ స్టూడియో.',
     c1: '5వ అంతస్తు, PNR ఎన్‌క్లేవ్.',
     c1t: 'కాకినాడ RTO ఆఫీస్ రోడ్, D-Mart దగ్గర. వారానికి ఆరు రోజులు, కోచ్ బ్యాచ్‌లతో పాటు ఓపెన్ జిమ్ సమయాలు.',
-    c2: '2,200 చ.అ. ఐదు ట్రైనింగ్ జోన్లు.',
+    c2: 'ఐదు ట్రైనింగ్ జోన్లు.',
     c2t: 'స్టీమ్, సౌనా, లాకర్లు, షవర్లతో ఒకే అంతస్తు.',
     c3: 'ప్రతి సెషన్‌కూ కోచ్.',
     c3t: 'గ్రూప్ బ్యాచ్‌లు, ఇద్దరికి సెమీ-ప్రైవేట్, వన్-టు-వన్ పర్సనల్ ట్రైనింగ్. ప్రతి ప్లాన్ ఐదు పిల్లర్ల మీద: FORGE, BLAZE, FLOW, STRIKE, TRIBE.',
@@ -401,9 +401,9 @@ const te: Copy = {
     follow: '@shaanfitness.in ఫాలో అవ్వండి',
   },
   studio: {
-    title: '2,200 చ.అ. ఐదు జోన్లు.',
+    title: 'ఐదు ట్రైనింగ్ జోన్లు.',
     text: 'గోదారి గుంట PNR ఎన్‌క్లేవ్‌లో ఒకే అంతస్తు: ఐదు ట్రైనింగ్ జోన్లు, చివర్లో స్టీమ్, సౌనా.',
-    size: 'చదరపు అడుగులు', zones: 'ట్రైనింగ్ జోన్లు',
+    zones: 'ట్రైనింగ్ జోన్లు',
   },
   athletic: {
     title: 'Absolute Athleticism',
@@ -508,7 +508,7 @@ const te: Copy = {
     storyTitle: 'ప్రతి సెషన్‌కు కోచ్ ఎందుకు',
     story: 'చాలా మంది సోమరితనం వల్ల జిమ్ మానేయరు. ఏం చేయాలో ఎవరూ చూపించకపోవడం, రావడం ఆపేసినప్పుడు ఎవరూ గమనించకపోవడం, ఏమీ మారకపోవడం వల్ల మానేస్తారు. అందుకే షాన్‌లో కోచ్ మీ బ్లాక్ ప్లాన్ చేస్తారు, మీ సెట్లు చూస్తారు, ప్రగతి ట్రాక్ చేస్తారు, మీరు రాని రోజు కాల్ చేస్తారు.',
     spaceTitle: 'మా స్థలం',
-    space: 'గోదారి గుంట PNR ఎన్‌క్లేవ్ 5వ అంతస్తులో ఐదు ట్రైనింగ్ జోన్లు, స్టీమ్, సౌనా, లాకర్లు, షవర్లు, చేంజింగ్ రూమ్‌లతో 2,200 చదరపు అడుగుల స్టూడియో.',
+    space: 'గోదారి గుంట PNR ఎన్‌క్లేవ్ 5వ అంతస్తులో ఐదు ట్రైనింగ్ జోన్లు, స్టీమ్, సౌనా, లాకర్లు, షవర్లు, చేంజింగ్ రూమ్‌లు.',
     valuesTitle: 'మేము నమ్మేవి',
     values: [
       { t: 'నిజాయితీ కోచింగ్', d: 'మీరు వినాలనుకున్నది కాకపోయినా, మీ శరీరానికి ఏది పనిచేస్తుందో చెబుతాం.' },

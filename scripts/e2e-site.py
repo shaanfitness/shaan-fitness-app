@@ -47,7 +47,7 @@ with sync_playwright() as p:
     watch(page)
     page.goto(BASE + "/")
     expect(page.get_by_role("heading", level=1)).to_contain_text("Your trusted health partner")
-    for h in ["The Shaan method", "Choose how you train", "2,200 sq ft. Five training zones.", "Absolute Athleticism", "Outside the studio", "A day at Shaan", "Questions people ask"]:
+    for h in ["The Shaan method", "Choose how you train", "Five training zones.", "Absolute Athleticism", "Outside the studio", "A day at Shaan", "Questions people ask"]:
         expect(page.get_by_role("heading", name=h)).to_be_visible()
     # The film's four chapters are all in the page, and its first frame is a plain image.
     expect(page.locator(".sf-film-title")).to_have_count(5)

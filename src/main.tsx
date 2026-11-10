@@ -9,6 +9,7 @@ import { AuthProvider } from './auth'
 import { ThemeProvider } from './theme'
 import { ToastProvider } from './components/toast'
 import { registerServiceWorker } from './lib/install'
+import { normalizeSite, type SiteInfo } from './db/site'
 
 const queryClient = new QueryClient({
   defaultOptions: { queries: { staleTime: 30_000, refetchOnWindowFocus: false, retry: 1 } },
@@ -16,8 +17,8 @@ const queryClient = new QueryClient({
 
 // Website pages arrive as finished HTML with the gym's details from the build (scripts/prerender.mjs).
 // Those details seed the page, marked old so the live ones load straight after.
-const seed = (window as { __SITE__?: unknown }).__SITE__
-if (seed !== undefined) queryClient.setQueryData(['site'], seed, { updatedAt: 0 })
+const seed = (window as { __SITE__?: SiteInfo | null }).__SITE__
+if (seed !== undefined) queryClient.setQueryData(['site'], normalizeSite(seed), { updatedAt: 0 })
 
 registerServiceWorker()
 
