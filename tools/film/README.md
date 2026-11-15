@@ -1,23 +1,28 @@
 # Home page film
 
 The home page hero is a short film rendered ahead of time in Blender (Cycles) and played in the browser
-(`src/site/hero/FilmHero.tsx`): 224 frames per screen shape. It opens on the logo (frames 0-63): gold blueprint lines,
-then the 15 metal pieces fly in and lock; that part plays by itself on the first visit. From frame 48 scrolling
-drives it: through the ring to the street at blue hour, up PNR Enclave to the 5th floor sign, through the glass into
-reception, across the gym floor, and into the assessment scan.
+(`src/site/hero/FilmHero.tsx`): 192 frames per screen shape, the logo as a machine on a black stage.
 
-- `opening.py` renders the logo opening: `python3 opening.py --fmt land|port --frames 0-63 --scale 1 --spp 8 --out out/pland`
-- `scene.py` builds the walk-through in code (building, reception, gym floor, lights, camera path, scan):
-  `python3 scene.py --fmt land|port --frames 0-159 --scale 1 --spp 8 --out out/land`
-- `combine.py` joins both into `public/film/{land,port}/000-223.webp`, dissolving the opening into the street.
+- Frames 0-39: the emblem assembles itself out of white smoke (the blue core spins up, the barbell slides in, the
+  ring, the S and the F lock on). This part plays by itself on the first visit.
+- Frame 40: the finished emblem. Scrolling starts here.
+- 40-76 a slow move round to the front; 76-112 a close glide over the red plate; 108-132 the letters open like
+  doors on the blue turbine core; 136-164 the metal gives way to a glowing blue wireframe at dusk; 164-191 sunrise.
+
+Files:
+
+- `emblem.py` builds everything in code from the traced logo and renders it:
+  `python3 emblem.py --fmt land|port --frames 0-191 --scale 1 --spp 6 --out out`
+  (1280×720 for `land`, 720×1280 for `port`; `SKIP_EXISTING=1` skips frames already in `out`.)
+  Every frame's state is computed from its number, so any frame renders on its own.
+- `post.py` finishes the frames (soft bloom, vignette, fine grain) and writes the WebP sequence the site plays:
+  `python3 post.py out ../../public/film` (add `--blend` to fill frames not rendered yet from their neighbours).
 - `logo.json` is the traced logo (same paths as `src/site/hero/logoPaths.ts`).
 
-Needs `pip install bpy` (Blender as a Python module, 5.x) and, next to this folder in `../fonts` and `../mh`:
+Needs `pip install bpy shapely numpy pillow` (Blender as a Python module, 5.x). No other assets: the smoke, sky,
+ground and metal are procedural.
 
-- Fonts (SIL Open Font License): Manrope and Bodoni Moda from github.com/google/fonts, as static instances
-  `Manrope-ExtraBold.ttf`, `Manrope-SemiBold.ttf`, `BodoniModa-96-Medium.ttf` (fontTools `instancer`).
-- The human body (CC0): MakeHuman's `base.obj` and the macro/shape `.target` files named in `scene.py`, from
-  github.com/makehumancommunity/makehuman (`makehuman/data/3dobjs`, `makehuman/data/targets`).
+Rendering takes about 30 seconds a frame per format on 2 CPU cores.
 
-Rendering takes about 20 seconds a frame per format on 2 CPU cores. The 3D building and rooms are an
-interpretation, not a survey of the real studio; with photos of the space, the scene can be matched to it.
+The camera path is the `KEYS` table in `emblem.py`: frame, angle round, angle up, distance, look-at right, look-at
+up, lens, f-stop, emblem turn. The chapters in `FilmHero.tsx` (`CHAPTER_AT`) follow the timeline in `set_frame`.

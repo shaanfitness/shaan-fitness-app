@@ -161,7 +161,7 @@ with sync_playwright() as p:
     toast(page, "App Permission Basic Information saved")
     shot(page, "app-permissions")
     page.goto(BASE + "/membership-plans")
-    expect(page.get_by_role("heading", name="Every plan and fee")).to_be_visible()
+    expect(page.get_by_role("heading", name="Subscriptions and fees")).to_be_visible()
     expect(page.get_by_role("link", name="Join online")).to_have_count(0)
     page.goto(BASE + "/app-settings/permissions")
     page.get_by_role("radiogroup", name="Can Sign Up").get_by_label("Yes").check()

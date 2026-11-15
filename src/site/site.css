@@ -572,9 +572,9 @@
 .sf-social a:hover { background: var(--sf-porcelain); color: var(--sf-ink); }
 
 /* Phone dock: call, WhatsApp, free trial, always at hand on phones. */
-.sf-dock { position: fixed; left: 12px; right: 12px; bottom: calc(12px + env(safe-area-inset-bottom)); z-index: 55; display: grid; grid-template-columns: 1fr 1fr 1.5fr; gap: 8px; padding: 8px; border-radius: 22px; background: color-mix(in srgb, var(--sf-ink) 88%, transparent); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border: 1px solid var(--sf-line); box-shadow: 0 20px 40px -12px rgba(0, 0, 0, .8); transform: translateY(140%); transition: transform .45s var(--sf-ease-out); }
+.sf-dock { position: fixed; left: 12px; right: 12px; bottom: calc(12px + env(safe-area-inset-bottom)); z-index: 55; display: grid; grid-template-columns: 1fr 1.25fr 1.7fr; gap: 6px; padding: 6px; border-radius: 22px; background: color-mix(in srgb, var(--sf-ink) 88%, transparent); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border: 1px solid var(--sf-line); box-shadow: 0 20px 40px -12px rgba(0, 0, 0, .8); transform: translateY(140%); transition: transform .45s var(--sf-ease-out); }
 .sf-dock.is-up { transform: none; }
-.sf-dock a { display: flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; border-radius: 15px; text-decoration: none; font-weight: 700; font-size: 15px; background: rgba(238, 240, 247, .07); }
+.sf-dock a { display: flex; align-items: center; justify-content: center; gap: 7px; min-height: 48px; padding: 0 6px; border-radius: 15px; text-decoration: none; font-weight: 700; font-size: 14px; line-height: 1.15; text-align: center; background: rgba(238, 240, 247, .07); }
 .sf-dock a.is-main { background: var(--sf-crimson); color: #fff; }
 @media (min-width: 900px) { .sf-dock { display: none; } }
 @media (max-width: 899px) { .sf-has-dock .sf-foot-legal { padding-bottom: calc(100px + env(safe-area-inset-bottom)); } }
@@ -639,6 +639,8 @@
 .sf-film-title em { display: block; font-style: normal; color: var(--sf-crimson-hi); }
 .sf-film-ch > p { font-size: clamp(16px, 1.25vw, 18px); line-height: 1.6; color: #DCDAE2; max-width: 44ch; text-wrap: pretty; text-shadow: 0 1px 14px rgba(0, 0, 0, .6); }
 .sf:lang(te) .sf-film-title { font-size: clamp(30px, 4vw, 60px); line-height: 1.24; letter-spacing: 0; font-weight: 800; }
+/* Wide screens: the headline stacks in short lines so it stays clear of the emblem beside it. */
+@media (min-width: 761px) { .sf:not(:lang(te)) .sf-film-title { max-width: 7.2em; } }
 /* A subscription's facts, on glass: the owner's line, one figure per person, the price. */
 .sf-film-card { display: grid; gap: 14px; min-width: min(360px, 100%); max-width: 460px; padding: 18px 20px; border: 1px solid var(--sf-line-strong); border-radius: 18px;
   background: rgba(8, 8, 11, .52); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); }

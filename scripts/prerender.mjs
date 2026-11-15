@@ -6,7 +6,7 @@
 // Hosting: Cloudflare Pages (public/_worker.js sends unknown addresses to the app shell) or Netlify (netlify.toml).
 // The pages use the gym's live public summary (plans, timings, coaches) read with the public anon key at build time.
 // If it can't be read, the pages are still written, just without those details, and the build carries on.
-import { mkdir, readFile, readdir, writeFile } from 'node:fs/promises'
+import { mkdir, readFile, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 import { pathToFileURL } from 'node:url'
 
@@ -44,13 +44,11 @@ const shell = template.replace('<head>', '<head>\n    <meta name="robots" conten
 await writeFile(path.join(dist, 'app.html'), shell)
 await writeFile(path.join(dist, '404.html'), shell)
 
-// The website's own headline font, preloaded so the headline paints in it straight away.
-const assets = await readdir(path.join(dist, 'assets'))
-const font = assets.find((f) => /^bodoni-moda-latin-opsz-normal.*\.woff2$/.test(f))
-const preload = font ? `<link rel="preload" href="/assets/${font}" as="font" type="font/woff2" crossorigin />` : ''
-// Home only: the finished emblem (frame 48) is the first thing anyone sees, so it loads first (one size per screen shape).
-const filmPreload = `<link rel="preload" as="image" href="/film/land/048.webp" media="(min-aspect-ratio: 4/5)" fetchpriority="high" />
-    <link rel="preload" as="image" href="/film/port/048.webp" media="(max-aspect-ratio: 4/5)" fetchpriority="high" />`
+// The website's own fonts, preloaded so the headline paints in them straight away.
+const preload = ['lovelo-black', 'garet-book', 'garet-heavy'].map((f) => `<link rel="preload" href="/fonts/${f}.woff2" as="font" type="font/woff2" crossorigin />`).join('\n    ')
+// Home only: the finished emblem (frame 40) is the first thing anyone sees, so it loads first (one size per screen shape).
+const filmPreload = `<link rel="preload" as="image" href="/film/land/040.webp" media="(min-aspect-ratio: 4/5)" fetchpriority="high" />
+    <link rel="preload" as="image" href="/film/port/040.webp" media="(max-aspect-ratio: 4/5)" fetchpriority="high" />`
 
 // Home only: on the first visit in a session, a black screen covers the page until the opening loader takes over
 // (hero/CineHero.tsx), so the static page never flashes first. It lifts itself after 9 seconds whatever happens.

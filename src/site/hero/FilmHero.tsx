@@ -223,7 +223,7 @@ export function FilmHero({ site }: { site: SiteInfo | null }) {
 
   const custom = site?.website.hero_title
   const off = (i: number) => (ch === i ? undefined : -1)
-  const count = (i: number) => <p className="sf-film-count" aria-hidden="true"><b>{i + 1}</b> / {names.length}<span>{names[i]}</span></p>
+  const count = (i: number, label: string) => <p className="sf-film-count" aria-hidden="true"><b>{i + 1}</b> / {names.length}<span>{label}</span></p>
   return (
     <>
     {intro !== 'off' && (
@@ -254,7 +254,7 @@ export function FilmHero({ site }: { site: SiteInfo | null }) {
 
         <div className="sf-wrap sf-film-copy">
           <div className={`sf-film-ch ${ch === 0 ? 'is-on' : ''}`}>
-            {count(0)}
+            {count(0, k.home)}
             <h1 id="sf-h1" className="sf-film-title">{custom || <>{k.h1a} <em>{k.h1b}</em></>}</h1>
             <p>{site?.website.hero_text || k.lede}</p>
             <div className="sf-ctas">
@@ -268,7 +268,7 @@ export function FilmHero({ site }: { site: SiteInfo | null }) {
               const sp = k.spare[i]
               return (
                 <div key={n} className={`sf-film-ch ${ch === n ? 'is-on' : ''}`}>
-                  {count(n)}
+                  {count(n, k.method)}
                   <h2 className="sf-film-title">{sp.a} <em>{sp.b}</em></h2>
                   <p>{sp.t}</p>
                 </div>
@@ -279,7 +279,7 @@ export function FilmHero({ site }: { site: SiteInfo | null }) {
             const size = sizeLine(o, c)
             return (
               <div key={n} className={`sf-film-ch ${ch === n ? 'is-on' : ''}`}>
-                {count(n)}
+                {count(n, k.sub)}
                 <h2 className="sf-film-title">{cut < 0 ? o.name : <>{o.name.slice(0, cut)} <em>{o.name.slice(cut + 1)}</em></>}</h2>
                 <div className="sf-film-card">
                   {note && <p className="sf-film-note">{note}</p>}
@@ -293,7 +293,7 @@ export function FilmHero({ site }: { site: SiteInfo | null }) {
             )
           })}
           <div className={`sf-film-ch ${ch === 4 ? 'is-on' : ''}`}>
-            {count(4)}
+            {count(4, k.trial)}
             <h2 className="sf-film-title">{k.lastA} <em>{k.lastB}</em></h2>
             <p>{k.lastText}</p>
             <div className="sf-ctas">

@@ -119,7 +119,7 @@ function WebsiteForm({ studio }: { studio: Studio }) {
       <form onSubmit={(e) => { e.preventDefault(); save() }} className="flex max-w-[900px] flex-col pb-10">
         <Section title="Front page" id="ws-front">
           <div className="card grid gap-4 p-5">
-            <Field label="Headline" id="ws-title" hint={`Leave empty to use your tag line${studio.tag_line ? ` (“${studio.tag_line}”)` : ''} or “Your trusted health partner”.`}>
+            <Field label="Headline" id="ws-title" hint="Leave empty for “Semi-private training studio.”">
               <TextInput id="ws-title" value={f.hero_title} onChange={set('hero_title')} maxLength={80} />
             </Field>
             <Field label="Text under the headline" id="ws-text" hint="One or two sentences. Leave empty for the standard text.">

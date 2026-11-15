@@ -115,7 +115,7 @@ const en = {
   },
   day: {
     title: 'A day at Shaan',
-    sub: 'Coached batches morning and evening, six days a week, with open gym hours alongside and personal training by appointment.',
+    sub: 'Coached sessions morning and evening, six days a week, with one-on-one coaching by appointment.',
     now: 'Now', group: 'Group', semi: 'Semi-private', elite: '1:1 Elite', other: 'Batch', fullTimings: 'Full timings',
   },
   join: {
@@ -134,7 +134,7 @@ const en = {
     w1: 'Goblet squat', w2: 'Bench press', w3: 'Lat pull-down', w4: 'Plank', done: '3 of 4 done', glasses: '6 of 12 glasses', lost: 'Weight, last 6 weeks',
   },
   film: {
-    place: 'Shaan Fitness, Kakinada', scroll: 'Scroll', home: 'Shaan', trial: 'Free trial',
+    place: 'Shaan Fitness, Kakinada', scroll: 'Scroll', home: 'Shaan', trial: 'Free trial', sub: 'Subscription', method: 'The method',
     h1a: 'Semi-private', h1b: 'training studio.',
     lede: 'Coached training in small numbers, in Kakinada. Your trusted health partner.',
     lastA: 'Your first session', lastB: 'is on us.',
@@ -363,7 +363,7 @@ const te: Copy = {
   },
   day: {
     title: 'షాన్‌లో ఒక రోజు',
-    sub: 'వారానికి ఆరు రోజులు ఉదయం, సాయంత్రం కోచ్ బ్యాచ్‌లు, వాటితో పాటు ఓపెన్ జిమ్ సమయాలు, అపాయింట్‌మెంట్‌తో పర్సనల్ ట్రైనింగ్.',
+    sub: 'వారానికి ఆరు రోజులు ఉదయం, సాయంత్రం కోచ్ సెషన్లు, అపాయింట్‌మెంట్‌తో వన్-ఆన్-వన్ కోచింగ్.',
     now: 'ఇప్పుడు', group: 'గ్రూప్', semi: 'సెమీ-ప్రైవేట్', elite: '1:1 ఎలీట్', other: 'బ్యాచ్', fullTimings: 'పూర్తి టైమింగ్స్',
   },
   join: {
@@ -382,7 +382,7 @@ const te: Copy = {
     w1: 'గాబ్లెట్ స్క్వాట్', w2: 'బెంచ్ ప్రెస్', w3: 'లాట్ పుల్-డౌన్', w4: 'ప్లాంక్', done: '4లో 3 పూర్తి', glasses: '12లో 6 గ్లాసులు', lost: 'బరువు, గత 6 వారాలు',
   },
   film: {
-    place: 'షాన్ ఫిట్‌నెస్, కాకినాడ', scroll: 'స్క్రోల్ చేయండి', home: 'షాన్', trial: 'ఉచిత ట్రయల్',
+    place: 'షాన్ ఫిట్‌నెస్, కాకినాడ', scroll: 'స్క్రోల్ చేయండి', home: 'షాన్', trial: 'ఉచిత ట్రయల్', sub: 'సబ్‌స్క్రిప్షన్', method: 'పద్ధతి',
     h1a: 'సెమీ-ప్రైవేట్', h1b: 'ట్రైనింగ్ స్టూడియో.',
     lede: 'కాకినాడలో, తక్కువ మందితో, కోచ్ దగ్గరుండి చేయించే ట్రైనింగ్. మీ నమ్మకమైన ఆరోగ్య భాగస్వామి.',
     lastA: 'మీ మొదటి సెషన్', lastB: 'మా తరఫున.',
