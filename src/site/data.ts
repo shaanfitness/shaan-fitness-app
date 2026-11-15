@@ -1,14 +1,20 @@
-import type { SiteBatch, SiteInfo, SitePlan } from '../db/site'
+import { siteOffers, type SiteBatch, type SiteInfo, type SiteOffer, type SitePlan } from '../db/site'
 import { fill, type Copy, type Lang, type PageId } from './content'
 
-// Facts the website works out from the CRM's public summary: the three tiers, open hours and "open now",
+// Facts the website works out from the CRM's public summary: the subscriptions, open hours and "open now",
 // money, and the questions each page answers (also sent to Google as FAQ data).
 
+/** The kind of coaching by how many train with one coach: a group, two side by side ('semi'), or one-on-one ('elite'). */
 export type Tier = 'group' | 'semi' | 'elite'
-export const tierOf = (p: Pick<SitePlan, 'name' | 'kind'>): Tier =>
-  /1\s*:\s*1|elite|one[- ]to[- ]one|personal/i.test(p.name) ? 'elite' : /semi|side|duo|couple/i.test(p.name) ? 'semi' : p.kind === 'pt' ? 'elite' : 'group'
-export const MEMBERS: Record<Tier, number> = { group: 8, semi: 2, elite: 1 }
-export const batchTier = (b: Pick<SiteBatch, 'name'>): Tier => (/elite|1\s*:\s*1|personal/i.test(b.name) ? 'elite' : /semi|side/i.test(b.name) ? 'semi' : 'group')
+const kindByName = (name: string): Tier =>
+  /vip|1\s*:\s*1|one[- ]?(on|to)[- ]?one|personal/i.test(name) ? 'elite' : /elite|semi|side|duo|couple/i.test(name) ? 'semi' : 'group'
+/** A subscription's kind: from its group size, or from its name when the owner hides sizes. */
+export const offerTier = (o: Pick<SiteOffer, 'name' | 'size'>): Tier => (o.size == null ? kindByName(o.name) : o.size <= 1 ? 'elite' : o.size === 2 ? 'semi' : 'group')
+export const batchTier = (b: Pick<SiteBatch, 'name'>): Tier => kindByName(b.name)
+/** The subscriptions the website shows, in the owner's order. */
+export const offers = (site: SiteInfo | null) => siteOffers(site)
+/** The cheapest shown price, when prices are shown. */
+export const fromPrice = (list: SiteOffer[]) => { const p = list.map((o) => o.price).filter((x): x is number => x != null); return p.length ? Math.min(...p) : null }
 
 const inr = new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 })
 export const rupees = (n: number) => inr.format(n)
@@ -32,15 +38,8 @@ export function term(p: Pick<SitePlan, 'tenure_value' | 'tenure_unit'>, c: Copy)
   return say(t.day, t.days, n)
 }
 
-/** Plans by tier, in the order group, semi, elite, each cheapest first. */
-export function tierGroups(site: SiteInfo) {
-  const out: { tier: Tier; plans: SitePlan[]; from: number }[] = []
-  for (const t of ['group', 'semi', 'elite'] as Tier[]) {
-    const plans = salePlans(site).filter((p) => tierOf(p) === t)
-    if (plans.length) out.push({ tier: t, plans, from: plans[0].total_price })
-  }
-  return out
-}
+/** "4 weeks", "1 week". */
+export const weeksText = (n: number, c: Copy) => (n === 1 ? c.common.term.week : fill(c.common.term.weeks, { n }))
 
 /** The plan cycle most plans share (e.g. 28 days, 24 sessions). */
 export function cycle(site: SiteInfo) {
@@ -116,12 +115,12 @@ export const services = (site: SiteInfo) => {
 export function faqFor(id: PageId, site: SiteInfo | null, c: Copy, lang: Lang): { q: string; a: string }[] {
   const f = c.faqs
   const out: { q: string; a: string }[] = []
-  const plans = site ? salePlans(site) : []
-  const showPrices = site?.website.show_prices !== false && plans.length > 0
-  const priced = (t: Tier) => plans.find((p) => tierOf(p) === t)
-  const groups = site ? tierGroups(site) : []
-  const fees = () => out.push(showPrices
-    ? { q: f.fees.q, a: fill(f.fees.a, { from: rupees(plans[0].total_price), list: groups.map((g) => g.plans.length === 1 ? `${g.plans[0].name} ${rupees(g.from)}` : `${c.tiers.names[g.tier]} ${fill(c.tiers.from, { price: rupees(g.from) })}`).join(', ') }) }
+  const list = offers(site)
+  const priced = list.filter((o) => o.price != null)
+  const from = fromPrice(list)
+  const weeks = (o: SiteOffer) => fill(c.subs.forTerm, { term: weeksText(o.weeks, c) })
+  const fees = () => out.push(from != null
+    ? { q: f.fees.q, a: fill(f.fees.a, { from: rupees(from), list: priced.map((o) => `${o.name} ${rupees(o.price!)} ${weeks(o)}`).join(', ') }) }
     : f.feesNoPrice)
   const timings = () => { if (site) { const h = hoursSentence(site, c, lang); if (h.days) out.push({ q: f.timings.q, a: fill(f.timings.a, h) }) } }
   const where = () => { if (site) out.push({ q: f.where.q, a: fill(f.where.a, { address: addressText(site) }) }) }
@@ -131,8 +130,8 @@ export function faqFor(id: PageId, site: SiteInfo | null, c: Copy, lang: Lang): 
     if (fac.some((x) => /steam|sauna/i.test(x))) out.push({ q: f.facilities.q, a: fill(f.facilities.a, { list: fac.map((x) => x.toLowerCase()).join(', ') }) })
   }
   const cost = () => {
-    const e = priced('elite'), s = priced('semi')
-    if (showPrices && e) out.push({ q: f.cost.q, a: fill(f.cost.a, { elite: rupees(e.total_price) }) + (s ? fill(f.cost.semi, { semi: rupees(s.total_price) }) : '') })
+    const personal = priced.filter((o) => offerTier(o) !== 'group')
+    if (personal.length) out.push({ q: f.cost.q, a: fill(f.cost.a, { list: personal.map((o) => `${o.name} ${rupees(o.price!)} ${weeks(o)}`).join(', ') }) })
   }
   switch (id) {
     case 'home': fees(); timings(); out.push(f.trial, f.women, f.weight, f.beginner); where(); steam(); break

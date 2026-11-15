@@ -1,10 +1,10 @@
 import { useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react'
 import { Link } from 'react-router-dom'
-import { siteHours, telLink, whatsappLink, prettyPhone, mapsLink, type SiteInfo } from '../db/site'
+import { siteHours, telLink, whatsappLink, prettyPhone, mapsLink, type SiteInfo, type SiteOffer } from '../db/site'
 import { supabase } from '../lib/supabase'
-import { Crest, GLYPHS, Ic, PAGE_ART, RatioArt, cosd, sind } from './art'
+import { Crest, GLYPHS, Ic, PAGE_ART, Squad, cosd, sind } from './art'
 import { PATHS, fill, type PageId } from './content'
-import { MEMBERS, addressText, batchTier, clock, liveStatus, openSpans, rupees, services, term, tierGroups, tierOf, type Tier } from './data'
+import { addressText, batchTier, clock, liveStatus, offerTier, offers, openSpans, rupees, services, weeksText, type Tier } from './data'
 import { prefersReducedMotion, useInView, useNow } from './motion'
 import { useCopy } from './layout'
 
@@ -68,102 +68,59 @@ export function Manifesto() {
   )
 }
 
-// Tiers ----------------------------------------------------------------------------------------------------------------
-type Group = ReturnType<typeof tierGroups>[number]
-function TierRow({ g, site, max }: { g: Group; site: SiteInfo; max: number }) {
+// Subscriptions -------------------------------------------------------------------------------------------------------
+/** The owner's one-line note, in Telugu when it is one of the studio's standard lines. */
+export const offerNote = (o: SiteOffer, c: ReturnType<typeof useCopy>['c']) => (o.note ? c.subs.notes[o.note] ?? o.note : null)
+/** "One coach, about 8 people": only when the owner shows group sizes. */
+export const sizeLine = (o: SiteOffer, c: ReturnType<typeof useCopy>['c']) =>
+  o.size == null ? null : o.size <= 1 ? c.subs.size.one : o.size === 2 ? c.subs.size.two : fill(c.subs.size.many, { n: o.size })
+/** "₹4,999 for 4 weeks", or nothing when the owner hides prices. */
+export function OfferPrice({ o }: { o: SiteOffer }) {
+  const { c } = useCopy()
+  if (o.price == null) return null
+  return <p className="sf-sub-price"><b>{rupees(o.price)}</b><span>{fill(c.subs.forTerm, { term: weeksText(o.weeks, c) })}</span></p>
+}
+
+function SubCard({ o, site }: { o: SiteOffer; site: SiteInfo }) {
   const { c } = useCopy()
   const ref = useRef<HTMLElement>(null)
   const seen = useInView(ref)
-  const showPrice = site.website.show_prices !== false
-  const one = g.plans.length === 1 ? g.plans[0] : null
-  const name = one ? one.name : c.tiers.names[g.tier]
-  const short = name.replace(/\s*[([][^)\]]*[)\]]/g, '').trim() || name
-  const shown = g.plans.slice(0, max)
+  const tier = offerTier(o)
+  const note = offerNote(o, c)
+  const size = sizeLine(o, c)
+  const wa = whatsappLink(site.website.whatsapp || site.studio.mobile, c.lead.waText)
   return (
-    <article ref={ref} className={`sf-tier ${seen ? 'is-in' : ''}`}>
-      <RatioArt members={MEMBERS[g.tier]} />
-      <div className="sf-tier-name"><h3>{name}</h3><span>{c.tiers[g.tier].ratio}</span></div>
-      <div className="sf-tier-text">
-        <p>{one?.description || c.tiers[g.tier].text}</p>
-        {!one && showPrice && (
-          <ul className="sf-options">
-            {shown.map((p) => <li key={p.id}><span>{p.name}</span><b>{rupees(p.total_price)}</b></li>)}
-            {g.plans.length > shown.length && <li className="is-more"><Link to={PATHS.plans} viewTransition className="sf-link">{fill(c.tiers.options, { count: g.plans.length })}</Link></li>}
-          </ul>
-        )}
-      </div>
-      <div className="sf-tier-buy">
-        {showPrice && (
-          <>
-            <div className="sf-price">
-              {!one && <small>{fill(c.tiers.from, { price: '' }).trim()}</small>}
-              <b>{rupees(g.from)}</b>
-              {one && one.discount_price != null && one.discount_price < one.price && <s>{rupees(one.price)}</s>}
-            </div>
-            <span className="sf-price-note">{planNote(one ?? g.plans[0], c)}</span>
-          </>
-        )}
-        <a href="#free-trial" className="sf-btn sf-btn-sm sf-magnet" data-plan={name} data-tier={g.tier}>{fill(c.tiers.choose, { name: short })}</a>
-      </div>
+    <article ref={ref} className={`sf-sub ${seen ? 'is-in' : ''}`}>
+      <header>
+        <h3>{o.name}</h3>
+        {note && <p className="sf-sub-note">{note}</p>}
+      </header>
+      {o.size != null && <div className="sf-sub-people"><Squad size={o.size} label={size!} coach={c.subs.coach} /><span>{size}</span></div>}
+      <p className="sf-sub-text">{c.subs.text[tier]}</p>
+      <footer>
+        {o.price != null ? <OfferPrice o={o} /> : wa && <a className="sf-link" href={wa} target="_blank" rel="noreferrer">{c.subs.askFee}</a>}
+        <a href="#free-trial" className="sf-btn sf-btn-red sf-magnet" data-plan={o.name} data-tier={tier}>{fill(c.subs.choose, { name: o.name })}</a>
+      </footer>
     </article>
   )
 }
 
-/** "for 4 weeks, 24 coached sessions" */
-export function planNote(p: SiteInfo['plans'][number], c: ReturnType<typeof useCopy>['c']) {
-  const t = fill(c.tiers.forTerm, { term: term(p, c) })
-  return p.session_count && !p.unlimited_sessions ? `${t}, ${fill(c.tiers.sessionsN, { count: p.session_count })}` : t
-}
-
-export function Tiers({ site, only, title, sub, max = 4 }: { site: SiteInfo; only?: Tier[]; title?: string; sub?: string; max?: number }) {
+/** The studio's subscriptions, from the dashboard: names, people per coach (drawn as figures) and prices. */
+export function Subscriptions({ site, only, title, sub, more = true }: { site: SiteInfo; only?: Tier[]; title?: string; sub?: string; more?: boolean }) {
   const { c } = useCopy()
-  const groups = tierGroups(site).filter((g) => !only || only.includes(g.tier))
-  if (!groups.length) return null
+  const list = offers(site).filter((o) => !only || only.includes(offerTier(o)))
+  if (!list.length) return null
   return (
-    <section className="sf-section" aria-labelledby="sf-tiers">
+    <section className="sf-section" id="subscriptions" aria-labelledby="sf-subs">
       <div className="sf-wrap">
         <div className="sf-head-split">
-          <h2 id="sf-tiers" className="sf-h2">{title ?? c.tiers.title}</h2>
-          <p className="sf-lede">{sub ?? c.tiers.sub}</p>
+          <h2 id="sf-subs" className="sf-h2">{title ?? c.subs.title}</h2>
+          <p className="sf-lede">{sub ?? c.subs.sub}</p>
         </div>
-        <div className="sf-tiers">{groups.map((g) => <TierRow key={g.tier} g={g} site={site} max={max} />)}</div>
-        <p className="sf-small" style={{ marginTop: 18 }}><Link to={PATHS.plans} viewTransition className="sf-link">{c.common.allPlans}</Link></p>
+        <div className={`sf-subs is-${Math.min(list.length, 3)}`}>{list.map((o) => <SubCard key={o.name} o={o} site={site} />)}</div>
+        <p className="sf-subs-foot">{c.subs.foot}{more && <> <Link to={PATHS.plans} viewTransition className="sf-link">{c.common.allPlans}</Link></>}</p>
       </div>
     </section>
-  )
-}
-
-/** Every plan with its length, sessions and fee, by tier (the plans page). */
-export function PlanTable({ site }: { site: SiteInfo }) {
-  const { c } = useCopy()
-  const groups = tierGroups(site)
-  const join = site.studio.can_sign_up !== false
-  if (!groups.length || site.website.show_prices === false) return null
-  return (
-    <div className="sf-plan-groups">
-      {groups.map((g) => (
-        <div key={g.tier} className="sf-table-wrap">
-          <table className="sf-table sf-plan-table">
-            <caption>{c.tiers.names[g.tier]}<span>{c.tiers[g.tier].ratio}</span></caption>
-            <thead><tr><th scope="col">{c.plans.cols.plan}</th><th scope="col">{c.plans.cols.term}</th><th scope="col">{c.plans.cols.sessions}</th><th scope="col" className="is-num">{c.plans.cols.fee}</th><th scope="col"><span className="sf-sr">{c.nav.trial}</span></th></tr></thead>
-            <tbody>
-              {g.plans.map((p) => (
-                <tr key={p.id}>
-                  <th scope="row">{p.name}</th>
-                  <td className="is-term" data-label={c.plans.cols.term}>{term(p, c)}</td>
-                  <td className="is-sess" data-label={c.plans.cols.sessions}>{p.unlimited_sessions ? c.plans.unlimited : p.session_count ?? c.plans.anyDay}</td>
-                  <td className="is-num"><b>{rupees(p.total_price)}</b>{p.discount_price != null && p.discount_price < p.price && <s>{rupees(p.price)}</s>}</td>
-                  <td className="is-act">{join
-                    ? <Link to={`/join?plan=${p.id}`} className="sf-btn sf-btn-sm" aria-label={`${c.nav.join}: ${p.name}`}>{c.nav.join}</Link>
-                    : <a href="#free-trial" className="sf-btn sf-btn-sm" data-plan={p.name} data-tier={g.tier}>{c.nav.trial}</a>}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      ))}
-      <p className="sf-small">{c.plans.note}</p>
-    </div>
   )
 }
 
@@ -338,7 +295,8 @@ export function DayRail({ site, only, title, sub, link = true }: { site: SiteInf
   const pct = (m: number) => `${((m - lo) / (hi - lo)) * 100}%`
   const hours = Array.from({ length: (hi - lo) / 60 + 1 }, (_, i) => lo + i * 60)
   const showNow = now && now.day === day && now.min >= lo && now.min <= hi
-  const label = (t: Tier) => (t === 'elite' ? c.day.elite : t === 'semi' ? c.day.semi : c.day.group)
+  const named = offers(site)
+  const label = (t: Tier) => named.find((o) => offerTier(o) === t)?.name ?? (t === 'elite' ? c.day.elite : t === 'semi' ? c.day.semi : c.day.group)
   const slotH = lanes > 3 ? 48 : 66, gap = 8, top = 40
   const height = top + lanes * (slotH + gap) + 44
   return (
@@ -529,7 +487,7 @@ export function BmiCheck() {
         <div>
           <svg className="sf-gauge" viewBox="0 0 400 230" role="img" aria-label={`${c.check.your} ${bmi.toFixed(1)}, ${c.check.band[band]}`}>
             <path d={arc(0, deg(18.5))} stroke="#3B5BFF" strokeWidth="22" fill="none" />
-            <path d={arc(deg(18.5) + 1, deg(25))} stroke="#D9B97A" strokeWidth="22" fill="none" />
+            <path d={arc(deg(18.5) + 1, deg(25))} stroke="#F2B84B" strokeWidth="22" fill="none" />
             <path d={arc(deg(25) + 1, deg(30))} stroke="#FF8A5B" strokeWidth="22" fill="none" />
             <path d={arc(deg(30) + 1, 180)} stroke="#E8283B" strokeWidth="22" fill="none" />
             <g className="sf-gauge-needle" style={{ transform: `rotate(${angle}deg)` }}>
@@ -568,7 +526,7 @@ function LeadForm({ site, page }: { site: SiteInfo | null; page: PageId }) {
       const a = (e.target as Element | null)?.closest?.('a[data-plan]')
       if (!a) return
       const name = a.getAttribute('data-plan') ?? ''
-      const t = (a.getAttribute('data-tier') as Tier | null) ?? tierOf({ name, kind: 'gym' })
+      const t = (a.getAttribute('data-tier') as Tier | null) ?? 'group'
       setF((x) => ({ ...x, interest: t === 'group' ? 'group' : 'personal', message: x.message || name }))
     }
     document.addEventListener('click', on)
@@ -729,35 +687,6 @@ export function HoursTable({ site }: { site: SiteInfo }) {
         )
       })}
     </dl>
-  )
-}
-
-export function CompareTable({ site }: { site: SiteInfo }) {
-  const { c } = useCopy()
-  const groups = tierGroups(site)
-  if (groups.length < 2) return null
-  const yes = <span aria-label="Yes" style={{ color: 'var(--sf-crimson-hi)' }}>{Ic.check(20)}</span>
-  const no = <span className="sf-small" aria-label="No">—</span>
-  const diet = (t: Tier) => groups.find((g) => g.tier === t)?.plans.some((p) => p.services.some((x) => /nutrition|diet/i.test(x)))
-  // Rows: coach-led sessions, your own written plan, diet plan, weekly progress check, Shaan app, coach attention.
-  const cell = (row: number, t: Tier) => {
-    if (row === 5) return c.plans.attention[t]
-    if (row === 1 || row === 3) return t === 'group' ? no : yes
-    if (row === 2) return t !== 'group' || diet(t) ? yes : no
-    return yes
-  }
-  return (
-    <div className="sf-table-wrap">
-      <table className="sf-table">
-        <caption className="sf-sr">{c.plans.compareTitle}</caption>
-        <thead><tr><th scope="col">{c.plans.feature}</th>{groups.map((g) => <th key={g.tier} scope="col" className={g.tier === 'elite' ? 'is-elite' : ''}>{g.plans.length === 1 ? g.plans[0].name : c.tiers.names[g.tier]}{site.website.show_prices !== false && <div className="sf-small" style={{ fontFamily: 'var(--sf-body)', fontStretch: '100%' }}>{g.plans.length === 1 ? rupees(g.from) : fill(c.tiers.from, { price: rupees(g.from) })}</div>}</th>)}</tr></thead>
-        <tbody>
-          {c.plans.rows.map((r, i) => (
-            <tr key={r}><th scope="row">{r}</th>{groups.map((g) => <td key={g.tier} className={g.tier === 'elite' ? 'is-elite' : ''}>{cell(i, g.tier)}</td>)}</tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
   )
 }
 

@@ -19,6 +19,29 @@ export interface SiteSettings {
   twitter?: string | null; linkedin?: string | null; video?: string | null
   /** The number on the website's call buttons (Settings › Website). */
   phone?: string | null
+  /** The subscriptions the website sells (Settings › Website). Visitors get only the ones switched on. */
+  offers?: SiteOffer[]
+  /** Whether the website shows people per coach. */
+  show_sizes?: boolean
+}
+/** One way to train. `size` is people per coach: the website draws that many figures. For visitors, `price` is null
+ *  when prices are hidden and `size` is null when group sizes are hidden; `show` only exists on the owner's copy. */
+export interface SiteOffer { name: string; note: string | null; size: number | null; price: number | null; weeks: number; show?: boolean }
+
+/** The studio's three subscriptions, used until the database has them (and as the starting point in Settings). */
+export const DEFAULT_OFFERS: SiteOffer[] = [
+  { name: 'Advanced Training', note: 'Group of 8 approx', size: 8, price: 4999, weeks: 4, show: true },
+  { name: 'Elite Coaching', note: 'Side-by-side personal training', size: 2, price: 7999, weeks: 4, show: true },
+  { name: 'VIP Coaching', note: 'One-on-one', size: 1, price: 13999, weeks: 4, show: true },
+]
+
+/** The subscriptions a visitor sees. Before the database update that adds them, the studio's three, with prices
+ *  following the existing "show prices" switch. */
+export function siteOffers(site: SiteInfo | null | undefined): SiteOffer[] {
+  const w = site?.website
+  if (w && Array.isArray(w.offers)) return w.offers.filter((o) => o && o.name)
+  const prices = w?.show_prices !== false
+  return DEFAULT_OFFERS.map((o) => ({ ...o, price: prices ? o.price : null }))
 }
 export interface SitePlan {
   id: string; name: string; kind: 'gym' | 'pt'; tenure_value: number; tenure_unit: 'days' | 'months' | 'years'

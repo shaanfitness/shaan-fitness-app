@@ -30,7 +30,7 @@ select test.fails($$select public.save_website('00000000-0000-4000-8000-00000000
 select set_config('request.jwt.claim.sub', '10000000-0000-4000-8000-000000000001', false);
 select test.fails($$select public.save_website('00000000-0000-4000-8000-000000000001', '{"website": {"map_url": "javascript:alert(1)"}}')$$,
   'https://', 'the map link must be a web address');
-select public.save_website(:studio, '{"website": {"hero_title": "Strong at every age", "show_prices": false, "whatsapp": "9502318090", "unknown_key": "x"},
+select public.save_website(:studio, '{"website": {"hero_title": "Strong at every age", "show_prices": false, "whatsapp": "9963547869", "unknown_key": "x"},
   "studio": {"street1": "Godari Gunta", "pincode": "533003"}}');
 reset role;
 set role anon;

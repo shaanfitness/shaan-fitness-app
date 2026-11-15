@@ -15,7 +15,8 @@ update public.studios set
     'instagram', case when coalesce(settings->'website'->>'instagram', '') = '' then 'https://www.instagram.com/shaanfitness.in' end,
     'twitter', case when coalesce(settings->'website'->>'twitter', '') = '' then 'https://x.com/ShaanFitnessGym' end,
     'youtube', case when coalesce(settings->'website'->>'youtube', '') = '' then 'https://www.youtube.com/@ShaanFitnessGym' end,
-    'whatsapp', case when coalesce(settings->'website'->>'whatsapp', '') = '' then '+919642467896' end)))
+    'whatsapp', case when coalesce(settings->'website'->>'whatsapp', '') = '' then '+919963547869' end,
+    'phone', case when coalesce(settings->'website'->>'phone', '') = '' then '+919642467896' end)))
 where slug = 'shaan-fitness';
 
 -- Fitness Center Timings: Monday to Saturday, 5 AM – 1 PM and 2 PM – 10 PM, everyone.

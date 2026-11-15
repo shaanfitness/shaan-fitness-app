@@ -15,9 +15,11 @@ select test.eq((public.site_info()->'website'->'offers'->1->>'price')::int, 7999
 select test.eq((public.site_info()->'website'->'offers'->2->>'weeks')::int, 4, 'for four weeks');
 select test.eq(public.site_info()->'website'->'offers'->0 ? 'show', false, 'the on/off switch itself is not sent');
 reset role;
-update public.studios set mobile = '9000000999' where id = :studio and mobile is null;
-select test.eq(position((select mobile from public.studios where id = :studio) in public.site_info()::text) > 0, false,
+create temp table t_o as select mobile from public.studios where id = :studio;
+update public.studios set mobile = '9000000999' where id = :studio;
+select test.eq(position('9000000999' in public.site_info()::text) > 0, false,
   'the studio''s own mobile (kept for invoices) is not sent to visitors');
+update public.studios set mobile = (select mobile from t_o) where id = :studio;
 
 -- Only the owner changes them, and only with sensible values ------------------------------------------------------
 set role authenticated;

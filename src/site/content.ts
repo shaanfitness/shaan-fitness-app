@@ -22,8 +22,8 @@ export const pageForPath = (path: string) => PAGE_IDS.find((id) => PATHS[id] ===
 /** Search results: title (under 60 characters) and description (under 160). */
 export const SEO: Record<PageId, { title: string; description: string }> = {
   home: {
-    title: 'Shaan Fitness | Gym & Personal Trainer in Kakinada',
-    description: 'Your trusted health partner in Kakinada: a coach-led studio at PNR Enclave, near D-Mart. Personal and group training. Book a free trial.',
+    title: 'Shaan Fitness | Semi-Private Training Studio in Kakinada',
+    description: 'Shaan Fitness is a semi-private training studio in Kakinada: coached small-group, side-by-side and one-on-one training. Book a free trial.',
   },
   personal: {
     title: 'Personal Trainer in Kakinada | 1:1 Coaching | Shaan Fitness',
@@ -39,7 +39,7 @@ export const SEO: Record<PageId, { title: string; description: string }> = {
   },
   plans: {
     title: 'Gym Membership Fees in Kakinada | Plans | Shaan Fitness',
-    description: 'Shaan Fitness membership plans and prices in Kakinada: coached group training and personal training, monthly to yearly. Book a free trial.',
+    description: 'Shaan Fitness subscriptions and fees in Kakinada: coached small-group, side-by-side and one-on-one training. Book a free trial.',
   },
   timings: {
     title: 'Gym Timings in Kakinada | Morning & Evening | Shaan Fitness',
@@ -55,7 +55,7 @@ export const SEO: Record<PageId, { title: string; description: string }> = {
   },
   about: {
     title: 'About Shaan Fitness | Training Studio in Kakinada',
-    description: 'Shaan Fitness is a coach-led training studio on the 5th floor of PNR Enclave, Kakinada. Our method, our space and why every session is coached.',
+    description: 'Shaan Fitness is a semi-private training studio on the 5th floor of PNR Enclave, Kakinada. Our method and why every session is coached.',
   },
   contact: {
     title: 'Contact Shaan Fitness | Gym at Godari Gunta, Kakinada',
@@ -65,7 +65,7 @@ export const SEO: Record<PageId, { title: string; description: string }> = {
 
 const en = {
   nav: {
-    training: 'Training', personal: 'Personal training', group: 'Group training', weightLoss: 'Weight loss', plans: 'Plans & fees',
+    training: 'Training', personal: 'Personal training', group: 'Group training', weightLoss: 'Weight loss', plans: 'Subscriptions',
     timings: 'Timings', coaches: 'Coaches', results: 'Transformations', about: 'About', contact: 'Contact', home: 'Home',
     menu: 'Menu', close: 'Close menu', login: 'Log in', join: 'Join online', openApp: 'Open my app', openDashboard: 'Open dashboard',
     trial: 'Book a free trial', call: 'Call', whatsapp: 'WhatsApp', skip: 'Skip to content',
@@ -74,7 +74,7 @@ const en = {
     openUntil: 'Open now, until {{time}}', opensAt: 'Opens today at {{time}}', opensOn: 'Opens {{day}} at {{time}}', closedNow: 'Closed now',
   },
   common: {
-    seePlans: 'See plans and fees', perCycle: '{{days}} days, {{sessions}} sessions', allPlans: 'All plans and fees', moreAbout: 'More about this',
+    seePlans: 'See the subscriptions', perCycle: '{{days}} days, {{sessions}} sessions', allPlans: 'All subscriptions', moreAbout: 'More about this',
     readFaq: 'Questions people ask', directions: 'Get directions', showMap: 'Show the map', address: 'Address', hours: 'Hours',
     phone: 'Phone', email: 'Email', follow: 'Follow us', rights: '© {{year}} Shaan Fitness, Kakinada. All rights reserved.',
     privacy: 'Privacy notice', staffLogin: 'Staff and member login', closed: 'Closed', mornings: 'Morning batches', evenings: 'Evening batches',
@@ -90,7 +90,7 @@ const en = {
   },
   facts: { days: 'days a week', batches: 'coached batches a day', sessions: 'sessions in every plan', ways: 'ways to train' },
   manifesto: {
-    text: 'Shaan Fitness is a coach-led studio. You train on a written plan, in small numbers, with a coach watching your sets: in a group batch, side by side with one other person, or one to one.',
+    text: 'Shaan Fitness is a semi-private training studio. You train on a written plan, in small numbers, with a coach watching your sets: in a small group, side by side, or one-on-one.',
     sign: '',
   },
   tiers: {
@@ -134,21 +134,29 @@ const en = {
     w1: 'Goblet squat', w2: 'Bench press', w3: 'Lat pull-down', w4: 'Plank', done: '3 of 4 done', glasses: '6 of 12 glasses', lost: 'Weight, last 6 weeks',
   },
   film: {
-    place: 'PNR Enclave, Kakinada', scroll: 'Scroll to step inside',
-    chapters: ['Shaan', 'Arrive', 'Reception', 'The floor', 'Assessment'],
-    h1: 'Your trusted health partner in Kakinada.',
-    lede: 'A coach-led training studio for strength, fat loss and fitness.',
-    c1: '5th floor, PNR Enclave.',
-    c1t: 'Near D-Mart on RTO Office Road, Kakinada. Open six days a week, with open gym hours alongside coached batches.',
-    c2: 'Five training zones.',
-    c2t: 'One floor, with steam and sauna, lockers and showers.',
-    c3: 'Coached, every session.',
-    c3t: 'Group batches, semi-private training for two, and one-to-one personal training. Every plan draws on five pillars: FORGE, BLAZE, FLOW, STRIKE and TRIBE.',
-    c4: 'Assessment first.',
-    c4t: 'Posture, mobility, strength and health history, before your first plan. Your coach writes the program from what the assessment shows.',
-    scan: 'Assessment',
-    parts: ['Chest and shoulders', 'Arms', 'Core', 'Legs'],
-    notes: ['Pressing strength, shoulder mobility', 'Pulling and grip', 'Bracing and back health', 'Squat, hinge and balance'],
+    place: 'Shaan Fitness, Kakinada', scroll: 'Scroll', home: 'Shaan', trial: 'Free trial',
+    h1a: 'Semi-private', h1b: 'training studio.',
+    lede: 'Coached training in small numbers, in Kakinada. Your trusted health partner.',
+    lastA: 'Your first session', lastB: 'is on us.',
+    lastText: 'Come see how coached training feels. Book a free trial, or call or message us.',
+    spare: [
+      { a: 'Coached,', b: 'every session.', t: 'A coach plans your block, watches your sets and tracks your progress.' },
+      { a: 'Assessment', b: 'first.', t: 'Posture, mobility, strength and health history, before your first plan.' },
+      { a: 'Planned,', b: 'not random.', t: 'Every plan draws on five pillars: FORGE, BLAZE, FLOW, STRIKE and TRIBE.' },
+    ],
+  },
+  subs: {
+    title: 'Choose how you train',
+    sub: 'One studio, one method, small numbers. What changes is how much of the coach you have to yourself.',
+    size: { one: 'One coach, only you', two: 'One coach, two of you', many: 'One coach, about {{n}} people' },
+    text: {
+      group: 'Strength, conditioning and mobility in planned training blocks, with the energy of training together. The coach corrects every rep.',
+      semi: 'You train side by side, each on your own plan, with the coach’s eyes on every set.',
+      elite: 'The coach is yours for the session: fully personal programming, form correction, a diet plan and progress reviews every week.',
+    },
+    forTerm: 'for {{term}}', askFee: 'Ask us for the fee', choose: 'Choose {{name}}', coach: 'Coach',
+    foot: 'Not sure which one fits? Book a free trial. Your coach assesses you first and tells you where to start.',
+    notes: {} as Record<string, string>,
   },
   community: {
     title: 'Outside the studio',
@@ -245,8 +253,8 @@ const en = {
     paceText: 'For most people a safe pace is about half to one kilogram a week. Your coach sets your target after the assessment and adjusts it as you go.',
   },
   plans: {
-    h1: 'Membership plans and fees',
-    intro: 'Every plan comes with coaching and the Shaan app. Choose how much one-to-one time with a coach you want, and for how long.',
+    h1: 'Subscriptions and fees',
+    intro: 'Every subscription comes with coaching and the Shaan app. Choose how much of the coach you want to yourself.',
     compareTitle: 'Compare the plans', feature: 'What you get',
     rows: ['Coach-led sessions', 'Your own written plan', 'Diet plan', 'Weekly progress check', 'Shaan app', 'Coach attention'],
     attention: { group: 'Shared in a small batch', semi: 'Shared by two', elite: 'All yours' },
@@ -264,7 +272,7 @@ const en = {
   resultsPage: { h1: 'Real results from real members', intro: 'Fat loss, strength and confidence, shared with permission by Shaan Fitness members in Kakinada.' },
   about: {
     h1: 'About Shaan Fitness',
-    intro: 'Shaan Fitness is a coach-led training studio on the 5th floor of PNR Enclave, near D-Mart on RTO Office Road, Kakinada: group batches, semi-private and one-to-one personal training, six days a week, with open gym hours alongside.',
+    intro: 'Shaan Fitness is a semi-private training studio on the 5th floor of PNR Enclave, near D-Mart on RTO Office Road, Kakinada: coached training in a small group, side by side or one-on-one, six days a week.',
     storyTitle: 'Why every session is coached',
     story: 'Most people don’t quit the gym because they are lazy. They quit because nobody showed them what to do, nobody noticed when they stopped coming, and nothing seemed to change. So at Shaan, a coach plans your block, watches your sets, tracks your progress and calls you when you miss a day.',
     spaceTitle: 'The space',
@@ -283,8 +291,8 @@ const en = {
     findTitle: 'Find us', talkTitle: 'Talk to us',
   },
   faqs: {
-    fees: { q: 'How much is a gym membership at Shaan Fitness, Kakinada?', a: 'Plans start from {{from}}: {{list}}. Every plan includes coaching and the Shaan app.' },
-    feesNoPrice: { q: 'How much is a gym membership at Shaan Fitness, Kakinada?', a: 'We have group, semi-private and one-to-one personal training plans. Call or WhatsApp us for the current fees.' },
+    fees: { q: 'How much does it cost to train at Shaan Fitness, Kakinada?', a: 'Subscriptions start from {{from}}: {{list}}. Every subscription includes coaching and the Shaan app.' },
+    feesNoPrice: { q: 'How much does it cost to train at Shaan Fitness, Kakinada?', a: 'We have small-group, side-by-side and one-on-one coaching. Call or WhatsApp us for the current fees.' },
     timings: { q: 'What are the gym timings?', a: 'We are open {{days}}, {{hours}}. Batches start throughout the morning and evening.' },
     trial: { q: 'Do you offer a free trial?', a: 'Yes. Book a free trial with the form on this page or message us on WhatsApp, and we will fix a session with a coach.' },
     women: { q: 'Is there a woman trainer?', a: 'Yes. Our team includes a woman trainer, and there are changing rooms and showers on site. For complete privacy, choose one-to-one personal training.' },
@@ -293,7 +301,7 @@ const en = {
     where: { q: 'Where is Shaan Fitness in Kakinada?', a: '{{address}}.' },
     facilities: { q: 'Do you have steam and sauna?', a: 'Yes. Members can use {{list}}.' },
     sessions: { q: 'How many sessions are in a plan?', a: 'Each {{term}} plan has {{count}} coached sessions.' },
-    cost: { q: 'How much does a personal trainer cost in Kakinada?', a: 'At Shaan Fitness, personal training plans start from {{elite}}, with your coach beside you for every session.', semi: ' Semi-private training for two starts from {{semi}}.' },
+    cost: { q: 'How much does a personal trainer cost in Kakinada?', a: 'At Shaan Fitness: {{list}}, with your coach beside you for every session.' },
     pace: { q: 'How much weight can I lose in a month?', a: 'A safe pace for most people is about half to one kilogram a week. Your coach sets your target after the assessment.' },
     supplements: { q: 'Do I need supplements?', a: 'No. Your diet plan uses regular food. Supplements are optional and your coach will tell you honestly if they help.' },
     freeze: { q: 'Can I pause my plan?', a: 'Yes. Ask to freeze your plan from the Shaan app when you travel or fall ill. Once the gym approves it, your end date moves.' },
@@ -305,7 +313,7 @@ export type Copy = typeof en
 
 const te: Copy = {
   nav: {
-    training: 'ట్రైనింగ్', personal: 'పర్సనల్ ట్రైనింగ్', group: 'గ్రూప్ ట్రైనింగ్', weightLoss: 'వెయిట్ లాస్', plans: 'ప్లాన్లు & ఫీజులు',
+    training: 'ట్రైనింగ్', personal: 'పర్సనల్ ట్రైనింగ్', group: 'గ్రూప్ ట్రైనింగ్', weightLoss: 'వెయిట్ లాస్', plans: 'సబ్‌స్క్రిప్షన్లు',
     timings: 'టైమింగ్స్', coaches: 'కోచ్‌లు', results: 'ట్రాన్స్‌ఫర్మేషన్స్', about: 'మా గురించి', contact: 'సంప్రదించండి', home: 'హోమ్',
     menu: 'మెనూ', close: 'మెనూ మూసివేయండి', login: 'లాగిన్', join: 'ఆన్‌లైన్‌లో చేరండి', openApp: 'నా యాప్ తెరవండి', openDashboard: 'డాష్‌బోర్డ్ తెరవండి',
     trial: 'ఉచిత ట్రయల్ బుక్ చేయండి', call: 'కాల్', whatsapp: 'WhatsApp', skip: 'కంటెంట్‌కు వెళ్ళండి',
@@ -314,7 +322,7 @@ const te: Copy = {
     openUntil: 'ఇప్పుడు తెరిచి ఉంది, {{time}} వరకు', opensAt: 'ఈరోజు {{time}} కి తెరుస్తాం', opensOn: '{{day}} {{time}} కి తెరుస్తాం', closedNow: 'ఇప్పుడు మూసి ఉంది',
   },
   common: {
-    seePlans: 'ప్లాన్లు, ఫీజులు చూడండి', perCycle: '{{days}} రోజులు, {{sessions}} సెషన్లు', allPlans: 'అన్ని ప్లాన్లు, ఫీజులు', moreAbout: 'మరింత తెలుసుకోండి',
+    seePlans: 'సబ్‌స్క్రిప్షన్లు చూడండి', perCycle: '{{days}} రోజులు, {{sessions}} సెషన్లు', allPlans: 'అన్ని సబ్‌స్క్రిప్షన్లు', moreAbout: 'మరింత తెలుసుకోండి',
     readFaq: 'తరచుగా అడిగే ప్రశ్నలు', directions: 'దారి చూపించు', showMap: 'మ్యాప్ చూపించు', address: 'చిరునామా', hours: 'సమయాలు',
     phone: 'ఫోన్', email: 'ఈమెయిల్', follow: 'మమ్మల్ని ఫాలో అవ్వండి', rights: '© {{year}} షాన్ ఫిట్‌నెస్, కాకినాడ. అన్ని హక్కులు రిజర్వ్ చేయబడ్డాయి.',
     privacy: 'ప్రైవసీ నోటీసు', staffLogin: 'సిబ్బంది, సభ్యుల లాగిన్', closed: 'మూసి ఉంది', mornings: 'ఉదయం బ్యాచ్‌లు', evenings: 'సాయంత్రం బ్యాచ్‌లు',
@@ -330,7 +338,7 @@ const te: Copy = {
   },
   facts: { days: 'రోజులు వారానికి', batches: 'కోచ్ బ్యాచ్‌లు రోజుకు', sessions: 'సెషన్లు ప్రతి ప్లాన్‌లో', ways: 'ట్రైనింగ్ విధానాలు' },
   manifesto: {
-    text: 'షాన్ ఫిట్‌నెస్ కోచ్ నడిపించే స్టూడియో. రాసిన ప్లాన్‌తో, తక్కువ మందితో, మీ సెట్లను కోచ్ చూస్తుండగా ట్రైన్ అవుతారు: గ్రూప్ బ్యాచ్‌లో, ఇంకొకరితో పక్కపక్కనే, లేదా వన్-టు-వన్.',
+    text: 'షాన్ ఫిట్‌నెస్ ఒక సెమీ-ప్రైవేట్ ట్రైనింగ్ స్టూడియో. రాసిన ప్లాన్‌తో, తక్కువ మందితో, మీ సెట్లను కోచ్ చూస్తుండగా ట్రైన్ అవుతారు: చిన్న గ్రూప్‌లో, పక్కపక్కనే, లేదా వన్-ఆన్-వన్.',
     sign: '',
   },
   tiers: {
@@ -374,21 +382,29 @@ const te: Copy = {
     w1: 'గాబ్లెట్ స్క్వాట్', w2: 'బెంచ్ ప్రెస్', w3: 'లాట్ పుల్-డౌన్', w4: 'ప్లాంక్', done: '4లో 3 పూర్తి', glasses: '12లో 6 గ్లాసులు', lost: 'బరువు, గత 6 వారాలు',
   },
   film: {
-    place: 'PNR ఎన్‌క్లేవ్, కాకినాడ', scroll: 'లోపలికి రావడానికి స్క్రోల్ చేయండి',
-    chapters: ['షాన్', 'రాక', 'రిసెప్షన్', 'ఫ్లోర్', 'అసెస్‌మెంట్'],
-    h1: 'కాకినాడలో మీ నమ్మకమైన ఆరోగ్య భాగస్వామి.',
-    lede: 'బలం, ఫ్యాట్ లాస్, ఫిట్‌నెస్ కోసం కోచ్ నడిపించే ట్రైనింగ్ స్టూడియో.',
-    c1: '5వ అంతస్తు, PNR ఎన్‌క్లేవ్.',
-    c1t: 'కాకినాడ RTO ఆఫీస్ రోడ్, D-Mart దగ్గర. వారానికి ఆరు రోజులు, కోచ్ బ్యాచ్‌లతో పాటు ఓపెన్ జిమ్ సమయాలు.',
-    c2: 'ఐదు ట్రైనింగ్ జోన్లు.',
-    c2t: 'స్టీమ్, సౌనా, లాకర్లు, షవర్లతో ఒకే అంతస్తు.',
-    c3: 'ప్రతి సెషన్‌కూ కోచ్.',
-    c3t: 'గ్రూప్ బ్యాచ్‌లు, ఇద్దరికి సెమీ-ప్రైవేట్, వన్-టు-వన్ పర్సనల్ ట్రైనింగ్. ప్రతి ప్లాన్ ఐదు పిల్లర్ల మీద: FORGE, BLAZE, FLOW, STRIKE, TRIBE.',
-    c4: 'ముందు అసెస్‌మెంట్.',
-    c4t: 'మీ మొదటి ప్లాన్‌కు ముందు పోస్చర్, మొబిలిటీ, బలం, ఆరోగ్య చరిత్ర. అసెస్‌మెంట్ చూపించినదాని ఆధారంగా కోచ్ ప్రోగ్రామ్ రాస్తారు.',
-    scan: 'అసెస్‌మెంట్',
-    parts: ['ఛాతీ, భుజాలు', 'చేతులు', 'కోర్', 'కాళ్లు'],
-    notes: ['ప్రెస్సింగ్ బలం, భుజాల మొబిలిటీ', 'పుల్లింగ్, గ్రిప్', 'బ్రేసింగ్, వెన్ను ఆరోగ్యం', 'స్క్వాట్, హింజ్, బ్యాలెన్స్'],
+    place: 'షాన్ ఫిట్‌నెస్, కాకినాడ', scroll: 'స్క్రోల్ చేయండి', home: 'షాన్', trial: 'ఉచిత ట్రయల్',
+    h1a: 'సెమీ-ప్రైవేట్', h1b: 'ట్రైనింగ్ స్టూడియో.',
+    lede: 'కాకినాడలో, తక్కువ మందితో, కోచ్ దగ్గరుండి చేయించే ట్రైనింగ్. మీ నమ్మకమైన ఆరోగ్య భాగస్వామి.',
+    lastA: 'మీ మొదటి సెషన్', lastB: 'మా తరఫున.',
+    lastText: 'కోచ్‌తో ట్రైనింగ్ ఎలా ఉంటుందో వచ్చి చూడండి. ఉచిత ట్రయల్ బుక్ చేయండి, లేదా కాల్ లేదా మెసేజ్ చేయండి.',
+    spare: [
+      { a: 'ప్రతి సెషన్‌కూ', b: 'కోచ్.', t: 'కోచ్ మీ బ్లాక్ ప్లాన్ చేస్తారు, మీ సెట్లు చూస్తారు, మీ ప్రోగ్రెస్ ట్రాక్ చేస్తారు.' },
+      { a: 'ముందు', b: 'అసెస్‌మెంట్.', t: 'మీ మొదటి ప్లాన్‌కు ముందు పోస్చర్, మొబిలిటీ, బలం, ఆరోగ్య చరిత్ర.' },
+      { a: 'ప్లాన్ ప్రకారం,', b: 'యాదృచ్ఛికంగా కాదు.', t: 'ప్రతి ప్లాన్ ఐదు పిల్లర్ల మీద: FORGE, BLAZE, FLOW, STRIKE, TRIBE.' },
+    ],
+  },
+  subs: {
+    title: 'మీరు ఎలా ట్రైన్ అవుతారో ఎంచుకోండి',
+    sub: 'ఒకే స్టూడియో, ఒకే పద్ధతి, తక్కువ మంది. మారేది కోచ్ సమయం మీకు ఎంత దక్కుతుందో మాత్రమే.',
+    size: { one: 'ఒక కోచ్, మీరు మాత్రమే', two: 'ఒక కోచ్, మీరిద్దరు', many: 'ఒక కోచ్, సుమారు {{n}} మంది' },
+    text: {
+      group: 'ప్లాన్ చేసిన ట్రైనింగ్ బ్లాక్‌లలో బలం, కండిషనింగ్, మొబిలిటీ, కలిసి ట్రైన్ అయ్యే ఉత్సాహంతో. కోచ్ ప్రతి రెప్‌ను సరిచేస్తారు.',
+      semi: 'పక్కపక్కనే ట్రైన్ అవుతారు, ఎవరి ప్లాన్ వాళ్ళది, ప్రతి సెట్‌పై కోచ్ దృష్టి.',
+      elite: 'ఆ సెషన్ కోచ్ మీకే: పూర్తిగా వ్యక్తిగత ప్రోగ్రామ్, ఫార్మ్ సరిచేయడం, డైట్ ప్లాన్, ప్రతి వారం ప్రోగ్రెస్ రివ్యూ.',
+    },
+    forTerm: '{{term}}కు', askFee: 'ఫీజు కోసం మమ్మల్ని అడగండి', choose: '{{name}} ఎంచుకోండి', coach: 'కోచ్',
+    foot: 'ఏది సరిపోతుందో తెలియడం లేదా? ఉచిత ట్రయల్ బుక్ చేయండి. కోచ్ ముందు మిమ్మల్ని అసెస్ చేసి, ఎక్కడ మొదలుపెట్టాలో చెబుతారు.',
+    notes: { 'Group of 8 approx': 'సుమారు 8 మంది గ్రూప్', 'Side-by-side personal training': 'పక్కపక్కనే పర్సనల్ ట్రైనింగ్', 'One-on-one': 'వన్-ఆన్-వన్' } as Record<string, string>,
   },
   community: {
     title: 'స్టూడియో బయట',
@@ -485,8 +501,8 @@ const te: Copy = {
     paceText: 'చాలా మందికి వారానికి అర కేజీ నుండి ఒక కేజీ సురక్షితమైన వేగం. అసెస్‌మెంట్ తర్వాత కోచ్ మీ లక్ష్యం నిర్ణయించి, అవసరమైనప్పుడు మారుస్తారు.',
   },
   plans: {
-    h1: 'మెంబర్‌షిప్ ప్లాన్లు, ఫీజులు',
-    intro: 'ప్రతి ప్లాన్‌లో కోచింగ్, షాన్ యాప్ ఉంటాయి. కోచ్‌తో వన్-టు-వన్ సమయం ఎంత కావాలో, ఎంత కాలమో ఎంచుకోండి.',
+    h1: 'సబ్‌స్క్రిప్షన్లు, ఫీజులు',
+    intro: 'ప్రతి సబ్‌స్క్రిప్షన్‌లో కోచింగ్, షాన్ యాప్ ఉంటాయి. కోచ్ సమయం మీకు ఎంత కావాలో ఎంచుకోండి.',
     compareTitle: 'ప్లాన్లను పోల్చండి', feature: 'మీకు లభించేది',
     rows: ['కోచ్ నడిపించే సెషన్లు', 'మీకోసం రాసిన ప్లాన్', 'డైట్ ప్లాన్', 'వారానికోసారి ప్రోగ్రెస్ చెక్', 'షాన్ యాప్', 'కోచ్ శ్రద్ధ'],
     attention: { group: 'చిన్న బ్యాచ్‌లో పంచుకుంటారు', semi: 'ఇద్దరు పంచుకుంటారు', elite: 'పూర్తిగా మీదే' },
@@ -504,7 +520,7 @@ const te: Copy = {
   resultsPage: { h1: 'నిజమైన సభ్యుల నిజమైన ఫలితాలు', intro: 'కాకినాడ షాన్ ఫిట్‌నెస్ సభ్యులు అనుమతితో పంచుకున్న ఫ్యాట్ లాస్, బలం, ఆత్మవిశ్వాసం.' },
   about: {
     h1: 'షాన్ ఫిట్‌నెస్ గురించి',
-    intro: 'షాన్ ఫిట్‌నెస్ కాకినాడ RTO ఆఫీస్ రోడ్, D-Mart దగ్గర, PNR ఎన్‌క్లేవ్ 5వ అంతస్తులోని కోచ్ నడిపించే ట్రైనింగ్ స్టూడియో: గ్రూప్ బ్యాచ్‌లు, సెమీ-ప్రైవేట్, వన్-టు-వన్ పర్సనల్ ట్రైనింగ్, వారానికి ఆరు రోజులు, వాటితో పాటు ఓపెన్ జిమ్ సమయాలు.',
+    intro: 'షాన్ ఫిట్‌నెస్ కాకినాడ RTO ఆఫీస్ రోడ్, D-Mart దగ్గర, PNR ఎన్‌క్లేవ్ 5వ అంతస్తులో ఉన్న సెమీ-ప్రైవేట్ ట్రైనింగ్ స్టూడియో: చిన్న గ్రూప్‌లో, పక్కపక్కనే, లేదా వన్-ఆన్-వన్ కోచ్ ట్రైనింగ్, వారానికి ఆరు రోజులు.',
     storyTitle: 'ప్రతి సెషన్‌కు కోచ్ ఎందుకు',
     story: 'చాలా మంది సోమరితనం వల్ల జిమ్ మానేయరు. ఏం చేయాలో ఎవరూ చూపించకపోవడం, రావడం ఆపేసినప్పుడు ఎవరూ గమనించకపోవడం, ఏమీ మారకపోవడం వల్ల మానేస్తారు. అందుకే షాన్‌లో కోచ్ మీ బ్లాక్ ప్లాన్ చేస్తారు, మీ సెట్లు చూస్తారు, ప్రగతి ట్రాక్ చేస్తారు, మీరు రాని రోజు కాల్ చేస్తారు.',
     spaceTitle: 'మా స్థలం',
@@ -523,8 +539,8 @@ const te: Copy = {
     findTitle: 'మమ్మల్ని కనుగొనండి', talkTitle: 'మాతో మాట్లాడండి',
   },
   faqs: {
-    fees: { q: 'కాకినాడ షాన్ ఫిట్‌నెస్‌లో జిమ్ మెంబర్‌షిప్ ఎంత?', a: 'ప్లాన్లు {{from}} నుండి మొదలవుతాయి: {{list}}. ప్రతి ప్లాన్‌లో కోచింగ్, షాన్ యాప్ ఉంటాయి.' },
-    feesNoPrice: { q: 'కాకినాడ షాన్ ఫిట్‌నెస్‌లో జిమ్ మెంబర్‌షిప్ ఎంత?', a: 'గ్రూప్, సెమీ-ప్రైవేట్, వన్-టు-వన్ పర్సనల్ ట్రైనింగ్ ప్లాన్లు ఉన్నాయి. ప్రస్తుత ఫీజుల కోసం కాల్ లేదా WhatsApp చేయండి.' },
+    fees: { q: 'కాకినాడ షాన్ ఫిట్‌నెస్‌లో ట్రైనింగ్‌కు ఎంత ఖర్చు?', a: 'సబ్‌స్క్రిప్షన్లు {{from}} నుండి మొదలవుతాయి: {{list}}. ప్రతి సబ్‌స్క్రిప్షన్‌లో కోచింగ్, షాన్ యాప్ ఉంటాయి.' },
+    feesNoPrice: { q: 'కాకినాడ షాన్ ఫిట్‌నెస్‌లో ట్రైనింగ్‌కు ఎంత ఖర్చు?', a: 'చిన్న గ్రూప్, పక్కపక్కనే, వన్-ఆన్-వన్ కోచింగ్ ఉన్నాయి. ప్రస్తుత ఫీజుల కోసం కాల్ లేదా WhatsApp చేయండి.' },
     timings: { q: 'జిమ్ టైమింగ్స్ ఏమిటి?', a: 'మేము {{days}}, {{hours}} తెరిచి ఉంటాం. ఉదయం, సాయంత్రం అంతా బ్యాచ్‌లు మొదలవుతాయి.' },
     trial: { q: 'ఉచిత ట్రయల్ ఉందా?', a: 'అవును. ఈ పేజీలోని ఫారంతో లేదా WhatsAppలో ఉచిత ట్రయల్ బుక్ చేయండి, కోచ్‌తో సెషన్ నిర్ణయిస్తాం.' },
     women: { q: 'మహిళా ట్రైనర్ ఉన్నారా?', a: 'అవును. మా బృందంలో మహిళా ట్రైనర్ ఉన్నారు, చేంజింగ్ రూమ్‌లు, షవర్లు కూడా ఉన్నాయి. పూర్తి ప్రైవసీ కోసం వన్-టు-వన్ పర్సనల్ ట్రైనింగ్ ఎంచుకోండి.' },
@@ -533,7 +549,7 @@ const te: Copy = {
     where: { q: 'కాకినాడలో షాన్ ఫిట్‌నెస్ ఎక్కడ ఉంది?', a: '{{address}}.' },
     facilities: { q: 'స్టీమ్, సౌనా ఉన్నాయా?', a: 'అవును. సభ్యులు {{list}} వాడుకోవచ్చు.' },
     sessions: { q: 'ఒక ప్లాన్‌లో ఎన్ని సెషన్లు?', a: 'ప్రతి {{term}} ప్లాన్‌లో {{count}} కోచ్ సెషన్లు ఉంటాయి.' },
-    cost: { q: 'కాకినాడలో పర్సనల్ ట్రైనర్‌కు ఎంత ఖర్చు?', a: 'షాన్ ఫిట్‌నెస్‌లో పర్సనల్ ట్రైనింగ్ ప్లాన్లు {{elite}} నుండి మొదలవుతాయి, ప్రతి సెషన్‌లో కోచ్ మీ పక్కనే.', semi: ' ఇద్దరికి సెమీ-ప్రైవేట్ ట్రైనింగ్ {{semi}} నుండి.' },
+    cost: { q: 'కాకినాడలో పర్సనల్ ట్రైనర్‌కు ఎంత ఖర్చు?', a: 'షాన్ ఫిట్‌నెస్‌లో: {{list}}, ప్రతి సెషన్‌లో కోచ్ మీ పక్కనే.' },
     pace: { q: 'ఒక నెలలో ఎంత బరువు తగ్గవచ్చు?', a: 'చాలా మందికి వారానికి అర కేజీ నుండి ఒక కేజీ సురక్షితమైన వేగం. అసెస్‌మెంట్ తర్వాత కోచ్ మీ లక్ష్యం నిర్ణయిస్తారు.' },
     supplements: { q: 'సప్లిమెంట్లు అవసరమా?', a: 'లేదు. మీ డైట్ ప్లాన్ సాధారణ ఆహారాన్నే వాడుతుంది. సప్లిమెంట్లు ఐచ్ఛికం, అవి ఉపయోగపడితే కోచ్ నిజాయితీగా చెబుతారు.' },
     freeze: { q: 'నా ప్లాన్‌ను ఆపవచ్చా?', a: 'అవును. ప్రయాణం లేదా అనారోగ్యం సమయంలో షాన్ యాప్ నుండి ప్లాన్ ఫ్రీజ్ కోరండి. జిమ్ ఆమోదించాక మీ ముగింపు తేదీ ముందుకు జరుగుతుంది.' },

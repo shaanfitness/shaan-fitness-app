@@ -116,7 +116,7 @@ function Header() {
         <div className="sf-head-side">
           <span className="sf-hide-sm"><LangSwitch /></span>
           <span className="sf-hide-sm"><Account /></span>
-          <a href="#free-trial" className="sf-btn sf-btn-red sf-btn-sm sf-hide-sm sf-magnet">{c.nav.trial}</a>
+          <a href="#free-trial" className="sf-btn sf-btn-light sf-btn-sm sf-hide-sm sf-magnet">{c.nav.trial}</a>
           <button type="button" className="sf-burger" aria-expanded={menu} aria-controls="sf-menu" aria-label={c.nav.menu} onClick={() => setMenu(true)}>{Ic.menu(22)}</button>
         </div>
       </div>

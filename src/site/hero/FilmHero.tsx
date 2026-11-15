@@ -1,28 +1,28 @@
 import { useEffect, useRef, useState, type CSSProperties } from 'react'
-import { Link } from 'react-router-dom'
-import { whatsappLink, type SiteInfo } from '../../db/site'
-import { Ic } from '../art'
-import { PATHS } from '../content'
+import { telLink, whatsappLink, type SiteInfo, type SiteOffer } from '../../db/site'
+import { Ic, Squad } from '../art'
+import { fill } from '../content'
+import { offerTier, offers } from '../data'
 import { useCopy } from '../layout'
 import { prefersReducedMotion } from '../motion'
-import { LiveChip } from '../sections'
+import { LiveChip, OfferPrice, offerNote, sizeLine } from '../sections'
 import { LOGO, LOGO_COLORS } from './logoPaths'
 
-// The home page hero: a short film, rendered ahead of time in Blender, in one continuous shot. It opens on the
-// logo: gold blueprint lines, then the metal pieces fly in and lock together. That part plays by itself on the
-// first visit, after the loader. From the finished emblem on, scrolling drives it: through the ring to the street
-// at blue hour, up to the 5th floor sign, into reception, across the gym floor, and into the assessment scan,
-// where muscle groups light up one by one. It is drawn on a plain 2D canvas (no WebGL), so it plays the same on
-// every phone. The finished emblem is an ordinary image in the page, so something good shows before any script
-// runs, and every chapter's words are in the page for search and screen readers.
+// The home page hero: the logo as a machine, rendered ahead of time in Blender, on a black stage. On the first visit
+// it assembles by itself after the loader: the blue core spins up, the barbell slides in, the ring, the S and the F
+// lock on, out of white smoke. From the finished emblem on, scrolling drives one continuous shot with five chapters:
+// the studio, then one chapter for each subscription (a glide over the red plate, the letters opening on the blue
+// core, the emblem as blue wireframe at dusk), then sunrise and the free trial. The subscriptions' names, group
+// sizes and prices come from the dashboard; each group size is drawn as that many figures.
+// It is drawn on a plain 2D canvas (no WebGL), so it plays the same on every phone. The finished emblem is an
+// ordinary image in the page, so something good shows before any script runs, and every chapter's words are in the
+// page for search and screen readers.
 
-export const FILM_FRAMES = 224
+export const FILM_FRAMES = 192
 /** The logo is complete here; scrolling starts from this frame and the assembly before it plays by itself. */
-const HOME = 48
-/** Frames where each chapter starts (from the render scripts: 64 frames of logo, then the 160-frame walk-through). */
-const CHAPTER_AT = [44, 86, 107, 139, 176]
-/** Frames where each muscle group lights up in the scan. */
-const SCAN_AT = [192, 198, 204, 209]
+const HOME = 40
+/** Frames where each chapter starts (from tools/film/emblem.py: close-up from 80, core from 108, dusk from 138, sunrise from 158). */
+const CHAPTER_AT = [36, 80, 111, 141, 166]
 const INTRO_MS = 2600
 const frameSrc = (fmt: 'land' | 'port', i: number) => `/film/${fmt}/${String(i).padStart(3, '0')}.webp`
 
@@ -56,7 +56,6 @@ export function FilmHero({ site }: { site: SiteInfo | null }) {
   const section = useRef<HTMLElement>(null)
   const canvas = useRef<HTMLCanvasElement>(null)
   const [ch, setCh] = useState(0)
-  const [scan, setScan] = useState(-1)
   const [live, setLive] = useState(false)
   // The opening loader. It is in the built page, shown by CSS from the first paint when the page's head script asked
   // for it (first visit this session), so the logo starts drawing before any JavaScript has loaded; then this takes
@@ -69,6 +68,11 @@ export function FilmHero({ site }: { site: SiteInfo | null }) {
   const assembly = useRef<'no' | 'wait' | 'play' | 'snap' | 'done'>('no')
   const kickRef = useRef<() => void>(() => {})
   const wa = whatsappLink(site?.website.whatsapp || site?.studio.mobile, c.lead.waText)
+  const tel = telLink(site?.studio.mobile)
+  // Chapters two to four: the first three subscriptions; a line about the method fills a slot the owner left empty.
+  const list = offers(site)
+  const slots: (SiteOffer | null)[] = [0, 1, 2].map((i) => list[i] ?? null)
+  const names = [k.home, ...slots.map((o, i) => o?.name ?? `${k.spare[i].a} ${k.spare[i].b}`), k.trial]
 
   useEffect(() => {
     if (!claimed.current) {
@@ -155,9 +159,6 @@ export function FilmHero({ site }: { site: SiteInfo | null }) {
       for (let i = 0; i < CHAPTER_AT.length; i++) if (fi >= CHAPTER_AT[i]) chapter = i
       setCh(Math.max(0, chapter))
       sec.classList.toggle('is-assembling', fi < CHAPTER_AT[0])
-      let s = -1
-      for (let i = 0; i < SCAN_AT.length; i++) if (fi >= SCAN_AT[i]) s = i
-      setScan(s)
     }
     const loop = (now: number) => {
       raf = 0
@@ -222,6 +223,7 @@ export function FilmHero({ site }: { site: SiteInfo | null }) {
 
   const custom = site?.website.hero_title
   const off = (i: number) => (ch === i ? undefined : -1)
+  const count = (i: number) => <p className="sf-film-count" aria-hidden="true"><b>{i + 1}</b> / {names.length}<span>{names[i]}</span></p>
   return (
     <>
     {intro !== 'off' && (
@@ -252,50 +254,59 @@ export function FilmHero({ site }: { site: SiteInfo | null }) {
 
         <div className="sf-wrap sf-film-copy">
           <div className={`sf-film-ch ${ch === 0 ? 'is-on' : ''}`}>
-            <h1 id="sf-h1" className="sf-film-title">{custom || k.h1}</h1>
+            {count(0)}
+            <h1 id="sf-h1" className="sf-film-title">{custom || <>{k.h1a} <em>{k.h1b}</em></>}</h1>
             <p>{site?.website.hero_text || k.lede}</p>
             <div className="sf-ctas">
               <a href="#free-trial" className="sf-btn sf-btn-red sf-magnet" tabIndex={off(0)}>{c.nav.trial}</a>
-              <Link to={PATHS.plans} viewTransition className="sf-btn sf-btn-glass sf-magnet" tabIndex={off(0)}>{c.common.seePlans}</Link>
+              <a href="#subscriptions" className="sf-btn sf-btn-glass sf-magnet" tabIndex={off(0)}>{c.common.seePlans}</a>
             </div>
           </div>
-          <div className={`sf-film-ch ${ch === 1 ? 'is-on' : ''}`}>
-            <h2 className="sf-film-title">{k.c1}</h2>
-            <p>{k.c1t}</p>
-          </div>
-          <div className={`sf-film-ch ${ch === 2 ? 'is-on' : ''}`}>
-            <h2 className="sf-film-title">{k.c2}</h2>
-            <p>{k.c2t}</p>
-          </div>
-          <div className={`sf-film-ch ${ch === 3 ? 'is-on' : ''}`}>
-            <h2 className="sf-film-title">{k.c3}</h2>
-            <p>{k.c3t}</p>
-          </div>
+          {slots.map((o, i) => {
+            const n = i + 1
+            if (!o) {
+              const sp = k.spare[i]
+              return (
+                <div key={n} className={`sf-film-ch ${ch === n ? 'is-on' : ''}`}>
+                  {count(n)}
+                  <h2 className="sf-film-title">{sp.a} <em>{sp.b}</em></h2>
+                  <p>{sp.t}</p>
+                </div>
+              )
+            }
+            const cut = o.name.indexOf(' ')
+            const note = offerNote(o, c)
+            const size = sizeLine(o, c)
+            return (
+              <div key={n} className={`sf-film-ch ${ch === n ? 'is-on' : ''}`}>
+                {count(n)}
+                <h2 className="sf-film-title">{cut < 0 ? o.name : <>{o.name.slice(0, cut)} <em>{o.name.slice(cut + 1)}</em></>}</h2>
+                <div className="sf-film-card">
+                  {note && <p className="sf-film-note">{note}</p>}
+                  {o.size != null && <div className="sf-sub-people"><Squad size={o.size} label={size!} coach={c.subs.coach} /><span>{size}</span></div>}
+                  <OfferPrice o={o} />
+                </div>
+                <div className="sf-ctas">
+                  <a href="#free-trial" className="sf-btn sf-btn-light sf-btn-sm sf-magnet" data-plan={o.name} data-tier={offerTier(o)} tabIndex={off(n)}>{fill(c.subs.choose, { name: o.name })}</a>
+                </div>
+              </div>
+            )
+          })}
           <div className={`sf-film-ch ${ch === 4 ? 'is-on' : ''}`}>
-            <h2 className="sf-film-title">{k.c4}</h2>
-            <p>{k.c4t}</p>
+            {count(4)}
+            <h2 className="sf-film-title">{k.lastA} <em>{k.lastB}</em></h2>
+            <p>{k.lastText}</p>
             <div className="sf-ctas">
               <a href="#free-trial" className="sf-btn sf-btn-red sf-magnet" tabIndex={off(4)}>{c.nav.trial}</a>
               {wa && <a href={wa} target="_blank" rel="noreferrer" className="sf-btn sf-btn-glass sf-magnet" tabIndex={off(4)}>{Ic.whatsapp(18)}{c.nav.whatsapp}</a>}
+              {tel && <a href={tel} className="sf-btn sf-btn-glass sf-magnet" tabIndex={off(4)}>{Ic.phone(18)}{c.nav.call}</a>}
             </div>
           </div>
-        </div>
-
-        <div className={`sf-film-scan ${ch === 4 ? 'is-on' : ''} ${scan >= 0 ? 'has-part' : ''}`} aria-hidden={ch !== 4}>
-          <p className="sf-film-scan-head"><i />{k.scan}</p>
-          <ol>
-            {k.parts.map((part, i) => (
-              <li key={part} className={scan === i ? 'is-on' : scan > i ? 'is-done' : ''}>
-                <b>{part}</b>
-                <span>{k.notes[i]}</span>
-              </li>
-            ))}
-          </ol>
         </div>
 
         <div className="sf-wrap sf-film-foot">
           <ol className="sf-film-steps" aria-hidden="true">
-            {k.chapters.map((name, i) => <li key={name} className={ch === i ? 'is-on' : ch > i ? 'is-past' : ''}><b>{String(i + 1).padStart(2, '0')}</b><span>{name}</span></li>)}
+            {names.map((name, i) => <li key={i} className={ch === i ? 'is-on' : ch > i ? 'is-past' : ''}><b>{i + 1}</b><span>{name}</span></li>)}
           </ol>
           <div className="sf-film-bar" aria-hidden="true"><i /></div>
           <span className={`sf-film-cue ${ch === 0 ? 'is-on' : ''}`} aria-hidden="true">{k.scroll}<i /></span>

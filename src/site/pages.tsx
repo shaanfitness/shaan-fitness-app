@@ -1,11 +1,11 @@
 import type { ReactNode } from 'react'
 import { useSite, type SiteInfo } from '../db/site'
 import { PATHS, type Copy, type PageId } from './content'
-import { faqFor, openSpans, tierGroups } from './data'
+import { faqFor, offerTier, offers, openSpans } from './data'
 import { SiteLayout, useCopy } from './layout'
 import {
-  AppShowcase, Athletic, BmiCheck, Cards, Checks, CoachGrid, Community, CompareTable, ContactBlock, Cta, DayRail, Faq, HoursTable, JoinSteps,
-  Manifesto, Marquee, Method, PageHero, PlanTable, ResultsGrid, Section, Studio, Tiers,
+  AppShowcase, Athletic, BmiCheck, Cards, Checks, CoachGrid, Community, ContactBlock, Cta, DayRail, Faq, HoursTable, JoinSteps,
+  Manifesto, Marquee, Method, PageHero, ResultsGrid, Section, Studio, Subscriptions,
 } from './sections'
 import { useHead } from './seo'
 import { FilmHero } from './hero/FilmHero'
@@ -37,14 +37,15 @@ function Body({ id, site }: { id: PageId; site: SiteInfo | null }) {
       <>
         <FilmHero site={site} />
         {site && <Marquee site={site} />}
+        {site && <Subscriptions site={site} />}
+        <JoinSteps />
         <Manifesto />
-        {site && <Tiers site={site} />}
         <Method />
-        <Athletic />
         {site && <CoachGrid site={site} limit={3} />}
         {site && <ResultsGrid site={site} />}
-        <Community site={site} />
         {site && <DayRail site={site} />}
+        <Athletic />
+        <Community site={site} />
       </>
     )
   }
@@ -52,13 +53,13 @@ function Body({ id, site }: { id: PageId; site: SiteInfo | null }) {
   const top = <PageHero id={id} title={h.title} intro={h.intro} site={site} />
   switch (id) {
     case 'personal': {
-      const semi = site ? tierGroups(site).some((g) => g.tier === 'semi') : false
+      const semi = offers(site).some((o) => offerTier(o) === 'semi')
       return (
         <>
           {top}
           <Section title={c.personal.includesTitle}><Checks items={c.personal.includes} /></Section>
           <Section title={c.personal.forTitle} tone="deep"><Cards items={c.personal.for} /></Section>
-          {site && <Tiers site={site} only={['semi', 'elite']} title={c.nav.personal} max={6} />}
+          {site && <Subscriptions site={site} only={['semi', 'elite']} title={c.nav.personal} />}
           {semi && <Section tone="ink"><Story title={c.personal.semiTitle} text={c.personal.semiText} /></Section>}
           <Athletic />
           {site && <CoachGrid site={site} limit={3} />}
@@ -73,7 +74,7 @@ function Body({ id, site }: { id: PageId; site: SiteInfo | null }) {
           <Section title={c.group.whyTitle}><Cards items={c.group.why} cols={2} /></Section>
           <Method />
           {site && <DayRail site={site} only={['group']} title={c.group.batchesTitle} />}
-          {site && <Tiers site={site} only={['group']} title={c.nav.group} max={6} />}
+          {site && <Subscriptions site={site} only={['group']} title={c.nav.group} />}
           <JoinSteps />
         </>
       )
@@ -95,7 +96,7 @@ function Body({ id, site }: { id: PageId; site: SiteInfo | null }) {
             </div>
           </Section>
           <BmiCheck />
-          {site && <Tiers site={site} />}
+          {site && <Subscriptions site={site} />}
           <AppShowcase />
         </>
       )
@@ -103,9 +104,7 @@ function Body({ id, site }: { id: PageId; site: SiteInfo | null }) {
       return (
         <>
           {top}
-          {site && tierGroups(site).length > 0 && site.website.show_prices !== false && <Section title={c.plans.allTitle}><PlanTable site={site} /></Section>}
-          {site && tierGroups(site).length > 1 && <Section title={c.plans.compareTitle} tone="deep"><CompareTable site={site} /></Section>}
-          {site && site.website.show_prices === false && <Tiers site={site} />}
+          {site && <Subscriptions site={site} more={false} />}
           <Section tone="ink"><Story title={c.plans.freezeTitle} text={c.plans.freezeText} /></Section>
           <JoinSteps />
         </>
@@ -124,7 +123,7 @@ function Body({ id, site }: { id: PageId; site: SiteInfo | null }) {
             </Section>
           )}
           {site && <DayRail site={site} title={c.timings.batchesTitle} link={false} />}
-          {site && <Tiers site={site} />}
+          {site && <Subscriptions site={site} />}
         </>
       )
     }

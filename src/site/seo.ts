@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 import type { SiteInfo } from '../db/site'
-import { COPY, PATHS, SEO, fill, type Lang, type PageId } from './content'
-import { faqFor, openSpans, rupees, salePlans, tierGroups, tierOf } from './data'
+import { COPY, PATHS, SEO, type Lang, type PageId } from './content'
+import { faqFor, offerTier, offers, openSpans, rupees } from './data'
 
 // What search engines and link previews read: title, description, canonical address, Open Graph and the
 // structured data (gym, offers, breadcrumbs, FAQ). The build writes it into each page's HTML; the app keeps
@@ -23,7 +23,7 @@ export function jsonLd(id: PageId, site: SiteInfo | null, origin: string, lang: 
     const spans = openSpans(site)
     const hours: Record<string, string[]> = {}
     for (let d = 1; d <= 7; d++) for (const [a, b] of spans[d]) (hours[`${hhmm(a)}-${hhmm(b)}`] ??= []).push(DAYS[d - 1])
-    const plans = salePlans(site)
+    const priced = offers(site).filter((o) => o.price != null).sort((a, b) => a.price! - b.price!)
     out.push({
       '@context': 'https://schema.org', '@type': 'HealthClub', '@id': gymId, name: s.name, alternateName: 'SHAAN',
       slogan: s.tag_line ?? undefined, description: SEO.home.description, url: `${origin}/`, logo: `${origin}/icon-512.png`, image: `${origin}/og.png`,
@@ -33,14 +33,14 @@ export function jsonLd(id: PageId, site: SiteInfo | null, origin: string, lang: 
       areaServed: { '@type': 'City', name: s.city ?? 'Kakinada' },
       hasMap: w.map_url ?? undefined,
       openingHoursSpecification: Object.entries(hours).map(([k, days]) => ({ '@type': 'OpeningHoursSpecification', dayOfWeek: days, opens: k.slice(0, 5), closes: k.slice(6) })),
-      priceRange: plans.length && w.show_prices !== false ? `${rupees(plans[0].total_price)} - ${rupees(plans[plans.length - 1].total_price)}` : '₹₹',
+      priceRange: priced.length ? `${rupees(priced[0].price!)} - ${rupees(priced[priced.length - 1].price!)}` : '₹₹',
       amenityFeature: s.facilities.slice(0, 12).map((f) => ({ '@type': 'LocationFeatureSpecification', name: f, value: true })),
       sameAs: [w.instagram, w.facebook, w.youtube, w.twitter, w.linkedin].filter((u): u is string => !!u && /^https:\/\//.test(u)),
-      ...(plans.length && w.show_prices !== false ? {
-        hasOfferCatalog: { '@type': 'OfferCatalog', name: 'Membership plans', itemListElement: plans.map((p) => ({
-          '@type': 'Offer', name: p.name, price: p.total_price, priceCurrency: 'INR', url: `${origin}${PATHS.plans}`,
-          description: `${p.tenure_value} ${p.tenure_unit}${p.session_count ? `, ${p.session_count} coached sessions` : ''}`,
-          category: tierOf(p) === 'group' ? 'Group training' : 'Personal training' })) },
+      ...(priced.length ? {
+        hasOfferCatalog: { '@type': 'OfferCatalog', name: 'Subscriptions', itemListElement: priced.map((o) => ({
+          '@type': 'Offer', name: o.name, price: o.price, priceCurrency: 'INR', url: `${origin}${PATHS.plans}`,
+          description: [o.note, `${o.weeks} ${o.weeks === 1 ? 'week' : 'weeks'}`].filter(Boolean).join(', '),
+          category: offerTier(o) === 'group' ? 'Group training' : 'Personal training' })) },
       } : {}),
     })
   }
@@ -71,15 +71,13 @@ const NAV_NAME: Record<PageId, string> = {
 const navName = (id: PageId) => NAV_NAME[id]
 
 export interface Head { title: string; description: string; canonical: string; image: string; jsonld: Record<string, unknown>[] }
-/** The plans page description carries live prices when the gym shows them ("Group training from ₹1,499, …"). */
+/** The subscriptions page description carries live prices when the studio shows them. */
 function describe(id: PageId, site: SiteInfo | null) {
   const base = SEO[id].description
-  if (id !== 'plans' || !site || site.website.show_prices === false) return base
-  const c = COPY.en
-  const groups = tierGroups(site)
-  if (!groups.length) return base
-  const list = groups.map((g) => `${c.tiers.names[g.tier].toLowerCase()} ${fill(c.tiers.from, { price: rupees(g.from) })}`).join(', ')
-  const text = `Gym membership fees at Shaan Fitness, Kakinada: ${list}. Every plan is coached. Book a free trial.`
+  if (id !== 'plans' || !site) return base
+  const priced = offers(site).filter((o) => o.price != null)
+  if (!priced.length) return base
+  const text = `Fees at Shaan Fitness, Kakinada: ${priced.map((o) => `${o.name} ${rupees(o.price!)}`).join(', ')}. Every session is coached. Book a free trial.`
   return text.length <= 160 ? text : base
 }
 

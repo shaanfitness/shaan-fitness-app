@@ -23,7 +23,7 @@ export function Crest({ className }: { className?: string }) {
         <path id="sf-crest-text" d="M300,300 m-236,0 a236,236 0 1,1 472,0 a236,236 0 1,1 -472,0" />
       </defs>
       <circle cx="300" cy="300" r="300" fill="url(#sf-crest-glow)" />
-      <circle className="sf-crest-draw" cx="300" cy="300" r="292" fill="none" stroke="#D9B97A" strokeOpacity=".7" strokeWidth="1.2" />
+      <circle className="sf-crest-draw" cx="300" cy="300" r="292" fill="none" stroke="#F4F2EE" strokeOpacity=".7" strokeWidth="1.2" />
       <circle className="sf-crest-draw" cx="300" cy="300" r="206" fill="none" stroke="#EEF0F7" strokeOpacity=".16" strokeWidth="1" />
       <g className="sf-crest-ring">
         {ticks.map((i) => {
@@ -31,7 +31,7 @@ export function Crest({ className }: { className?: string }) {
           return <line key={i} x1="300" y1={long ? 14 : 18} x2="300" y2={long ? 38 : 30} stroke={i === 0 ? '#E8283B' : '#EEF0F7'} strokeOpacity={long ? .55 : .25}
             strokeWidth={long ? 2 : 1} transform={`rotate(${i * 6} 300 300)`} />
         })}
-        <text fill="#D9B97A" fillOpacity=".75" fontSize="17" letterSpacing="6.2" fontFamily="'Manrope Variable', sans-serif" fontWeight="600">
+        <text fill="#F4F2EE" fillOpacity=".75" fontSize="17" letterSpacing="6.2" fontFamily="Garet, sans-serif" fontWeight="600">
           <textPath href="#sf-crest-text">{text}{text}</textPath>
         </text>
       </g>
@@ -41,7 +41,7 @@ export function Crest({ className }: { className?: string }) {
         <rect x="-150" y="-4" width="300" height="8" rx="4" fill="#E8283B" opacity=".9" />
         {[-1, 1].map((s) => (
           <g key={s} transform={`scale(${s} 1)`}>
-            <rect x="-128" y="-58" width="22" height="116" rx="6" fill="#121A45" stroke="#D9B97A" strokeWidth="2" />
+            <rect x="-128" y="-58" width="22" height="116" rx="6" fill="#121A45" stroke="#F4F2EE" strokeWidth="2" />
             <rect x="-100" y="-44" width="16" height="88" rx="5" fill="#121A45" stroke="#3B5BFF" strokeWidth="2" />
             <rect x="-80" y="-14" width="8" height="28" rx="3" fill="#EEF0F7" opacity=".7" />
           </g>
@@ -51,27 +51,21 @@ export function Crest({ className }: { className?: string }) {
   )
 }
 
-/** One coach (crimson) and the people they coach in a session, gathering in when the row comes into view. */
-export function RatioArt({ members }: { members: number }) {
-  const cx = 26, cy = 55
-  const pts = Array.from({ length: members }, (_, i) => {
-    if (members === 1) return { x: 112, y: 55 }
-    if (members === 2) return { x: 110, y: 30 + i * 50 }
-    const a = -70 + (140 / (members - 1)) * i
-    return { x: cx + cosd(a) * 92, y: cy + sind(a) * 48 }
-  })
+const Fig = () => (
+  <svg viewBox="0 0 24 32" aria-hidden="true" focusable="false"><circle cx="12" cy="7" r="5.4" /><path d="M2.2 31c0-8.6 4.1-13.6 9.8-13.6S21.8 22.4 21.8 31z" /></svg>
+)
+/** One coach (red) and the people who train with them, one figure each: the count is the group size the owner set
+ *  in the dashboard, so a group of 6 draws six. The first figure is you. */
+export function Squad({ size, label, coach }: { size: number; label: string; coach: string }) {
+  const n = Math.max(1, Math.min(30, Math.round(size)))
   return (
-    <svg className="sf-tier-art" viewBox="0 0 150 110" aria-hidden="true" focusable="false">
-      {pts.map((p, i) => (
-        <line key={`l${i}`} x1={cx} y1={cy} x2={p.x} y2={p.y} stroke="#D9B97A" strokeOpacity=".45" strokeWidth="1" strokeDasharray="60" style={{ transitionDelay: `${i * 60}ms` }} />
-      ))}
-      {pts.map((p, i) => (
-        <circle key={`m${i}`} className="sf-m" cx={p.x} cy={p.y} r={members > 2 ? 8 : 11} fill="#EEF0F7"
-          style={{ '--fx': `${cx - p.x}px`, '--fy': `${cy - p.y}px`, transitionDelay: `${i * 60}ms`, transformBox: 'fill-box', transformOrigin: 'center' } as CSSProperties} />
-      ))}
-      <circle cx={cx} cy={cy} r="15" fill="#E8283B" />
-      <circle cx={cx} cy={cy} r="21" fill="none" stroke="#E8283B" strokeOpacity=".4" />
-    </svg>
+    <span className="sf-squad" role="img" aria-label={label} data-n={n}>
+      <span className="sf-fig is-coach" title={coach}><Fig /></span>
+      <i className="sf-squad-link" aria-hidden="true" />
+      <span className="sf-squad-row">
+        {Array.from({ length: n }, (_, i) => <span key={i} className={`sf-fig ${i === 0 ? 'is-you' : ''}`} style={{ '--i': i } as CSSProperties}><Fig /></span>)}
+      </span>
+    </span>
   )
 }
 
