@@ -641,6 +641,7 @@
 .sf:lang(te) .sf-film-title { font-size: clamp(30px, 4vw, 60px); line-height: 1.24; letter-spacing: 0; font-weight: 800; }
 /* Wide screens: the headline stacks in short lines so it stays clear of the emblem beside it. */
 @media (min-width: 761px) { .sf:not(:lang(te)) .sf-film-title { max-width: 7.2em; } }
+.sf:lang(te) .sf-film-count span { letter-spacing: 0; text-transform: none; font-size: 13px; }
 /* A subscription's facts, on glass: the owner's line, one figure per person, the price. */
 .sf-film-card { display: grid; gap: 14px; min-width: min(360px, 100%); max-width: 460px; padding: 18px 20px; border: 1px solid var(--sf-line-strong); border-radius: 18px;
   background: rgba(8, 8, 11, .52); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); }
