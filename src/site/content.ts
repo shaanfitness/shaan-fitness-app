@@ -285,7 +285,7 @@ const en = {
   eventsPage: {
     h1: 'Events and community',
     intro: 'Runs, challenges, workshops and celebrations: what Shaan Fitness has organised and supported in Kakinada.',
-    see: 'See the event', all: 'All events', gallery: 'Gallery', gallerySub: 'From Instagram.', story: 'The story',
+    see: 'See the event', eventGallery: 'Event gallery', all: 'All events', gallery: 'Gallery', gallerySub: 'From Instagram.', story: 'The story',
     more: 'More events', follow: 'More on Instagram', soon: 'More events are on the way. Follow us on Instagram to hear first.',
   },
   about: {
@@ -537,7 +537,7 @@ const te: Copy = {
   eventsPage: {
     h1: 'ఈవెంట్లు, కమ్యూనిటీ',
     intro: 'రన్‌లు, ఛాలెంజ్‌లు, వర్క్‌షాప్‌లు, వేడుకలు: కాకినాడలో షాన్ ఫిట్‌నెస్ నిర్వహించినవి, సపోర్ట్ చేసినవి.',
-    see: 'ఈవెంట్ చూడండి', all: 'అన్ని ఈవెంట్లు', gallery: 'గ్యాలరీ', gallerySub: 'Instagram నుంచి.', story: 'కథ',
+    see: 'ఈవెంట్ చూడండి', eventGallery: 'ఈవెంట్ గ్యాలరీ', all: 'అన్ని ఈవెంట్లు', gallery: 'గ్యాలరీ', gallerySub: 'Instagram నుంచి.', story: 'కథ',
     more: 'మరిన్ని ఈవెంట్లు', follow: 'Instagramలో మరిన్ని', soon: 'మరిన్ని ఈవెంట్లు రాబోతున్నాయి. ముందుగా తెలుసుకోవడానికి Instagramలో ఫాలో అవ్వండి.',
   },
   about: {

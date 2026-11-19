@@ -11,21 +11,30 @@ import { Section } from './sections'
 
 const year = (e: ShaanEvent) => e.start.slice(0, 4)
 
+/** Opens the event's own page (its original website or announcement post) in a new tab, exactly as it is. */
+function SiteLink({ e, label, className }: { e: ShaanEvent; label: string; className: string }) {
+  return <a href={e.site} target="_blank" rel="noopener" className={className}>{label}{Ic.external(16)}</a>
+}
+
+// Two ways in from each card: "See the event" opens the event's own page as it always was (people registered and
+// donated there), and "Event gallery" opens our page with the details and the photos.
 function EventCard({ e, lang }: { e: ShaanEvent; lang: Lang }) {
   const { c } = useCopy()
   const k = e.copy[lang]
   return (
     <article className="sf-ev-card sf-spot">
-      <Link to={PATHS[e.id]} viewTransition className="sf-ev-link" aria-label={`${k.name}: ${c.eventsPage.see}`} />
-      <div className="sf-ev-media">
-        {e.image ? <img src={e.image} alt="" loading="lazy" decoding="async" /> : <span className="sf-ev-year" aria-hidden="true">{year(e)}</span>}
-      </div>
+      <Link to={PATHS[e.id]} viewTransition className="sf-ev-media" tabIndex={-1} aria-hidden="true">
+        {e.image ? <img src={e.image} alt="" loading="lazy" decoding="async" /> : <span className="sf-ev-year">{year(e)}</span>}
+      </Link>
       <div className="sf-ev-body">
         <p className="sf-ev-meta"><span>{k.when}</span><span>{k.role}</span></p>
         <h3>{k.name}</h3>
         <p>{k.summary}</p>
         <p className="sf-ev-stat"><b>{k.stat.v}</b><span>{k.stat.k}</span></p>
-        <span className="sf-ev-more">{c.eventsPage.see}{Ic.down(16)}</span>
+        <div className="sf-ev-actions">
+          <SiteLink e={e} label={c.eventsPage.see} className="sf-btn sf-btn-sm sf-btn-red" />
+          <Link to={PATHS[e.id]} viewTransition className="sf-btn sf-btn-sm sf-btn-glass" aria-label={`${c.eventsPage.eventGallery}: ${k.name}`}>{Ic.gallery(16)}{c.eventsPage.eventGallery}</Link>
+        </div>
       </div>
     </article>
   )
@@ -121,12 +130,9 @@ export function EventPage({ id }: { id: EventId }) {
             {k.facts.map((f) => <div key={f.k}><dt>{f.k}</dt><dd>{f.v}</dd></div>)}
           </dl>
           <div className="sf-ctas" style={{ marginTop: 28 }}>
-            <a href="#gallery" className="sf-btn sf-btn-red sf-magnet">{Ic.instagram(18)}{c.eventsPage.gallery}</a>
-            {k.links?.map((l) => (
-              l.href.startsWith('/')
-                ? <a key={l.href} href={l.href} className="sf-btn sf-magnet">{l.t}</a>
-                : <a key={l.href} href={l.href} target="_blank" rel="noreferrer" className="sf-btn sf-magnet">{l.t}</a>
-            ))}
+            <SiteLink e={e} label={k.open} className="sf-btn sf-btn-red sf-magnet" />
+            <a href="#gallery" className="sf-btn sf-btn-glass sf-magnet">{Ic.instagram(18)}{c.eventsPage.gallery}</a>
+            {k.links?.map((l) => <a key={l.href} href={l.href} target="_blank" rel="noreferrer" className="sf-btn sf-magnet">{l.t}</a>)}
           </div>
         </div>
       </section>

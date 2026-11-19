@@ -789,8 +789,6 @@ html[data-intro='1'] .sf-loader, .sf-loader.is-on { display: grid; }
 @media (min-width: 1080px) { .sf-ev-grid { grid-template-columns: repeat(3, 1fr); } }
 .sf-ev-card { position: relative; display: flex; flex-direction: column; overflow: hidden; border-radius: 24px; background: var(--sf-panel); border: 1px solid var(--sf-line); transition: border-color .3s, transform .4s var(--sf-ease-out); }
 .sf-ev-card:hover { border-color: var(--sf-line-strong); transform: translateY(-3px); }
-.sf-ev-link { position: absolute; inset: 0; z-index: 2; border-radius: inherit; }
-.sf-ev-link:focus-visible { outline: 2px solid var(--sf-crimson-hi); outline-offset: 3px; }
 .sf-ev-media { aspect-ratio: 16 / 9; overflow: hidden; background: radial-gradient(60% 80% at 30% 20%, rgba(232, 40, 59, .35), transparent 70%), radial-gradient(60% 80% at 80% 90%, rgba(59, 91, 255, .3), transparent 70%), var(--sf-deep); display: grid; place-items: center; }
 .sf-ev-media img { width: 100%; height: 100%; object-fit: cover; transition: transform .8s var(--sf-ease-out); }
 .sf-ev-card:hover .sf-ev-media img { transform: scale(1.04); }
@@ -803,9 +801,9 @@ html[data-intro='1'] .sf-loader, .sf-loader.is-on { display: grid; }
 .sf-ev-stat { display: flex; align-items: baseline; gap: 10px; margin-top: auto; padding-top: 10px; }
 .sf-ev-stat b { font-family: var(--sf-display); font-weight: 900; font-size: 28px; color: var(--sf-porcelain); }
 .sf-ev-stat span { font-size: 14px; color: var(--sf-mist); }
-.sf-ev-more { display: inline-flex; align-items: center; gap: 6px; font-weight: 800; font-size: 14px; color: var(--sf-crimson-hi); }
-.sf-ev-more svg { rotate: -90deg; transition: translate .3s; }
-.sf-ev-card:hover .sf-ev-more svg { translate: 4px 0; }
+/* "See the event" and "Event gallery" side by side; they stack only when the card is too narrow for both. */
+.sf-ev-actions { display: grid; grid-template-columns: repeat(auto-fit, minmax(136px, 1fr)); gap: 8px; padding-top: 8px; }
+.sf-ev-actions .sf-btn { justify-content: center; gap: 7px; padding: 0 12px; white-space: nowrap; }
 
 .sf-ev-hero { min-height: min(86svh, 820px); display: flex; align-items: flex-end; }
 .sf-ev-hero-img { position: absolute; inset: 0; z-index: -1; width: 100%; height: 100%; object-fit: cover; opacity: .38; mask-image: linear-gradient(180deg, #000 30%, transparent 100%); -webkit-mask-image: linear-gradient(180deg, #000 30%, transparent 100%); }

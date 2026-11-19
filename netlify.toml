@@ -7,10 +7,16 @@
 [build.environment]
   NODE_VERSION = "22"
 
+# The Dandiya Nights lucky draw stays on its own site, exactly as it was; this address only points to it.
+[[redirects]]
+  from = "/luckydraw"
+  to = "https://shaanfitness.github.io/luckydraw/"
+  status = 302
+
 [[redirects]]
   from = "/luckydraw/*"
-  to = "/luckydraw/index.html"
-  status = 200
+  to = "https://shaanfitness.github.io/luckydraw/:splat"
+  status = 302
 
 [[redirects]]
   from = "/*"

@@ -22,6 +22,8 @@ interface EventCopy {
   story: string[]
   /** Results, winners or the route: titled cards. */
   blocks: { title: string; sub?: string; numbered?: boolean; items: { t: string; d: string; img?: string }[] }[]
+  /** The button on the event's page that opens its own page (see ShaanEvent.site). */
+  open: string
   links?: { t: string; href: string }[]
   seoTitle: string
   seoDesc: string
@@ -32,6 +34,9 @@ export interface ShaanEvent {
   start: string
   end?: string
   image?: string
+  /** The event's own page, left exactly as it is: its original website (where people registered and donated), or the
+   *  Instagram post that announced it. "See the event" on the cards opens this; "Event gallery" opens our page. */
+  site: string
   /** Instagram posts and reels, as "p/CODE" or "reel/CODE". */
   gallery: string[]
   place: { name: string; address: string }
@@ -43,6 +48,7 @@ export const EVENTS: ShaanEvent[] = [
     id: 'dandiya',
     start: '2026-10-18T18:00:00+05:30',
     image: '/events/dandiya-nights.webp',
+    site: 'https://shaanfitness.github.io/luckydraw/',
     gallery: ['reel/DemMFadzQxP', 'p/DelrNlvM_rx', 'p/Deq0_7uT256', 'p/De1AMuQToVX', 'p/De1AfLwTrb9', 'p/De1AsLDzLr8'],
     place: { name: 'Halcyon Times Club', address: 'Nagamallithota Junction, Kakinada, Andhra Pradesh' },
     copy: {
@@ -82,7 +88,7 @@ export const EVENTS: ShaanEvent[] = [
             ],
           },
         ],
-        links: [{ t: 'Open the lucky draw page', href: '/luckydraw/' }],
+        open: 'Open the lucky draw page',
         seoTitle: 'Dandiya Nights 2K26 Lucky Draw | Shaan Fitness Kakinada',
         seoDesc: 'Shaan Fitness was a supporting partner of AuraPeak Dandiya Nights 2K26 in Kakinada, with a free lucky draw of ₹53,000 in fitness prizes. See the winners.',
       },
@@ -122,7 +128,7 @@ export const EVENTS: ShaanEvent[] = [
             ],
           },
         ],
-        links: [{ t: 'లక్కీ డ్రా పేజీ తెరవండి', href: '/luckydraw/' }],
+        open: 'లక్కీ డ్రా పేజీ తెరవండి',
         seoTitle: 'దాండియా నైట్స్ 2K26 లక్కీ డ్రా | షాన్ ఫిట్‌నెస్',
         seoDesc: 'AuraPeak దాండియా నైట్స్ 2K26కు షాన్ ఫిట్‌నెస్ సపోర్టింగ్ పార్ట్‌నర్, ₹53,000 ఫిట్‌నెస్ బహుమతుల ఉచిత లక్కీ డ్రా.',
       },
@@ -131,7 +137,8 @@ export const EVENTS: ShaanEvent[] = [
   {
     id: 'lungRun',
     start: '2026-08-01T06:00:00+05:30',
-    image: '/events/lung-run.webp',
+    image: '/events/lung-run-day.webp',
+    site: 'https://lung-cancer-day.netlify.app/',
     gallery: ['p/DbUV6FEE0sv', 'p/DbaEvuQTHPD', 'reel/DbYKjGmz8Ph', 'reel/DbdhnU_TEZn', 'reel/DbfC1BqTHEu', 'reel/Db77mQyT5Ij'],
     place: { name: 'Shaan Fitness', address: 'PNR Enclave, RTO Office Road, Godari Gunta, Kakinada, Andhra Pradesh 533003' },
     copy: {
@@ -182,6 +189,7 @@ export const EVENTS: ShaanEvent[] = [
             ],
           },
         ],
+        open: 'Open the Lung Run page',
         links: [
           { t: 'Donation proof: Moses Royal', href: 'https://drive.google.com/file/d/1B88BOiXQCBs0R-fG-Zln5a8fdjGRhK6n/view' },
           { t: 'Donation proof: Beenal', href: 'https://drive.google.com/file/d/1P9PXU8v-P291iEps9znmhC80mmIleFqv/view' },
@@ -236,6 +244,7 @@ export const EVENTS: ShaanEvent[] = [
             ],
           },
         ],
+        open: 'లంగ్ రన్ పేజీ తెరవండి',
         links: [
           { t: 'విరాళం రుజువు: మోసెస్ రాయల్', href: 'https://drive.google.com/file/d/1B88BOiXQCBs0R-fG-Zln5a8fdjGRhK6n/view' },
           { t: 'విరాళం రుజువు: బీనల్', href: 'https://drive.google.com/file/d/1P9PXU8v-P291iEps9znmhC80mmIleFqv/view' },
@@ -248,6 +257,8 @@ export const EVENTS: ShaanEvent[] = [
   {
     id: 'deadlift',
     start: '2023-12-17T17:00:00+05:30',
+    image: '/events/deadlift-2023.webp',
+    site: 'https://www.instagram.com/p/C0lXxeRPvhu/',
     gallery: ['p/C0lXxeRPvhu', 'p/C0rexrDPIGF', 'p/C08CySSPws_', 'p/C1EiDrkvcNc', 'p/C1EhBu6vmP9', 'p/C1Eg1F3PtVo', 'p/C1EhQoEPjh2', 'p/C1EjDIrv5Ab'],
     place: { name: 'Shaan Fitness', address: 'PNR Enclave, RTO Office Road, Godari Gunta, Kakinada, Andhra Pradesh 533003' },
     copy: {
@@ -279,6 +290,7 @@ export const EVENTS: ShaanEvent[] = [
             ],
           },
         ],
+        open: 'Open the event post',
         seoTitle: 'Deadlift December Challenge 2023 | Shaan Fitness Kakinada',
         seoDesc: 'Shaan Fitness’s Deadlift December Challenge 2023 in Kakinada, judged by strongman percentage. Winner Pandu Ranga lifted 170 kg at 68 kg body weight.',
       },
@@ -310,6 +322,7 @@ export const EVENTS: ShaanEvent[] = [
             ],
           },
         ],
+        open: 'ఈవెంట్ పోస్ట్ తెరవండి',
         seoTitle: 'డెడ్‌లిఫ్ట్ డిసెంబర్ ఛాలెంజ్ 2023 | షాన్ ఫిట్‌నెస్',
         seoDesc: 'కాకినాడ షాన్ ఫిట్‌నెస్ డెడ్‌లిఫ్ట్ డిసెంబర్ ఛాలెంజ్ 2023, స్ట్రాంగ్‌మ్యాన్ శాతంతో తీర్పు.',
       },
@@ -319,6 +332,8 @@ export const EVENTS: ShaanEvent[] = [
     id: 'summerFiesta',
     start: '2023-05-20T16:00:00+05:30',
     end: '2023-05-22T19:30:00+05:30',
+    image: '/events/summer-fiesta-2023.webp',
+    site: 'https://www.instagram.com/p/CsSykq5vWV-/',
     gallery: ['p/CsSykq5vWV-', 'p/CsoSwTFyqn8'],
     place: { name: '82° East SRMT Mall', address: 'Kakinada, Andhra Pradesh' },
     copy: {
@@ -341,6 +356,7 @@ export const EVENTS: ShaanEvent[] = [
           'The workshop included Zumba and yoga sessions that were both fun and challenging, and the children learned new moves and got fit together.',
         ],
         blocks: [],
+        open: 'Open the event post',
         seoTitle: 'Kids Fitness Workshop, Summer Fiesta 2023 | Shaan Fitness',
         seoDesc: 'Shaan Fitness ran a three-day kids fitness workshop with Zumba and yoga at 82° East SRMT Mall’s Summer Fiesta 2023 in Kakinada.',
       },
@@ -363,6 +379,7 @@ export const EVENTS: ShaanEvent[] = [
           'వర్క్‌షాప్‌లో సరదాగా, సవాలుగా ఉండే జుంబా, యోగా సెషన్లు; పిల్లలు కొత్త కదలికలు నేర్చుకుని కలిసి ఫిట్ అయ్యారు.',
         ],
         blocks: [],
+        open: 'ఈవెంట్ పోస్ట్ తెరవండి',
         seoTitle: 'పిల్లల ఫిట్‌నెస్ వర్క్‌షాప్, సమ్మర్ ఫియెస్టా 2023 | షాన్ ఫిట్‌నెస్',
         seoDesc: 'కాకినాడ 82° East SRMT మాల్ సమ్మర్ ఫియెస్టా 2023లో షాన్ ఫిట్‌నెస్ మూడు రోజుల పిల్లల ఫిట్‌నెస్ వర్క్‌షాప్.',
       },
