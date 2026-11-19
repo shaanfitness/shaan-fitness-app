@@ -46,9 +46,6 @@ await writeFile(path.join(dist, '404.html'), shell)
 
 // The website's own fonts, preloaded so the headline paints in them straight away.
 const preload = ['lovelo-black', 'garet-book', 'garet-heavy'].map((f) => `<link rel="preload" href="/fonts/${f}.woff2" as="font" type="font/woff2" crossorigin />`).join('\n    ')
-// Home only: the finished emblem (frame 40) is the first thing anyone sees, so it loads first (one size per screen shape).
-const filmPreload = `<link rel="preload" as="image" href="/film/land/040.webp" media="(min-aspect-ratio: 4/5)" fetchpriority="high" />
-    <link rel="preload" as="image" href="/film/port/040.webp" media="(max-aspect-ratio: 4/5)" fetchpriority="high" />`
 
 // Home only: on the first visit in a session, a black screen covers the page until the opening loader takes over
 // (hero/CineHero.tsx), so the static page never flashes first. It lifts itself after 9 seconds whatever happens.
@@ -62,7 +59,7 @@ for (const id of ssr.PAGE_IDS) {
     .replace('<html lang="en">', '<html lang="en" data-prerendered="1">')
     .replace(/<title>[^<]*<\/title>/, '')
     .replace(/<meta name="description"[^>]*>/, '')
-    .replace('</head>', `    ${page.head}\n    ${preload}\n    ${id === 'home' ? `${filmPreload}\n    ${introVeil}` : ''}\n  </head>`)
+    .replace('</head>', `    ${page.head}\n    ${preload}\n    ${id === 'home' ? introVeil : ''}\n  </head>`)
     // The app's theme fonts load without holding up the page.
     .replace(/<link rel="stylesheet" href="(https:\/\/fonts\.googleapis\.com[^"]+)" \/>/, '<link rel="stylesheet" href="$1" media="print" onload="this.media=\'all\'" />')
     .replace('<div id="root"></div>', `<div id="root">${page.html}</div>\n    <script>window.__SITE__ = ${json(ssr.normalizeSite(site))}</script>`)

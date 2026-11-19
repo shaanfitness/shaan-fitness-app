@@ -11,7 +11,7 @@ import { usePointerEffects, useScrolled } from './motion'
 import './site.css'
 
 // The website's frame: header with the Training menu, the full-screen menu on phones, the footer with every page
-// (internal links help search), and the phone dock with Call, WhatsApp and Free trial.
+// (internal links help search), and the phone dock with Call, WhatsApp and Enquire.
 
 export function useCopy() {
   const { i18n } = useTranslation()
@@ -116,7 +116,7 @@ function Header() {
         <div className="sf-head-side">
           <span className="sf-hide-sm"><LangSwitch /></span>
           <span className="sf-hide-sm"><Account /></span>
-          <a href="#free-trial" className="sf-btn sf-btn-light sf-btn-sm sf-hide-sm sf-magnet">{c.nav.trial}</a>
+          <a href="#enquire" className="sf-btn sf-btn-red sf-btn-sm sf-hide-sm sf-magnet">{c.nav.trial}</a>
           <button type="button" className="sf-burger" aria-expanded={menu} aria-controls="sf-menu" aria-label={c.nav.menu} onClick={() => setMenu(true)}>{Ic.menu(22)}</button>
         </div>
       </div>
@@ -149,7 +149,7 @@ function PhoneMenu({ onClose }: { onClose: () => void }) {
         ))}
       </nav>
       <div className="sf-menu-foot">
-        <a href="#free-trial" className="sf-btn sf-btn-red" onClick={onClose}>{c.nav.trial}</a>
+        <a href="#enquire" className="sf-btn sf-btn-red" onClick={onClose}>{c.nav.trial}</a>
         <div style={{ display: 'flex', gap: 10 }}>
           {phone && <a href={telLink(phone) ?? undefined} className="sf-btn" style={{ flex: 1 }}>{Ic.phone(18)}{c.nav.call}</a>}
           {wa && <a href={wa} target="_blank" rel="noreferrer" className="sf-btn" style={{ flex: 1 }}>{Ic.whatsapp(18)}{c.nav.whatsapp}</a>}
@@ -242,7 +242,7 @@ function Dock() {
     <nav className={`sf-dock ${y > 420 ? 'is-up' : ''}`} aria-label={c.nav.trial}>
       {phone ? <a href={telLink(phone) ?? undefined}>{Ic.phone(18)}{c.nav.call}</a> : <span />}
       {wa ? <a href={wa} target="_blank" rel="noreferrer">{Ic.whatsapp(18)}{c.nav.whatsapp}</a> : <span />}
-      <a href="#free-trial" className="is-main">{c.nav.trial}</a>
+      <a href="#enquire" className="is-main">{c.nav.trial}</a>
     </nav>
   )
 }

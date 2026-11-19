@@ -134,13 +134,13 @@ export function faqFor(id: PageId, site: SiteInfo | null, c: Copy, lang: Lang): 
     if (personal.length) out.push({ q: f.cost.q, a: fill(f.cost.a, { list: personal.map((o) => `${o.name} ${rupees(o.price!)} ${weeks(o)}`).join(', ') }) })
   }
   switch (id) {
-    case 'home': fees(); timings(); out.push(f.trial, f.women, f.weight, f.beginner); where(); steam(); break
-    case 'personal': cost(); out.push(f.women); sessions(); out.push(f.trial, f.beginner); break
-    case 'group': out.push(f.batchSize, f.beginner, f.women); timings(); out.push(f.trial); break
-    case 'weightLoss': out.push(f.weight, f.pace, f.supplements, f.trial); break
-    case 'plans': fees(); sessions(); out.push(f.freeze, f.trial); break
-    case 'timings': timings(); where(); out.push(f.trial); break
-    case 'contact': where(); timings(); out.push(f.trial); break
+    case 'home': fees(); timings(); out.push(f.women, f.weight, f.beginner); where(); steam(); break
+    case 'personal': cost(); out.push(f.women); sessions(); out.push(f.beginner); break
+    case 'group': out.push(f.batchSize, f.beginner, f.women); timings(); break
+    case 'weightLoss': out.push(f.weight, f.pace, f.supplements); break
+    case 'plans': fees(); sessions(); out.push(f.freeze); break
+    case 'timings': timings(); where(); break
+    case 'contact': where(); timings(); break
     case 'about': out.push(f.beginner, f.women); steam(); break
     default: break
   }

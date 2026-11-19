@@ -99,7 +99,7 @@ function SubCard({ o, site }: { o: SiteOffer; site: SiteInfo }) {
       <p className="sf-sub-text">{c.subs.text[tier]}</p>
       <footer>
         {o.price != null ? <OfferPrice o={o} /> : wa && <a className="sf-link" href={wa} target="_blank" rel="noreferrer">{c.subs.askFee}</a>}
-        <a href="#free-trial" className="sf-btn sf-btn-red sf-magnet" data-plan={o.name} data-tier={tier}>{fill(c.subs.choose, { name: o.name })}</a>
+        <a href="#enquire" className="sf-btn sf-btn-red sf-magnet" data-plan={o.name} data-tier={tier}>{fill(c.subs.choose, { name: o.name })}</a>
       </footer>
     </article>
   )
@@ -252,7 +252,7 @@ export function Athletic() {
           <p className="sf-lede">{a.sub}</p>
           <p className="sf-athletic-weeks"><b>18</b><span>{a.weeks}</span></p>
           <p className="sf-small">{a.note}</p>
-          <div><a href="#free-trial" className="sf-btn sf-btn-red sf-magnet" data-plan="Absolute Athleticism" data-tier="elite">{a.cta}</a></div>
+          <div><a href="#enquire" className="sf-btn sf-btn-red sf-magnet" data-plan="Absolute Athleticism" data-tier="elite">{a.cta}</a></div>
         </div>
         <ol className="sf-phases">
           {a.phases.map((p, i) => (
@@ -501,7 +501,7 @@ export function BmiCheck() {
             <strong>{c.check.band[band]}</strong>
             <p className="sf-small">{fill(c.check.healthy, { low, high })}</p>
             <p style={{ marginTop: 8 }}>{c.check.advice[band]}</p>
-            <div style={{ marginTop: 18 }}><a href="#free-trial" className="sf-btn sf-btn-red sf-magnet">{c.check.cta}</a></div>
+            <div style={{ marginTop: 18 }}><a href="#enquire" className="sf-btn sf-btn-red sf-magnet">{c.check.cta}</a></div>
           </div>
         </div>
       </div>
@@ -509,7 +509,7 @@ export function BmiCheck() {
   )
 }
 
-// Free trial form, inside the closing call to action -------------------------------------------------------------------------------------
+// Enquiry form, inside the closing call to action -------------------------------------------------------------------------------------
 type Interest = 'trial' | 'personal' | 'group' | 'weight_loss' | 'strength'
 const PAGE_INTEREST: Partial<Record<PageId, Interest>> = { personal: 'personal', group: 'group', weightLoss: 'weight_loss' }
 
@@ -593,7 +593,7 @@ export function Cta({ site, page }: { site: SiteInfo | null; page: PageId }) {
   const { c } = useCopy()
   const phone = site?.studio.mobile
   return (
-    <section id="free-trial" className="sf-cta" aria-labelledby="sf-cta-h">
+    <section id="enquire" className="sf-cta" aria-labelledby="sf-cta-h">
       <Crest className="sf-cta-crest" />
       <div className="sf-wrap sf-cta-row">
         <div style={{ display: 'grid', gap: 24, alignSelf: 'center' }}>
@@ -644,7 +644,7 @@ export function PageHero({ id, title, intro, site }: { id: PageId; title: string
           <h1 id="sf-h1" className="sf-h1">{title}</h1>
           <p className="sf-lede">{intro}</p>
           <div className="sf-ctas" style={{ marginTop: 28 }}>
-            <a href="#free-trial" className="sf-btn sf-btn-red sf-magnet">{c.nav.trial}</a>
+            <a href="#enquire" className="sf-btn sf-btn-red sf-magnet">{c.nav.trial}</a>
             {id !== 'plans' && <Link to={PATHS.plans} viewTransition className="sf-btn sf-magnet">{c.common.seePlans}</Link>}
           </div>
         </div>

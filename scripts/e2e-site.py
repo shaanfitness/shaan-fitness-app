@@ -1,4 +1,4 @@
-"""Click-through of the one-address structure: the public website (every page, the free trial form), join
+"""Click-through of the one-address structure: the public website (every page, the enquiry form), join
 (sign-up with email confirmation), sign-in that sends each person to their own place, the member app's welcome
 view, forgot password, and the owner's website settings — at phone and desktop sizes.
 Runs against the local test stack (fresh stack).
@@ -49,8 +49,9 @@ with sync_playwright() as p:
     expect(page.get_by_role("heading", level=1)).to_contain_text("Semi-private")
     for h in ["The Shaan method", "Choose how you train", "How joining works", "Absolute Athleticism", "Outside the studio", "A day at Shaan", "Questions people ask"]:
         expect(page.get_by_role("heading", name=h)).to_be_visible()
-    # The film's five chapters are all in the page, and its first frame is a plain image.
-    expect(page.locator(".sf-film-title")).to_have_count(5)
+    # The logo hero's four chapters are all in the page; no free trial anywhere.
+    expect(page.locator(".sf-cine-title")).to_have_count(4)
+    expect(page.get_by_text("free trial", exact=False)).to_have_count(0)
     # The three subscriptions: name, the owner's line, one figure per person, the price.
     subs = page.locator("#subscriptions .sf-sub")
     expect(subs).to_have_count(3)
@@ -64,34 +65,33 @@ with sync_playwright() as p:
     expect(subs.nth(2)).to_contain_text("VIP Coaching")
     expect(subs.nth(2).locator(".sf-squad-row .sf-fig")).to_have_count(1)
     expect(subs.nth(2)).to_contain_text("₹13,999")
-    expect(page.locator(".sf-film-ch").nth(1)).to_contain_text("₹4,999")
     # Calls and WhatsApp go to the studio's public numbers.
     expect(page.locator('a[href="tel:+919642467896"]').first).to_be_attached()
     expect(page.locator('a[href^="https://wa.me/919963547869"]').first).to_be_attached()
-    expect(page.get_by_role("heading", name="Train with Shaan.")).to_be_visible()
-    expect(page.locator(".sf-film-poster img")).to_be_visible()
+    expect(page.locator("#enquire").get_by_role("heading", name="Train with Shaan.")).to_be_visible()
+    expect(page.locator("svg.sf-cine-poster")).to_be_attached()
     expect(page.get_by_role("banner").get_by_role("link", name="Log in")).to_be_visible()
     expect(page.locator('script[type="application/ld+json"]').first).to_be_attached()
     shot(page, "website-desktop")
 
-    # The free trial form: no account needed --------------------------------------------------------------
-    page.get_by_role("button", name="Request my free trial").click()
+    # The enquiry form: no account needed --------------------------------------------------------------
+    page.get_by_role("button", name="Send my enquiry").click()
     expect(page.get_by_text("Enter your name.")).to_be_visible()
     page.fill("#sf-l-name", "Kavya Lakshmi")
     page.fill("#sf-l-phone", "12345")
-    page.get_by_role("button", name="Request my free trial").click()
+    page.get_by_role("button", name="Send my enquiry").click()
     expect(page.get_by_text("Enter a 10-digit mobile number.")).to_be_visible()
     page.fill("#sf-l-phone", "98480 70101")
     page.locator("form.sf-form").get_by_text("Weight loss", exact=True).click()
     page.locator("form.sf-form").get_by_text("Evening", exact=True).click()
     page.fill("#sf-l-msg", "Knee pain sometimes")
-    page.get_by_role("button", name="Request my free trial").click()
-    expect(page.get_by_text("Thank you, Kavya. We’ll call you soon to fix your trial.")).to_be_visible()
-    shot(page, "free-trial-sent", full=False)
+    page.get_by_role("button", name="Send my enquiry").click()
+    expect(page.get_by_text("Thank you, Kavya. We’ll call you soon.")).to_be_visible()
+    shot(page, "enquiry-sent", full=False)
     page.goto(BASE + "/contact")
     page.fill("#sf-l-name", "Kavya")
     page.fill("#sf-l-phone", "9848070101")
-    page.get_by_role("button", name="Request my free trial").click()
+    page.get_by_role("button", name="Send my enquiry").click()
     expect(page.get_by_text("We already have your request")).to_be_visible()
 
     # Every page answers its own search, with its own title --------------------------------------------------
@@ -198,7 +198,6 @@ with sync_playwright() as p:
     expect(first.locator(".sf-squad-row .sf-fig")).to_have_count(6)
     expect(first).to_contain_text("Group of 6 approx")
     expect(first).to_contain_text("₹5,499")
-    expect(page.locator(".sf-film-ch").nth(1).locator(".sf-squad-row .sf-fig")).to_have_count(6)
     # Prices off, then group sizes off: neither reaches the page.
     page.goto(BASE + "/settings/website")
     page.get_by_label("Prices", exact=True).uncheck()

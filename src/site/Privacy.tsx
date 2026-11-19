@@ -35,7 +35,7 @@ export default function Privacy() {
             <li>Your training: body measurements, progress photos, workout and diet plans, and notes from your coach.</li>
             <li>Health details you choose to share, such as injuries or medical conditions, so we can train you safely.</li>
             <li>Messages between you and our team in the app.</li>
-            <li>If you ask for a free trial on this website: your name, mobile number, what you are interested in and anything you write, so we can call you.</li>
+            <li>If you send an enquiry on this website: your name, mobile number, what you are interested in and anything you write, so we can call you.</li>
           </ul>
         </Part>
 

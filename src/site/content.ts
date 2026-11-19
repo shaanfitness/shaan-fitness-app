@@ -23,7 +23,7 @@ export const pageForPath = (path: string) => PAGE_IDS.find((id) => PATHS[id] ===
 export const SEO: Record<PageId, { title: string; description: string }> = {
   home: {
     title: 'Shaan Fitness | Semi-Private Training Studio in Kakinada',
-    description: 'Shaan Fitness is a semi-private training studio in Kakinada: coached small-group, side-by-side and one-on-one training. Book a free trial.',
+    description: 'Shaan Fitness is a semi-private training studio in Kakinada: coached small-group, side-by-side and one-on-one training. Call or WhatsApp to join.',
   },
   personal: {
     title: 'Personal Trainer in Kakinada | 1:1 Coaching | Shaan Fitness',
@@ -39,7 +39,7 @@ export const SEO: Record<PageId, { title: string; description: string }> = {
   },
   plans: {
     title: 'Gym Membership Fees in Kakinada | Plans | Shaan Fitness',
-    description: 'Shaan Fitness subscriptions and fees in Kakinada: coached small-group, side-by-side and one-on-one training. Book a free trial.',
+    description: 'Shaan Fitness subscriptions and fees in Kakinada: coached small-group, side-by-side and one-on-one training. Call or WhatsApp to join.',
   },
   timings: {
     title: 'Gym Timings in Kakinada | Morning & Evening | Shaan Fitness',
@@ -59,7 +59,7 @@ export const SEO: Record<PageId, { title: string; description: string }> = {
   },
   contact: {
     title: 'Contact Shaan Fitness | Gym at Godari Gunta, Kakinada',
-    description: 'Visit Shaan Fitness on RTO Office Road, Godari Gunta, near D-Mart, Kakinada. Call, WhatsApp or book a free trial session.',
+    description: 'Visit Shaan Fitness on RTO Office Road, Godari Gunta, near D-Mart, Kakinada. Call, WhatsApp or send us an enquiry.',
   },
 }
 
@@ -68,7 +68,7 @@ const en = {
     training: 'Training', personal: 'Personal training', group: 'Group training', weightLoss: 'Weight loss', plans: 'Subscriptions',
     timings: 'Timings', coaches: 'Coaches', results: 'Transformations', about: 'About', contact: 'Contact', home: 'Home',
     menu: 'Menu', close: 'Close menu', login: 'Log in', join: 'Join online', openApp: 'Open my app', openDashboard: 'Open dashboard',
-    trial: 'Book a free trial', call: 'Call', whatsapp: 'WhatsApp', skip: 'Skip to content',
+    trial: 'Enquire now', call: 'Call', whatsapp: 'WhatsApp', skip: 'Skip to content',
   },
   live: {
     openUntil: 'Open now, until {{time}}', opensAt: 'Opens today at {{time}}', opensOn: 'Opens {{day}} at {{time}}', closedNow: 'Closed now',
@@ -121,7 +121,7 @@ const en = {
   join: {
     title: 'How joining works',
     steps: [
-      { t: 'Book a free trial', d: 'Fill the form or message us on WhatsApp. We call you and fix a time that suits you.' },
+      { t: 'Enquire', d: 'Fill the form or message us on WhatsApp. We call you and fix a time to meet your coach.' },
       { t: 'Meet your coach', d: 'A short assessment of posture, mobility, strength and goals, and any health conditions we should know.' },
       { t: 'Get your plan', d: 'Your training plan, your batch time, and your workouts and diet in the Shaan app.' },
       { t: 'Train and track', d: 'Every session is coached and logged, so you see your progress week by week.' },
@@ -133,17 +133,14 @@ const en = {
     screens: ['Today’s workout', 'Diet', 'Water', 'Progress'],
     w1: 'Goblet squat', w2: 'Bench press', w3: 'Lat pull-down', w4: 'Plank', done: '3 of 4 done', glasses: '6 of 12 glasses', lost: 'Weight, last 6 weeks',
   },
-  film: {
-    place: 'Shaan Fitness, Kakinada', scroll: 'Scroll', home: 'Shaan', trial: 'Free trial', sub: 'Subscription', method: 'The method',
+  cine: {
+    place: 'Shaan Fitness, Kakinada', scroll: 'Scroll',
+    chapters: ['Studio', 'Coached', 'Planned', 'Join'],
     h1a: 'Semi-private', h1b: 'training studio.',
     lede: 'Coached training in small numbers, in Kakinada. Your trusted health partner.',
-    lastA: 'Your first session', lastB: 'is on us.',
-    lastText: 'Come see how coached training feels. Book a free trial, or call or message us.',
-    spare: [
-      { a: 'Coached,', b: 'every session.', t: 'A coach plans your block, watches your sets and tracks your progress.' },
-      { a: 'Assessment', b: 'first.', t: 'Posture, mobility, strength and health history, before your first plan.' },
-      { a: 'Planned,', b: 'not random.', t: 'Every plan draws on five pillars: FORGE, BLAZE, FLOW, STRIKE and TRIBE.' },
-    ],
+    c2a: 'Every rep,', c2b: 'coached.', c2: 'Your coach plans your block, watches every set and tracks your progress week by week.',
+    c3a: 'Planned for', c3b: 'your body.', c3: 'Posture, mobility, strength and health history first. Then a written plan built on five pillars: FORGE, BLAZE, FLOW, STRIKE and TRIBE.',
+    c4a: 'Train with', c4b: 'Shaan.', c4: 'In a small group, side by side or one-on-one. Call or message us to start.',
   },
   subs: {
     title: 'Choose how you train',
@@ -155,7 +152,7 @@ const en = {
       elite: 'The coach is yours for the session: fully personal programming, form correction, a diet plan and progress reviews every week.',
     },
     forTerm: 'for {{term}}', askFee: 'Ask us for the fee', choose: 'Choose {{name}}', coach: 'Coach',
-    foot: 'Not sure which one fits? Book a free trial. Your coach assesses you first and tells you where to start.',
+    foot: 'Not sure which one fits? Send us an enquiry. Your coach assesses you first and tells you where to start.',
     notes: {} as Record<string, string>,
   },
   community: {
@@ -196,18 +193,18 @@ const en = {
     cta: 'Get a plan for your body',
   },
   lead: {
-    title: 'Book a free trial',
-    sub: 'Tell us how to reach you. We call within working hours to fix your trial session. No account needed.',
+    title: 'Talk to a coach',
+    sub: 'Tell us how to reach you. We call within working hours to answer your questions and help you choose how to train. No account needed.',
     name: 'Your name', phone: 'Mobile number', interest: 'I’m interested in', time: 'Best time to train',
     interests: { trial: 'Not sure yet', personal: 'Personal training', group: 'Group training', weight_loss: 'Weight loss', strength: 'Strength and muscle' },
     times: { morning: 'Morning', evening: 'Evening', any: 'Any time' },
-    message: 'Anything we should know (optional)', send: 'Request my free trial', sending: 'Sending…',
-    sent: 'Thank you, {{name}}. We’ll call you soon to fix your trial.', already: 'We already have your request. We’ll call you soon.',
-    errName: 'Enter your name.', errPhone: 'Enter a 10-digit mobile number.', privacy: 'We use your number only to call you about your trial.',
+    message: 'Anything we should know (optional)', send: 'Send my enquiry', sending: 'Sending…',
+    sent: 'Thank you, {{name}}. We’ll call you soon.', already: 'We already have your request. We’ll call you soon.',
+    errName: 'Enter your name.', errPhone: 'Enter a 10-digit mobile number.', privacy: 'We use your number only to call you about your enquiry.',
     busy: 'We’re getting a lot of requests right now. Please call or WhatsApp us.', failed: 'That didn’t send. Please try again, or call or WhatsApp us.',
-    orWhatsapp: 'Prefer WhatsApp?', whatsappIt: 'Message us', waText: 'Hi Shaan Fitness, I’d like to book a free trial session.',
+    orWhatsapp: 'Prefer WhatsApp?', whatsappIt: 'Message us', waText: 'Hi Shaan Fitness, I’d like to know more about training with you.',
   },
-  cta: { title: 'Train with Shaan.', text: 'Your first session is on us. Come see how coached training feels.' },
+  cta: { title: 'Train with Shaan.', text: 'Small numbers, a coach on every set and a plan written for you. Call, message or send an enquiry.' },
   faq: { title: 'Questions people ask' },
   personal: {
     h1: 'Personal training in Kakinada',
@@ -287,14 +284,13 @@ const en = {
   },
   contact: {
     h1: 'Visit Shaan Fitness in Kakinada',
-    intro: 'We are on RTO Office Road at Godari Gunta, near D-Mart. Walk in during opening hours, call, or book a free trial below.',
+    intro: 'We are on RTO Office Road at Godari Gunta, near D-Mart. Walk in during opening hours, call, or send an enquiry below.',
     findTitle: 'Find us', talkTitle: 'Talk to us',
   },
   faqs: {
     fees: { q: 'How much does it cost to train at Shaan Fitness, Kakinada?', a: 'Subscriptions start from {{from}}: {{list}}. Every subscription includes coaching and the Shaan app.' },
     feesNoPrice: { q: 'How much does it cost to train at Shaan Fitness, Kakinada?', a: 'We have small-group, side-by-side and one-on-one coaching. Call or WhatsApp us for the current fees.' },
     timings: { q: 'What are the gym timings?', a: 'We are open {{days}}, {{hours}}. Batches start throughout the morning and evening.' },
-    trial: { q: 'Do you offer a free trial?', a: 'Yes. Book a free trial with the form on this page or message us on WhatsApp, and we will fix a session with a coach.' },
     women: { q: 'Is there a woman trainer?', a: 'Yes. Our team includes a woman trainer, and there are changing rooms and showers on site. For complete privacy, choose one-to-one personal training.' },
     weight: { q: 'Can you help me lose weight?', a: 'Yes. Fat loss plans combine strength training, conditioning and a diet plan with home food, and you track it all in the Shaan app.' },
     beginner: { q: 'I’m a complete beginner. Is this for me?', a: 'Yes. Your coach starts with an assessment and scales every exercise to your level.' },
@@ -316,7 +312,7 @@ const te: Copy = {
     training: 'ట్రైనింగ్', personal: 'పర్సనల్ ట్రైనింగ్', group: 'గ్రూప్ ట్రైనింగ్', weightLoss: 'వెయిట్ లాస్', plans: 'సబ్‌స్క్రిప్షన్లు',
     timings: 'టైమింగ్స్', coaches: 'కోచ్‌లు', results: 'ట్రాన్స్‌ఫర్మేషన్స్', about: 'మా గురించి', contact: 'సంప్రదించండి', home: 'హోమ్',
     menu: 'మెనూ', close: 'మెనూ మూసివేయండి', login: 'లాగిన్', join: 'ఆన్‌లైన్‌లో చేరండి', openApp: 'నా యాప్ తెరవండి', openDashboard: 'డాష్‌బోర్డ్ తెరవండి',
-    trial: 'ఉచిత ట్రయల్ బుక్ చేయండి', call: 'కాల్', whatsapp: 'WhatsApp', skip: 'కంటెంట్‌కు వెళ్ళండి',
+    trial: 'ఇప్పుడే సంప్రదించండి', call: 'కాల్', whatsapp: 'WhatsApp', skip: 'కంటెంట్‌కు వెళ్ళండి',
   },
   live: {
     openUntil: 'ఇప్పుడు తెరిచి ఉంది, {{time}} వరకు', opensAt: 'ఈరోజు {{time}} కి తెరుస్తాం', opensOn: '{{day}} {{time}} కి తెరుస్తాం', closedNow: 'ఇప్పుడు మూసి ఉంది',
@@ -369,7 +365,7 @@ const te: Copy = {
   join: {
     title: 'చేరడం ఎలా',
     steps: [
-      { t: 'ఉచిత ట్రయల్ బుక్ చేయండి', d: 'ఫారం నింపండి లేదా WhatsApp చేయండి. మేము కాల్ చేసి మీకు సరిపోయే సమయం నిర్ణయిస్తాం.' },
+      { t: 'సంప్రదించండి', d: 'ఫారం నింపండి లేదా WhatsApp చేయండి. మేము కాల్ చేసి మీ కోచ్‌ను కలిసే సమయం నిర్ణయిస్తాం.' },
       { t: 'మీ కోచ్‌ను కలవండి', d: 'పోస్చర్, మొబిలిటీ, బలం, లక్ష్యాలు, ఆరోగ్య సమస్యలపై చిన్న అసెస్‌మెంట్.' },
       { t: 'మీ ప్లాన్ పొందండి', d: 'మీ ట్రైనింగ్ ప్లాన్, బ్యాచ్ సమయం, షాన్ యాప్‌లో వర్కౌట్లు, డైట్.' },
       { t: 'ట్రైన్ అవ్వండి, ట్రాక్ చేయండి', d: 'ప్రతి సెషన్ కోచ్‌తో, రికార్డుతో, కాబట్టి వారం వారం మీ ప్రగతి కనిపిస్తుంది.' },
@@ -381,17 +377,14 @@ const te: Copy = {
     screens: ['ఈరోజు వర్కౌట్', 'డైట్', 'నీళ్లు', 'ప్రోగ్రెస్'],
     w1: 'గాబ్లెట్ స్క్వాట్', w2: 'బెంచ్ ప్రెస్', w3: 'లాట్ పుల్-డౌన్', w4: 'ప్లాంక్', done: '4లో 3 పూర్తి', glasses: '12లో 6 గ్లాసులు', lost: 'బరువు, గత 6 వారాలు',
   },
-  film: {
-    place: 'షాన్ ఫిట్‌నెస్, కాకినాడ', scroll: 'స్క్రోల్ చేయండి', home: 'షాన్', trial: 'ఉచిత ట్రయల్', sub: 'సబ్‌స్క్రిప్షన్', method: 'పద్ధతి',
+  cine: {
+    place: 'షాన్ ఫిట్‌నెస్, కాకినాడ', scroll: 'స్క్రోల్ చేయండి',
+    chapters: ['స్టూడియో', 'కోచింగ్', 'ప్లాన్', 'చేరండి'],
     h1a: 'సెమీ-ప్రైవేట్', h1b: 'ట్రైనింగ్ స్టూడియో.',
     lede: 'కాకినాడలో, తక్కువ మందితో, కోచ్ దగ్గరుండి చేయించే ట్రైనింగ్. మీ నమ్మకమైన ఆరోగ్య భాగస్వామి.',
-    lastA: 'మీ మొదటి సెషన్', lastB: 'మా తరఫున.',
-    lastText: 'కోచ్‌తో ట్రైనింగ్ ఎలా ఉంటుందో వచ్చి చూడండి. ఉచిత ట్రయల్ బుక్ చేయండి, లేదా కాల్ లేదా మెసేజ్ చేయండి.',
-    spare: [
-      { a: 'ప్రతి సెషన్‌కూ', b: 'కోచ్.', t: 'కోచ్ మీ బ్లాక్ ప్లాన్ చేస్తారు, మీ సెట్లు చూస్తారు, మీ ప్రోగ్రెస్ ట్రాక్ చేస్తారు.' },
-      { a: 'ముందు', b: 'అసెస్‌మెంట్.', t: 'మీ మొదటి ప్లాన్‌కు ముందు పోస్చర్, మొబిలిటీ, బలం, ఆరోగ్య చరిత్ర.' },
-      { a: 'ప్లాన్ ప్రకారం,', b: 'యాదృచ్ఛికంగా కాదు.', t: 'ప్రతి ప్లాన్ ఐదు పిల్లర్ల మీద: FORGE, BLAZE, FLOW, STRIKE, TRIBE.' },
-    ],
+    c2a: 'ప్రతి రెప్‌కూ', c2b: 'కోచ్.', c2: 'కోచ్ మీ బ్లాక్ ప్లాన్ చేస్తారు, ప్రతి సెట్ చూస్తారు, వారం వారం మీ ప్రగతి ట్రాక్ చేస్తారు.',
+    c3a: 'మీ శరీరానికి', c3b: 'ప్లాన్.', c3: 'ముందు పోస్చర్, మొబిలిటీ, బలం, ఆరోగ్య చరిత్ర. తర్వాత ఐదు పిల్లర్ల మీద రాసిన ప్లాన్: FORGE, BLAZE, FLOW, STRIKE, TRIBE.',
+    c4a: 'షాన్‌తో', c4b: 'ట్రైన్ అవ్వండి.', c4: 'చిన్న గ్రూప్‌లో, పక్కపక్కనే, లేదా వన్-ఆన్-వన్. మొదలుపెట్టడానికి కాల్ లేదా మెసేజ్ చేయండి.',
   },
   subs: {
     title: 'మీరు ఎలా ట్రైన్ అవుతారో ఎంచుకోండి',
@@ -403,7 +396,7 @@ const te: Copy = {
       elite: 'ఆ సెషన్ కోచ్ మీకే: పూర్తిగా వ్యక్తిగత ప్రోగ్రామ్, ఫార్మ్ సరిచేయడం, డైట్ ప్లాన్, ప్రతి వారం ప్రోగ్రెస్ రివ్యూ.',
     },
     forTerm: '{{term}}కు', askFee: 'ఫీజు కోసం మమ్మల్ని అడగండి', choose: '{{name}} ఎంచుకోండి', coach: 'కోచ్',
-    foot: 'ఏది సరిపోతుందో తెలియడం లేదా? ఉచిత ట్రయల్ బుక్ చేయండి. కోచ్ ముందు మిమ్మల్ని అసెస్ చేసి, ఎక్కడ మొదలుపెట్టాలో చెబుతారు.',
+    foot: 'ఏది సరిపోతుందో తెలియడం లేదా? మమ్మల్ని సంప్రదించండి. కోచ్ ముందు మిమ్మల్ని అసెస్ చేసి, ఎక్కడ మొదలుపెట్టాలో చెబుతారు.',
     notes: { 'Group of 8 approx': 'సుమారు 8 మంది గ్రూప్', 'Side-by-side personal training': 'పక్కపక్కనే పర్సనల్ ట్రైనింగ్', 'One-on-one': 'వన్-ఆన్-వన్' } as Record<string, string>,
   },
   community: {
@@ -444,18 +437,18 @@ const te: Copy = {
     cta: 'మీ శరీరానికి ప్లాన్ పొందండి',
   },
   lead: {
-    title: 'ఉచిత ట్రయల్ బుక్ చేయండి',
-    sub: 'మిమ్మల్ని ఎలా సంప్రదించాలో చెప్పండి. పని వేళల్లో కాల్ చేసి మీ ట్రయల్ సెషన్ నిర్ణయిస్తాం. అకౌంట్ అవసరం లేదు.',
+    title: 'కోచ్‌తో మాట్లాడండి',
+    sub: 'మిమ్మల్ని ఎలా సంప్రదించాలో చెప్పండి. పని వేళల్లో కాల్ చేసి మీ ప్రశ్నలకు జవాబిస్తాం, ఎలా ట్రైన్ అవ్వాలో ఎంచుకోవడానికి సాయం చేస్తాం. అకౌంట్ అవసరం లేదు.',
     name: 'మీ పేరు', phone: 'మొబైల్ నంబర్', interest: 'నాకు ఆసక్తి ఉన్నది', time: 'ట్రైన్ అవ్వడానికి అనువైన సమయం',
     interests: { trial: 'ఇంకా నిర్ణయించలేదు', personal: 'పర్సనల్ ట్రైనింగ్', group: 'గ్రూప్ ట్రైనింగ్', weight_loss: 'వెయిట్ లాస్', strength: 'బలం, కండరాలు' },
     times: { morning: 'ఉదయం', evening: 'సాయంత్రం', any: 'ఎప్పుడైనా' },
-    message: 'మేము తెలుసుకోవలసింది ఏదైనా (ఐచ్ఛికం)', send: 'నా ఉచిత ట్రయల్ కోరండి', sending: 'పంపుతున్నాం…',
-    sent: 'ధన్యవాదాలు, {{name}}. మీ ట్రయల్ కోసం త్వరలో కాల్ చేస్తాం.', already: 'మీ రిక్వెస్ట్ మాకు ఇప్పటికే వచ్చింది. త్వరలో కాల్ చేస్తాం.',
-    errName: 'మీ పేరు రాయండి.', errPhone: '10 అంకెల మొబైల్ నంబర్ రాయండి.', privacy: 'మీ నంబర్‌ను మీ ట్రయల్ గురించి కాల్ చేయడానికి మాత్రమే వాడతాం.',
+    message: 'మేము తెలుసుకోవలసింది ఏదైనా (ఐచ్ఛికం)', send: 'నా వివరాలు పంపండి', sending: 'పంపుతున్నాం…',
+    sent: 'ధన్యవాదాలు, {{name}}. త్వరలో కాల్ చేస్తాం.', already: 'మీ రిక్వెస్ట్ మాకు ఇప్పటికే వచ్చింది. త్వరలో కాల్ చేస్తాం.',
+    errName: 'మీ పేరు రాయండి.', errPhone: '10 అంకెల మొబైల్ నంబర్ రాయండి.', privacy: 'మీ నంబర్‌ను మీ ఎంక్వైరీ గురించి కాల్ చేయడానికి మాత్రమే వాడతాం.',
     busy: 'ఇప్పుడు చాలా రిక్వెస్ట్‌లు వస్తున్నాయి. దయచేసి కాల్ లేదా WhatsApp చేయండి.', failed: 'పంపడం కుదరలేదు. మళ్ళీ ప్రయత్నించండి, లేదా కాల్ లేదా WhatsApp చేయండి.',
-    orWhatsapp: 'WhatsApp కావాలా?', whatsappIt: 'మెసేజ్ చేయండి', waText: 'హాయ్ షాన్ ఫిట్‌నెస్, నేను ఉచిత ట్రయల్ సెషన్ బుక్ చేయాలనుకుంటున్నాను.',
+    orWhatsapp: 'WhatsApp కావాలా?', whatsappIt: 'మెసేజ్ చేయండి', waText: 'హాయ్ షాన్ ఫిట్‌నెస్, మీ దగ్గర ట్రైనింగ్ గురించి తెలుసుకోవాలనుకుంటున్నాను.',
   },
-  cta: { title: 'షాన్‌తో ట్రైన్ అవ్వండి.', text: 'మీ మొదటి సెషన్ ఉచితం. కోచ్‌తో ట్రైనింగ్ ఎలా ఉంటుందో వచ్చి చూడండి.' },
+  cta: { title: 'షాన్‌తో ట్రైన్ అవ్వండి.', text: 'తక్కువ మంది, ప్రతి సెట్‌పై కోచ్, మీ కోసమే రాసిన ప్లాన్. కాల్, మెసేజ్ చేయండి లేదా వివరాలు పంపండి.' },
   faq: { title: 'తరచుగా అడిగే ప్రశ్నలు' },
   personal: {
     h1: 'కాకినాడలో పర్సనల్ ట్రైనింగ్',
@@ -535,14 +528,13 @@ const te: Copy = {
   },
   contact: {
     h1: 'కాకినాడలో షాన్ ఫిట్‌నెస్‌కు రండి',
-    intro: 'మేము గోదారి గుంట RTO ఆఫీస్ రోడ్‌లో, D-Mart దగ్గర ఉన్నాం. పని వేళల్లో నేరుగా రండి, కాల్ చేయండి, లేదా కింద ఉచిత ట్రయల్ బుక్ చేయండి.',
+    intro: 'మేము గోదారి గుంట RTO ఆఫీస్ రోడ్‌లో, D-Mart దగ్గర ఉన్నాం. పని వేళల్లో నేరుగా రండి, కాల్ చేయండి, లేదా కింద వివరాలు పంపండి.',
     findTitle: 'మమ్మల్ని కనుగొనండి', talkTitle: 'మాతో మాట్లాడండి',
   },
   faqs: {
     fees: { q: 'కాకినాడ షాన్ ఫిట్‌నెస్‌లో ట్రైనింగ్‌కు ఎంత ఖర్చు?', a: 'సబ్‌స్క్రిప్షన్లు {{from}} నుండి మొదలవుతాయి: {{list}}. ప్రతి సబ్‌స్క్రిప్షన్‌లో కోచింగ్, షాన్ యాప్ ఉంటాయి.' },
     feesNoPrice: { q: 'కాకినాడ షాన్ ఫిట్‌నెస్‌లో ట్రైనింగ్‌కు ఎంత ఖర్చు?', a: 'చిన్న గ్రూప్, పక్కపక్కనే, వన్-ఆన్-వన్ కోచింగ్ ఉన్నాయి. ప్రస్తుత ఫీజుల కోసం కాల్ లేదా WhatsApp చేయండి.' },
     timings: { q: 'జిమ్ టైమింగ్స్ ఏమిటి?', a: 'మేము {{days}}, {{hours}} తెరిచి ఉంటాం. ఉదయం, సాయంత్రం అంతా బ్యాచ్‌లు మొదలవుతాయి.' },
-    trial: { q: 'ఉచిత ట్రయల్ ఉందా?', a: 'అవును. ఈ పేజీలోని ఫారంతో లేదా WhatsAppలో ఉచిత ట్రయల్ బుక్ చేయండి, కోచ్‌తో సెషన్ నిర్ణయిస్తాం.' },
     women: { q: 'మహిళా ట్రైనర్ ఉన్నారా?', a: 'అవును. మా బృందంలో మహిళా ట్రైనర్ ఉన్నారు, చేంజింగ్ రూమ్‌లు, షవర్లు కూడా ఉన్నాయి. పూర్తి ప్రైవసీ కోసం వన్-టు-వన్ పర్సనల్ ట్రైనింగ్ ఎంచుకోండి.' },
     weight: { q: 'బరువు తగ్గడానికి సహాయం చేస్తారా?', a: 'అవును. ఫ్యాట్ లాస్ ప్లాన్లలో బలం ట్రైనింగ్, కండిషనింగ్, ఇంటి భోజనంతో డైట్ ప్లాన్ ఉంటాయి, అన్నీ షాన్ యాప్‌లో ట్రాక్ చేస్తారు.' },
     beginner: { q: 'నేను పూర్తిగా కొత్తవాడిని. ఇది నాకు సరిపోతుందా?', a: 'అవును. కోచ్ అసెస్‌మెంట్‌తో మొదలుపెట్టి ప్రతి వ్యాయామాన్ని మీ స్థాయికి మారుస్తారు.' },

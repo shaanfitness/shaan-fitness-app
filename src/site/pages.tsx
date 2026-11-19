@@ -8,10 +8,10 @@ import {
   Manifesto, Marquee, Method, PageHero, ResultsGrid, Section, Studio, Subscriptions,
 } from './sections'
 import { useHead } from './seo'
-import { FilmHero } from './hero/FilmHero'
+import { CineHero } from './hero/CineHero'
 
 // One component per page. Each page answers one search ("personal trainer in Kakinada", "gym timings", …), ends with
-// its own questions (also sent to Google as FAQ data) and the free trial form.
+// its own questions (also sent to Google as FAQ data) and the enquiry form.
 
 function Story({ title, text, aside }: { title: string; text: string; aside?: ReactNode }) {
   return (
@@ -35,7 +35,7 @@ function Body({ id, site }: { id: PageId; site: SiteInfo | null }) {
   if (id === 'home') {
     return (
       <>
-        <FilmHero site={site} />
+        <CineHero site={site} />
         {site && <Marquee site={site} />}
         {site && <Subscriptions site={site} />}
         <JoinSteps />
@@ -165,7 +165,7 @@ function Body({ id, site }: { id: PageId; site: SiteInfo | null }) {
   }
 }
 
-/** A whole page of the website: frame, page body, its questions and the free trial form. */
+/** A whole page of the website: frame, page body, its questions and the enquiry form. */
 export function SitePage({ id }: { id: PageId }) {
   const { data } = useSite()
   const site = data ?? null
