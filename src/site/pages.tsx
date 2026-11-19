@@ -11,7 +11,7 @@ import { useHead } from './seo'
 import { CineHero } from './hero/CineHero'
 
 // One component per page. Each page answers one search ("personal trainer in Kakinada", "gym timings", …), ends with
-// its own questions (also sent to Google as FAQ data) and the enquiry form.
+// its own questions (also sent to Google as FAQ data) and the assessment form.
 
 function Story({ title, text, aside }: { title: string; text: string; aside?: ReactNode }) {
   return (
@@ -165,7 +165,7 @@ function Body({ id, site }: { id: PageId; site: SiteInfo | null }) {
   }
 }
 
-/** A whole page of the website: frame, page body, its questions and the enquiry form. */
+/** A whole page of the website: frame, page body, its questions and the assessment form. */
 export function SitePage({ id }: { id: PageId }) {
   const { data } = useSite()
   const site = data ?? null

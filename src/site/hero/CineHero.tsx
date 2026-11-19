@@ -189,7 +189,7 @@ export function CineHero({ site }: { site: SiteInfo | null }) {
             <p>{site?.website.hero_text || k.lede}</p>
             <div className="sf-ctas">
               <Link to={PATHS.plans} viewTransition className="sf-btn sf-btn-red sf-magnet">{c.common.seePlans}</Link>
-              <a href="#enquire" className="sf-btn sf-btn-glass sf-magnet">{c.nav.trial}</a>
+              <a href="#assessment" className="sf-btn sf-btn-glass sf-magnet">{c.nav.trial}</a>
             </div>
           </div>
           <div className={`sf-cine-ch ${ch === 1 ? 'is-on' : ''}`}>
@@ -204,9 +204,9 @@ export function CineHero({ site }: { site: SiteInfo | null }) {
             <h2 className="sf-cine-title"><span>{k.c4a}</span> <em>{k.c4b}</em></h2>
             <p>{k.c4}</p>
             <div className="sf-ctas">
-              {wa && <a href={wa} target="_blank" rel="noreferrer" className="sf-btn sf-btn-red sf-magnet">{Ic.whatsapp(18)}{c.nav.whatsapp}</a>}
+              <a href="#assessment" className="sf-btn sf-btn-red sf-magnet">{c.nav.trial}</a>
+              {wa && <a href={wa} target="_blank" rel="noreferrer" className="sf-btn sf-btn-glass sf-magnet">{Ic.whatsapp(18)}{c.nav.whatsapp}</a>}
               {tel && <a href={tel} className="sf-btn sf-btn-glass sf-magnet">{Ic.phone(18)}{c.nav.call}</a>}
-              <a href="#enquire" className="sf-btn sf-btn-glass sf-magnet">{c.nav.trial}</a>
             </div>
           </div>
         </div>

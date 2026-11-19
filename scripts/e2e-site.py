@@ -1,4 +1,4 @@
-"""Click-through of the one-address structure: the public website (every page, the enquiry form), join
+"""Click-through of the one-address structure: the public website (every page, the assessment form), join
 (sign-up with email confirmation), sign-in that sends each person to their own place, the member app's welcome
 view, forgot password, and the owner's website settings — at phone and desktop sizes.
 Runs against the local test stack (fresh stack).
@@ -68,30 +68,32 @@ with sync_playwright() as p:
     # Calls and WhatsApp go to the studio's public numbers.
     expect(page.locator('a[href="tel:+919642467896"]').first).to_be_attached()
     expect(page.locator('a[href^="https://wa.me/919963547869"]').first).to_be_attached()
-    expect(page.locator("#enquire").get_by_role("heading", name="Train with Shaan.")).to_be_visible()
+    expect(page.locator("#assessment").get_by_role("heading", name="Train with Shaan.")).to_be_visible()
     expect(page.locator("svg.sf-cine-poster")).to_be_attached()
     expect(page.get_by_role("banner").get_by_role("link", name="Log in")).to_be_visible()
+    expect(page.get_by_role("banner").get_by_role("link", name="Staff dashboard")).to_have_count(0)
+    expect(page.get_by_role("banner").get_by_role("link", name="My Shaan app")).to_have_count(0)
     expect(page.locator('script[type="application/ld+json"]').first).to_be_attached()
     shot(page, "website-desktop")
 
     # The enquiry form: no account needed --------------------------------------------------------------
-    page.get_by_role("button", name="Send my enquiry").click()
+    page.get_by_role("button", name="Book my assessment").click()
     expect(page.get_by_text("Enter your name.")).to_be_visible()
     page.fill("#sf-l-name", "Kavya Lakshmi")
     page.fill("#sf-l-phone", "12345")
-    page.get_by_role("button", name="Send my enquiry").click()
+    page.get_by_role("button", name="Book my assessment").click()
     expect(page.get_by_text("Enter a 10-digit mobile number.")).to_be_visible()
     page.fill("#sf-l-phone", "98480 70101")
     page.locator("form.sf-form").get_by_text("Weight loss", exact=True).click()
     page.locator("form.sf-form").get_by_text("Evening", exact=True).click()
     page.fill("#sf-l-msg", "Knee pain sometimes")
-    page.get_by_role("button", name="Send my enquiry").click()
-    expect(page.get_by_text("Thank you, Kavya. We’ll call you soon.")).to_be_visible()
-    shot(page, "enquiry-sent", full=False)
+    page.get_by_role("button", name="Book my assessment").click()
+    expect(page.get_by_text("Thank you, Kavya. We’ll call you soon to fix your assessment.")).to_be_visible()
+    shot(page, "assessment-sent", full=False)
     page.goto(BASE + "/contact")
     page.fill("#sf-l-name", "Kavya")
     page.fill("#sf-l-phone", "9848070101")
-    page.get_by_role("button", name="Send my enquiry").click()
+    page.get_by_role("button", name="Book my assessment").click()
     expect(page.get_by_text("We already have your request")).to_be_visible()
 
     # Every page answers its own search, with its own title --------------------------------------------------
@@ -151,7 +153,7 @@ with sync_playwright() as p:
     expect(page.get_by_text("We’ll call you to start")).to_be_visible()
     shot(page, "member-app-desktop")
     page.goto(BASE + "/")
-    expect(page.get_by_role("banner").get_by_role("link", name="Open my app")).to_be_visible()
+    expect(page.get_by_role("banner").get_by_role("link", name="My Shaan app")).to_be_visible()
     page.goto(BASE + "/dashboard")
     page.wait_for_url("**/app")
     ctx.close()
@@ -179,7 +181,7 @@ with sync_playwright() as p:
     shot(page, "website-settings")
     page.goto(BASE + "/")
     expect(page.get_by_role("heading", level=1)).to_contain_text("Strong at every age")
-    expect(page.get_by_role("banner").get_by_role("link", name="Open dashboard")).to_be_visible()
+    expect(page.get_by_role("banner").get_by_role("link", name="Staff dashboard")).to_be_visible()
     expect(page.locator(".sf-foot address")).to_contain_text("Main Road, Godari Gunta")
     # The owner sets a group of six and a new price: the website draws six and shows the price.
     page.goto(BASE + "/settings/website")

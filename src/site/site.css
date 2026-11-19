@@ -85,6 +85,8 @@
 .sf-btn svg { flex: none; }
 .sf-btn-red { background: var(--sf-crimson); border-color: var(--sf-crimson); color: #fff; box-shadow: 0 10px 30px -14px rgba(232, 40, 59, .55); }
 .sf-btn-red:hover { background: var(--sf-crimson-hi); border-color: var(--sf-crimson-hi); }
+.sf-acct { gap: 8px; padding-left: 6px; }
+.sf-acct-i { display: grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; background: var(--sf-crimson); color: #fff; font-size: 13px; font-weight: 800; }
 .sf-btn-light { background: var(--sf-porcelain); color: var(--sf-ink); border-color: var(--sf-porcelain); }
 .sf-btn-light:hover { background: #fff; }
 .sf-btn-sm { min-height: 42px; padding: 0 18px; font-size: 14px; }
@@ -571,7 +573,7 @@
 .sf-social a { display: grid; place-items: center; width: 42px; height: 42px; border-radius: 50%; border: 1px solid var(--sf-line-strong); color: var(--sf-porcelain); }
 .sf-social a:hover { background: var(--sf-porcelain); color: var(--sf-ink); }
 
-/* Phone dock: call, WhatsApp, enquire, always at hand on phones. */
+/* Phone dock: call, WhatsApp, book an assessment, always at hand on phones. */
 .sf-dock { position: fixed; left: 12px; right: 12px; bottom: calc(12px + env(safe-area-inset-bottom)); z-index: 55; display: grid; grid-template-columns: 1fr 1.25fr 1.7fr; gap: 6px; padding: 6px; border-radius: 22px; background: color-mix(in srgb, var(--sf-ink) 88%, transparent); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border: 1px solid var(--sf-line); box-shadow: 0 20px 40px -12px rgba(0, 0, 0, .8); transform: translateY(140%); transition: transform .45s var(--sf-ease-out); }
 .sf-dock.is-up { transform: none; }
 .sf-dock a { display: flex; align-items: center; justify-content: center; gap: 7px; min-height: 48px; padding: 0 6px; border-radius: 15px; text-decoration: none; font-weight: 700; font-size: 14px; line-height: 1.15; text-align: center; background: rgba(238, 240, 247, .07); }
@@ -626,6 +628,10 @@
   linear-gradient(90deg, rgba(4, 4, 6, .78) 0%, rgba(4, 4, 6, .2) 42%, transparent 60%),
   linear-gradient(180deg, transparent 62%, rgba(4, 4, 6, .9) 100%); }
 @keyframes sf-float { 50% { transform: translateY(calc(-50% - 10px)) rotate(-.6deg); } }
+/* Without the 3D (no WebGL), the flat logo still plays the chapters: it turns, comes closer and changes light. */
+.sf-cine-stage { perspective: 1400px; }
+.sf-cine-poster { rotate: y calc(sin(calc(var(--p, 0) * 1turn)) * 32deg - 8deg); scale: calc(1 + var(--p, 0) * .2); }
+.sf-cine-glow { transition: filter .6s; filter: hue-rotate(calc(var(--p, 0) * -40deg)); }
 
 .sf-cine-hud { position: absolute; left: 0; right: 0; top: 96px; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
 .sf-cine-tag { font-family: var(--sf-body); font-weight: 800; font-size: 12px; letter-spacing: .22em; text-transform: uppercase; color: var(--sf-mist); }

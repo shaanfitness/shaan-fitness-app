@@ -77,7 +77,7 @@ function describe(id: PageId, site: SiteInfo | null) {
   if (id !== 'plans' || !site) return base
   const priced = offers(site).filter((o) => o.price != null)
   if (!priced.length) return base
-  const text = `Fees at Shaan Fitness, Kakinada: ${priced.map((o) => `${o.name} ${rupees(o.price!)}`).join(', ')}. Every session is coached. Call or WhatsApp to join.`
+  const text = `Fees at Shaan Fitness, Kakinada: ${priced.map((o) => `${o.name} ${rupees(o.price!)}`).join(', ')}. Every session is coached. It starts with an assessment.`
   return text.length <= 160 ? text : base
 }
 

@@ -110,19 +110,22 @@ function wordTexture() {
 export function startEmblem(canvas: HTMLCanvasElement, opts: Options): Emblem | null {
   // Pinned to full quality, even on a software renderer (for recording the sequence in a headless browser).
   const fixed = (window as { __sfFixedQuality?: boolean }).__sfFixedQuality === true
-  // No WebGL 2, or only a software renderer (an old or blocklisted GPU, where the first frame alone can freeze the
-  // page for seconds): the flat logo stays.
-  const ctx = canvas.getContext('webgl2', {
-    alpha: false, antialias: !opts.mobile, depth: true, stencil: false, powerPreference: 'high-performance',
-  })
+  // No WebGL 2 at all: the flat logo stays (and still moves with the scroll, in CSS).
+  const ctx = canvas.getContext('webgl2', { alpha: false, antialias: false, depth: true, stencil: false, powerPreference: 'high-performance' })
   if (!ctx) return null
+  // Older laptop graphics (Intel HD and the like) and phones get a lighter scene from the first frame: fewer pixels,
+  // fewer smoke layers, simpler glow. It still plays every chapter.
+  const info = ctx.getExtension('WEBGL_debug_renderer_info')
+  const gpu = info ? String(ctx.getParameter(info.UNMASKED_RENDERER_WEBGL)) : ''
+  const weakGpu = /Intel.*HD Graphics|GMA|Mali-[4T]|Adreno \(TM\) [2-5]\d\d|PowerVR|SwiftShader|llvmpipe|Basic Render/i.test(gpu) && !/Iris|Arc/i.test(gpu)
+  const lite = !fixed && (opts.mobile || weakGpu)
   let renderer: WebGLRenderer
   try {
-    renderer = new WebGLRenderer({ canvas, context: ctx, antialias: !opts.mobile, powerPreference: 'high-performance' })
+    renderer = new WebGLRenderer({ canvas, context: ctx, antialias: false, powerPreference: 'high-performance' })
   } catch {
     return null
   }
-  let dpr = Math.min(window.devicePixelRatio || 1, opts.mobile ? 1.5 : 2)
+  let dpr = Math.min(window.devicePixelRatio || 1, opts.mobile ? 1.5 : weakGpu ? 1 : 2)
   renderer.setPixelRatio(dpr)
   renderer.outputColorSpace = SRGBColorSpace
   renderer.toneMapping = ACESFilmicToneMapping
@@ -176,7 +179,7 @@ export function startEmblem(canvas: HTMLCanvasElement, opts: Options): Emblem | 
   svg.paths.forEach((path, i) => {
     const key = order[i]
     const geo = new ExtrudeGeometry(path.toShapes(), {
-      depth: depth[key], bevelEnabled: true, bevelThickness: 3, bevelSize: 2.2, bevelSegments: opts.mobile ? 3 : 6, curveSegments: opts.mobile ? 10 : 18,
+      depth: depth[key], bevelEnabled: true, bevelThickness: 3, bevelSize: 2.2, bevelSegments: lite ? 3 : 6, curveSegments: lite ? 10 : 18,
     })
     geo.translate(0, 0, key === 'white' ? -depth[key] / 2 - 6 : -depth[key] / 2)
     // Transparent from the start (opaque at opacity 1), so the blueprint and the break-up can fade it without recompiling.
@@ -191,7 +194,7 @@ export function startEmblem(canvas: HTMLCanvasElement, opts: Options): Emblem | 
     const pa = geo.attributes.position as BufferAttribute
     const m = new Matrix4().copy(emblem.matrix)
     const v = new Vector3()
-    const step = Math.max(1, Math.floor(pa.count / (opts.mobile ? 1400 : 3200)))
+    const step = Math.max(1, Math.floor(pa.count / (lite ? 1400 : 3200)))
     for (let j = 0; j < pa.count; j += step) {
       v.fromBufferAttribute(pa, j).applyMatrix4(m)
       dustPos.push(v.x, v.y, v.z)
@@ -239,9 +242,9 @@ export function startEmblem(canvas: HTMLCanvasElement, opts: Options): Emblem | 
 
   // Smoke.
   const smokes: Mesh[] = []
-  const smokeCount = opts.mobile ? 4 : 7
-  const frontCount = opts.mobile ? 1 : 2
-  const frag = smokeFrag(opts.mobile ? 4 : 5)
+  const smokeCount = lite ? 4 : 7
+  const frontCount = lite ? 1 : 2
+  const frag = smokeFrag(lite ? 3 : 5)
   for (let i = 0; i < smokeCount; i++) {
     const front = i >= smokeCount - frontCount
     const mat = new ShaderMaterial({
@@ -257,14 +260,14 @@ export function startEmblem(canvas: HTMLCanvasElement, opts: Options): Emblem | 
   }
 
   // Embers drifting up, and sparks from the barbell.
-  const emberN = opts.mobile ? 90 : 180
+  const emberN = lite ? 90 : 180
   const ember = new BufferGeometry()
   const ep = new Float32Array(emberN * 3)
   for (let i = 0; i < emberN; i++) { ep[i * 3] = (Math.random() - 0.5) * 14; ep[i * 3 + 1] = (Math.random() - 0.5) * 9; ep[i * 3 + 2] = (Math.random() - 0.5) * 6 }
   ember.setAttribute('position', new BufferAttribute(ep, 3))
   const emberMat = new PointsMaterial({ map: dot, color: 0xff6a3a, size: 0.05, transparent: true, opacity: 0, depthWrite: false, blending: AdditiveBlending })
   scene.add(new Points(ember, emberMat))
-  const sparkN = opts.mobile ? 140 : 320
+  const sparkN = lite ? 140 : 320
   const spark = new BufferGeometry()
   const sp = new Float32Array(sparkN * 3), sv = new Float32Array(sparkN * 3), life = new Float32Array(sparkN)
   const ends = [new Vector3(-2.05, 0, 0.3), new Vector3(2.05, 0, 0.3)]
@@ -280,11 +283,11 @@ export function startEmblem(canvas: HTMLCanvasElement, opts: Options): Emblem | 
   holder.add(new Points(spark, sparkMat))
 
   // Bloom on the brightest edges.
-  const msaa = new WebGLRenderTarget(1, 1, { type: HalfFloatType, samples: opts.mobile ? 2 : 4 })
+  const msaa = new WebGLRenderTarget(1, 1, { type: HalfFloatType, samples: lite ? (weakGpu ? 0 : 2) : 4 })
   const composer = new EffectComposer(renderer, msaa)
   composer.setPixelRatio(dpr)
   composer.addPass(new RenderPass(scene, camera))
-  const bloom = new UnrealBloomPass(new Vector2(256, 256), opts.mobile ? 0.2 : 0.28, 0.2, opts.mobile ? 1.25 : 1.2)
+  const bloom = new UnrealBloomPass(new Vector2(256, 256), lite ? 0.2 : 0.28, 0.2, lite ? 1.25 : 1.2)
   composer.addPass(bloom)
   composer.addPass(new OutputPass())
 
@@ -295,7 +298,7 @@ export function startEmblem(canvas: HTMLCanvasElement, opts: Options): Emblem | 
     wide = w / h > 1.05
     renderer.setSize(w, h, false)
     composer.setSize(w, h)
-    const br = opts.mobile || level > 0 ? 0.5 : 0.75
+    const br = lite || level > 0 ? 0.4 : 0.75
     bloom.resolution.set(w * br, h * br)
     camera.aspect = w / h
     camera.updateProjectionMatrix()
@@ -409,9 +412,9 @@ export function startEmblem(canvas: HTMLCanvasElement, opts: Options): Emblem | 
     composer.render(dt)
     if (!ready) { ready = true; opts.onReady() }
   }
-  // Quality steps: 0 full, 1 fewer pixels, 2 no glow and fewer pixels again. Measured over two-second windows
-  // while the hero is on screen, after the first second (shaders compiling). 26 frames a second keeps a phone in
-  // battery saver (capped at 30) at full quality.
+  // Quality steps: 0 as started, 1 fewer pixels, 2 no glow and fewer pixels again, 3 fewest pixels and half the
+  // smoke. Measured over two-second windows while the hero is on screen, after the first second (shaders compiling).
+  // It never gives up on the animation unless the device manages almost nothing (under 5 frames a second).
   let winStart = 0, winFrames = 0, failed = false
   const govern = (now: number) => {
     if (fixed || failed) return
@@ -423,13 +426,14 @@ export function startEmblem(canvas: HTMLCanvasElement, opts: Options): Emblem | 
     const fps = (winFrames * 1000) / span
     winStart = now; winFrames = 0
     if (fps >= 26) return
-    if (level === 2) {
-      if (fps < 12) { failed = true; opts.onFail?.() }
+    if (level === 3) {
+      if (fps < 5) { failed = true; opts.onFail?.() }
       return
     }
     level++
-    dpr = level === 1 ? Math.min(dpr, 1) : Math.min(dpr, 0.75)
-    if (level === 2) bloom.enabled = false
+    dpr = Math.min(dpr, level === 1 ? 1 : level === 2 ? 0.75 : 0.55)
+    if (level >= 2) bloom.enabled = false
+    if (level === 3) smokes.forEach((m, i) => { if (i % 2) m.visible = false })
     renderer.setPixelRatio(dpr)
     composer.setPixelRatio(dpr)
     resize()
@@ -457,7 +461,8 @@ export function startEmblem(canvas: HTMLCanvasElement, opts: Options): Emblem | 
     try { compiling = renderer.compileAsync(scene, camera) } catch { compiling = Promise.resolve() }
     renderer.setRenderTarget(null)
     dust.visible = false
-    compiling.catch(() => undefined).then(start)
+    // Some graphics drivers never report back: start anyway after a few seconds.
+    Promise.race([compiling.catch(() => undefined), new Promise((r) => window.setTimeout(r, 3500))]).then(start)
   } else start()
 
   return {
