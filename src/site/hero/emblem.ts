@@ -10,7 +10,8 @@
 // still isn't smooth it hands back to the flat logo.
 import {
   ACESFilmicToneMapping, AdditiveBlending, BufferAttribute, BufferGeometry, CanvasTexture, Color, EdgesGeometry, ExtrudeGeometry,
-  Group, LineBasicMaterial, LineSegments, Matrix4, Mesh, MeshBasicMaterial, MeshPhysicalMaterial, NormalBlending, PerspectiveCamera,
+  DataTexture, Group, LineBasicMaterial, LineSegments, Matrix4, Mesh, MeshBasicMaterial, MeshPhysicalMaterial, MeshStandardMaterial, NormalBlending,
+  PerspectiveCamera, RepeatWrapping, RGBAFormat,
   HalfFloatType, PlaneGeometry, PMREMGenerator, PointLight, Points, PointsMaterial, Scene, ShaderMaterial, SRGBColorSpace, Vector2, Vector3,
   WebGLRenderer, WebGLRenderTarget, type Material,
 } from 'three'
@@ -70,6 +71,40 @@ void main(){
   gl_FragColor=vec4(col*(.5+.7*f),a);
 }`
 
+// The same smoke for weaker graphics: the noise is worked out once into a small tiling texture, and each layer just
+// slides two samples of it past each other, instead of computing the noise for every pixel of every frame.
+const SMOKE_LITE = `
+precision mediump float;
+varying vec2 vUv;uniform float t;uniform float seed;uniform vec3 col;uniform float op;uniform sampler2D map;
+void main(){
+  vec2 p=vUv*1.3+seed*.11;
+  float a1=texture2D(map,p+vec2(t*.012,t*.004)).r;
+  float a2=texture2D(map,p*1.9+vec2(-t*.016,t*.009)+a1*.35).r;
+  float f=a1*.62+a2*.38;
+  float edge=smoothstep(.5,.06,length(vUv-.5));
+  gl_FragColor=vec4(col*(.5+.7*f),smoothstep(.3,.8,f)*edge*op);
+}`
+function noiseTexture() {
+  const N = 256, data = new Uint8Array(N * N * 4)
+  const h = (x: number, y: number) => { const v = Math.sin(x * 127.1 + y * 311.7) * 43758.5453; return v - Math.floor(v) }
+  const n = (x: number, y: number, per: number) => {
+    const xi = Math.floor(x), yi = Math.floor(y), xf = x - xi, yf = y - yi
+    const u = xf * xf * (3 - 2 * xf), v = yf * yf * (3 - 2 * yf)
+    const g = (a: number, b: number) => h(((a % per) + per) % per, ((b % per) + per) % per)
+    return (g(xi, yi) * (1 - u) + g(xi + 1, yi) * u) * (1 - v) + (g(xi, yi + 1) * (1 - u) + g(xi + 1, yi + 1) * u) * v
+  }
+  for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) {
+    let f = 0, a = 0.5, per = 4
+    for (let o = 0; o < 5; o++) { f += a * n((x / N) * per, (y / N) * per, per); per *= 2; a *= 0.5 }
+    const i = (y * N + x) * 4
+    data[i] = data[i + 1] = data[i + 2] = Math.round(Math.min(1, f / 0.97) * 255); data[i + 3] = 255
+  }
+  const t = new DataTexture(data, N, N, RGBAFormat)
+  t.wrapS = t.wrapT = RepeatWrapping
+  t.needsUpdate = true
+  return t
+}
+
 function dotTexture() {
   const c = document.createElement('canvas')
   c.width = c.height = 64
@@ -110,18 +145,27 @@ function wordTexture() {
 export function startEmblem(canvas: HTMLCanvasElement, opts: Options): Emblem | null {
   // Pinned to full quality, even on a software renderer (for recording the sequence in a headless browser).
   const fixed = (window as { __sfFixedQuality?: boolean }).__sfFixedQuality === true
+  // Older laptop graphics (Intel HD and the like) get a lighter scene from the first frame: drawn straight to the
+  // screen (no glow pipeline), simpler metal, baked smoke and a pixel budget. Phones get fewer layers. Every chapter
+  // still plays. The graphics chip is read from a throwaway context first, because anti-aliasing is set when the
+  // real one is made.
+  let gpu = ''
+  try {
+    const probe = document.createElement('canvas').getContext('webgl2')
+    const info = probe?.getExtension('WEBGL_debug_renderer_info')
+    if (probe && info) gpu = String(probe.getParameter(info.UNMASKED_RENDERER_WEBGL))
+    probe?.getExtension('WEBGL_lose_context')?.loseContext()
+  } catch { /* unknown chip: full quality, the frame-rate governor still watches */ }
+  // (window.__sfLite forces the lighter scene, to check how it looks.)
+  const weakGpu = (window as { __sfLite?: boolean }).__sfLite === true || !fixed && /Intel.*HD Graphics|GMA|Mali-[4T]|Adreno \(TM\) [2-5]\d\d|PowerVR|SwiftShader|llvmpipe|Basic Render/i.test(gpu) && !/Iris|Arc/i.test(gpu)
+  const lite = weakGpu || (!fixed && opts.mobile)
+  const direct = weakGpu
   // No WebGL 2 at all: the flat logo stays (and still moves with the scroll, in CSS).
-  const ctx = canvas.getContext('webgl2', { alpha: false, antialias: false, depth: true, stencil: false, powerPreference: 'high-performance' })
+  const ctx = canvas.getContext('webgl2', { alpha: false, antialias: direct, depth: true, stencil: false, powerPreference: 'high-performance' })
   if (!ctx) return null
-  // Older laptop graphics (Intel HD and the like) and phones get a lighter scene from the first frame: fewer pixels,
-  // fewer smoke layers, simpler glow. It still plays every chapter.
-  const info = ctx.getExtension('WEBGL_debug_renderer_info')
-  const gpu = info ? String(ctx.getParameter(info.UNMASKED_RENDERER_WEBGL)) : ''
-  const weakGpu = /Intel.*HD Graphics|GMA|Mali-[4T]|Adreno \(TM\) [2-5]\d\d|PowerVR|SwiftShader|llvmpipe|Basic Render/i.test(gpu) && !/Iris|Arc/i.test(gpu)
-  const lite = !fixed && (opts.mobile || weakGpu)
   let renderer: WebGLRenderer
   try {
-    renderer = new WebGLRenderer({ canvas, context: ctx, antialias: false, powerPreference: 'high-performance' })
+    renderer = new WebGLRenderer({ canvas, context: ctx, antialias: direct, powerPreference: 'high-performance' })
   } catch {
     return null
   }
@@ -158,15 +202,23 @@ export function startEmblem(canvas: HTMLCanvasElement, opts: Options): Emblem | 
   const S = 4.4 / 512
   emblem.scale.set(S, -S, S)
   emblem.position.set(-256 * S, 256 * S, 0)
+  // Simpler metal on older graphics: the same colours without the clear-coat layer.
+  type MatOpts = ConstructorParameters<typeof MeshPhysicalMaterial>[0] & { clearcoat?: number; clearcoatRoughness?: number }
+  const Metal = (o: MatOpts) => {
+    if (!direct) return new MeshPhysicalMaterial(o)
+    const { clearcoat: _c, clearcoatRoughness: _r, ...rest } = o as Record<string, unknown>
+    void _c; void _r
+    return new MeshStandardMaterial(rest as ConstructorParameters<typeof MeshStandardMaterial>[0])
+  }
   const faces = {
-    white: new MeshPhysicalMaterial({ color: 0xdedee6, metalness: 0.8, roughness: 0.42, envMapIntensity: 0.3 }),
-    red: new MeshPhysicalMaterial({ color: 0xd0101e, metalness: 0.78, roughness: 0.2, clearcoat: 1, clearcoatRoughness: 0.08, envMapIntensity: 0.6, emissive: new Color(0xff1020), emissiveIntensity: 0.04 }),
-    blue: new MeshPhysicalMaterial({ color: 0x1192dc, metalness: 0.78, roughness: 0.2, clearcoat: 1, clearcoatRoughness: 0.08, envMapIntensity: 0.6, emissive: new Color(0x0a7fd0), emissiveIntensity: 0.04 }),
+    white: Metal({ color: 0xdedee6, metalness: 0.8, roughness: 0.42, envMapIntensity: 0.3 }),
+    red: Metal({ color: 0xd0101e, metalness: 0.78, roughness: 0.2, clearcoat: 1, clearcoatRoughness: 0.08, envMapIntensity: 0.6, emissive: new Color(0xff1020), emissiveIntensity: 0.04 }),
+    blue: Metal({ color: 0x1192dc, metalness: 0.78, roughness: 0.2, clearcoat: 1, clearcoatRoughness: 0.08, envMapIntensity: 0.6, emissive: new Color(0x0a7fd0), emissiveIntensity: 0.04 }),
   }
   const sides = {
-    white: new MeshPhysicalMaterial({ color: 0x8c8c96, metalness: 1, roughness: 0.34, envMapIntensity: 0.45 }),
-    red: new MeshPhysicalMaterial({ color: 0x5c0710, metalness: 0.95, roughness: 0.24, envMapIntensity: 0.55 }),
-    blue: new MeshPhysicalMaterial({ color: 0x06365a, metalness: 0.95, roughness: 0.24, envMapIntensity: 0.55 }),
+    white: Metal({ color: 0x8c8c96, metalness: 1, roughness: 0.34, envMapIntensity: 0.45 }),
+    red: Metal({ color: 0x5c0710, metalness: 0.95, roughness: 0.24, envMapIntensity: 0.55 }),
+    blue: Metal({ color: 0x06365a, metalness: 0.95, roughness: 0.24, envMapIntensity: 0.55 }),
   }
   const tint = { white: new Color(0xf2efe9), red: new Color(0xff3a3a), blue: new Color(0x34b4ff) }
   const depth = { white: 26, red: 40, blue: 40 }
@@ -244,11 +296,12 @@ export function startEmblem(canvas: HTMLCanvasElement, opts: Options): Emblem | 
   const smokes: Mesh[] = []
   const smokeCount = lite ? 4 : 7
   const frontCount = lite ? 1 : 2
-  const frag = smokeFrag(lite ? 3 : 5)
+  const frag = direct ? SMOKE_LITE : smokeFrag(lite ? 4 : 5)
+  const noise = direct ? noiseTexture() : null
   for (let i = 0; i < smokeCount; i++) {
     const front = i >= smokeCount - frontCount
     const mat = new ShaderMaterial({
-      uniforms: { t: { value: 0 }, seed: { value: i * 7.13 }, col: { value: new Color(i % 3 === 0 ? 0x4a5468 : i % 3 === 1 ? 0x6a3a44 : 0x55555e) }, op: { value: 0 } },
+      uniforms: { t: { value: 0 }, seed: { value: i * 7.13 }, col: { value: new Color(i % 3 === 0 ? 0x4a5468 : i % 3 === 1 ? 0x6a3a44 : 0x55555e) }, op: { value: 0 }, map: { value: noise } },
       vertexShader: SMOKE_VERT, fragmentShader: frag, transparent: true, depthWrite: false, blending: NormalBlending,
     })
     const m = new Mesh(new PlaneGeometry(front ? 9 : 14, front ? 6 : 9), mat)
@@ -296,6 +349,8 @@ export function startEmblem(canvas: HTMLCanvasElement, opts: Options): Emblem | 
     const r = canvas.getBoundingClientRect()
     const w = Math.max(1, Math.round(r.width)), h = Math.max(1, Math.round(r.height))
     wide = w / h > 1.05
+    // Older graphics: at most about a million pixels a frame, whatever the screen.
+    if (direct) renderer.setPixelRatio(Math.min(dpr, Math.sqrt(1.0e6 / (w * h))))
     renderer.setSize(w, h, false)
     composer.setSize(w, h)
     const br = lite || level > 0 ? 0.4 : 0.75
@@ -409,7 +464,7 @@ export function startEmblem(canvas: HTMLCanvasElement, opts: Options): Emblem | 
       ;(spark.attributes.position as BufferAttribute).needsUpdate = true
     }
 
-    composer.render(dt)
+    if (direct) renderer.render(scene, camera); else composer.render(dt)
     if (!ready) { ready = true; opts.onReady() }
   }
   // Quality steps: 0 as started, 1 fewer pixels, 2 no glow and fewer pixels again, 3 fewest pixels and half the
@@ -456,7 +511,7 @@ export function startEmblem(canvas: HTMLCanvasElement, opts: Options): Emblem | 
   // they're shown just for this so they don't stall the last chapter.
   if (renderer.extensions.has('KHR_parallel_shader_compile')) {
     dust.visible = true
-    renderer.setRenderTarget(composer.readBuffer)
+    renderer.setRenderTarget(direct ? null : composer.readBuffer)
     let compiling: Promise<unknown>
     try { compiling = renderer.compileAsync(scene, camera) } catch { compiling = Promise.resolve() }
     renderer.setRenderTarget(null)
@@ -480,6 +535,7 @@ export function startEmblem(canvas: HTMLCanvasElement, opts: Options): Emblem | 
         mats.forEach((x) => x.dispose())
       })
       dot.dispose()
+      noise?.dispose()
       wordTex.dispose()
       env.dispose()
       pmrem.dispose()
