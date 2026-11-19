@@ -96,6 +96,16 @@ export const PAGE_ART: Record<string, ReactNode> = {
   results: <P><path className="sf-draw" d="M64 220V80M64 220h176" strokeOpacity=".6" /><path className="sf-draw" d="M78 200l40-30 32 18 38-52 40-30" stroke="#E8283B" /><path className="sf-draw" d="M214 106h18v18" stroke="#E8283B" /></P>,
   about: <P><path className="sf-draw" d="M150 60 74 96v54c0 46 32 78 76 92 44-14 76-46 76-92V96z" /><path className="sf-draw" d="M112 152h76" stroke="#E8283B" strokeWidth="6" /></P>,
   contact: <P><path className="sf-draw" d="M150 236s-64-58-64-112a64 64 0 0 1 128 0c0 54-64 112-64 112z" /><circle className="sf-draw" cx="150" cy="124" r="22" stroke="#E8283B" /></P>,
+  // One coach (red) with a few people around them.
+  semi: <P><circle className="sf-draw" cx="150" cy="110" r="26" stroke="#E8283B" />{[200, 245, 295, 340].map((a) => <circle key={a} className="sf-draw" cx={150 + cosd(a) * 96} cy={150 - sind(a) * 96} r="16" />)}<path className="sf-draw" d="M110 216c8-30 22-44 40-44s32 14 40 44" stroke="#E8283B" /></P>,
+  // A checklist with the last line ticked.
+  assessment: <P><rect className="sf-draw" x="88" y="66" width="124" height="170" rx="14" /><path className="sf-draw" d="M124 58h52v20h-52zM112 112h76M112 144h76M112 176h44" strokeOpacity=".7" /><path className="sf-draw" d="m164 204 14 14 28-34" stroke="#E8283B" /></P>,
+  // A loaded barbell.
+  strength: <P><path className="sf-draw" d="M46 150h208" /><path className="sf-draw" d="M78 108v84M96 118v64M222 108v84M204 118v64" stroke="#E8283B" /><path className="sf-draw" d="M60 136v28M240 136v28" /></P>,
+  // A steady line: balance, with a heart beat.
+  seniors: <P><path className="sf-draw" d="M150 236s-70-44-70-98a38 38 0 0 1 70-20 38 38 0 0 1 70 20c0 54-70 98-70 98z" /><path className="sf-draw" d="M96 154h30l12-22 18 40 12-18h36" stroke="#E8283B" /></P>,
+  // A sprint bolt over a track lane.
+  athletes: <P><path className="sf-draw" d="M162 52 104 160h44l-14 88 70-120h-46z" stroke="#E8283B" /><path className="sf-draw" d="M56 236h188M56 212h60M184 212h60" strokeOpacity=".6" /></P>,
 }
 
 // Icons -----------------------------------------------------------------------------------------------------------
@@ -120,5 +130,10 @@ export const Ic = {
   people: (s?: number) => <I size={s} d={<><circle cx="9" cy="9" r="3" /><circle cx="17" cy="10" r="2.4" /><path d="M3.5 19c.6-3 2.8-4.5 5.5-4.5s4.9 1.5 5.5 4.5M15 15c2.6 0 4.6 1.2 5.3 4" /></>} />,
   external: (s?: number) => <I size={s} d={<><path d="M14 4h6v6M20 4l-8.5 8.5" /><path d="M18 14v4a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4" /></>} />,
   gallery: (s?: number) => <I size={s} d={<><rect x="3.5" y="3.5" width="7" height="7" rx="1.6" /><rect x="13.5" y="3.5" width="7" height="7" rx="1.6" /><rect x="3.5" y="13.5" width="7" height="7" rx="1.6" /><rect x="13.5" y="13.5" width="7" height="7" rx="1.6" /></>} />,
+  star: (s?: number) => <I size={s} d={<path d="m12 3.5 2.6 5.4 5.9.8-4.3 4.1 1 5.8L12 16.8l-5.2 2.8 1-5.8-4.3-4.1 5.9-.8z" />} />,
+  squad: (s?: number) => <I size={s} d={<><circle cx="12" cy="6.5" r="2.3" /><circle cx="5.5" cy="13" r="2" /><circle cx="18.5" cy="13" r="2" /><path d="M8.5 13.5c.9-2 2-3 3.5-3s2.6 1 3.5 3M2.5 20c.5-2.2 1.6-3.3 3-3.3s2.5 1.1 3 3.3M15.5 20c.5-2.2 1.6-3.3 3-3.3s2.5 1.1 3 3.3" /></>} />,
+  barbell: (s?: number) => <I size={s} d={<path d="M2.5 12h19M5.5 7.5v9M8.5 9v6M18.5 7.5v9M15.5 9v6" />} />,
+  heart: (s?: number) => <I size={s} d={<path d="M12 20s-7.5-4.6-7.5-10.2A4.3 4.3 0 0 1 12 7.2a4.3 4.3 0 0 1 7.5 2.6C19.5 15.4 12 20 12 20zM6.5 12.5h3l1.5-2.5 2 4 1.5-1.5h3" />} />,
+  bolt: (s?: number) => <I size={s} d={<path d="M13 3 5 13.5h6l-1 7.5 8-10.5h-6z" />} />,
   flame: (s?: number) => <I size={s} d={<path d="M12 21c-3.9 0-6.5-2.6-6.5-6 0-3.7 3.2-5 3.7-8.8 2.4 2 2.9 4 2.8 5.2.8-1.2 1.2-2.4 1.2-3.6 2.4 2 3.8 4.2 3.8 7.2 0 3.4-2.6 6-5 6z" />} />,
 }

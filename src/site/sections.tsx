@@ -1,12 +1,13 @@
 import { useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react'
 import { Link } from 'react-router-dom'
-import { siteHours, telLink, whatsappLink, prettyPhone, mapsLink, type SiteInfo, type SiteOffer } from '../db/site'
+import { addressLines, googlePlace, siteHours, telLink, whatsappLink, prettyPhone, mapsLink, type SiteInfo, type SiteOffer } from '../db/site'
 import { supabase } from '../lib/supabase'
 import { Crest, GLYPHS, Ic, PAGE_ART, Squad, cosd, sind } from './art'
 import { PATHS, fill, type PageId } from './content'
 import { addressText, batchTier, clock, liveStatus, offerTier, offers, openSpans, rupees, services, weeksText, type Tier } from './data'
 import { prefersReducedMotion, useInView, useNow } from './motion'
 import { useCopy } from './layout'
+import { guideById, isGuideId } from './guides'
 
 // The website's sections. Data comes from the CRM's public summary (site); copy from content.ts.
 
@@ -631,14 +632,15 @@ export function Faq({ items }: { items: { q: string; a: string }[] }) {
 
 // Inner page hero ---------------------------------------------------------------------------------------------------------------------------
 export function PageHero({ id, title, intro, site }: { id: PageId; title: string; intro: string; site?: SiteInfo | null }) {
-  const { c } = useCopy()
+  const { c, lang } = useCopy()
+  const crumb = isGuideId(id) ? guideById(id).copy[lang].nav : c.nav[navKey(id)]
   return (
     <section className="sf-page-hero" aria-labelledby="sf-h1">
       <div className="sf-hero-bg" />
       <div className="sf-wrap sf-page-hero-grid sf-enter">
         <div>
           <nav aria-label={c.common.breadcrumb}>
-            <ol className="sf-crumbs"><li><Link to="/" viewTransition>Shaan Fitness</Link></li><li aria-current="page">{title.length > 40 ? c.nav[navKey(id)] : title}</li></ol>
+            <ol className="sf-crumbs"><li><Link to="/" viewTransition>Shaan Fitness</Link></li><li aria-current="page">{title.length > 40 ? crumb : title}</li></ol>
           </nav>
           {site && <div style={{ marginBottom: 18 }}><LiveChip site={site} /></div>}
           <h1 id="sf-h1" className="sf-h1">{title}</h1>
@@ -690,12 +692,54 @@ export function HoursTable({ site }: { site: SiteInfo }) {
   )
 }
 
-export function ContactBlock({ site }: { site: SiteInfo }) {
+/** Google's map with the studio's own pin and listing card. It loads only when asked, so the page stays light and
+ *  Google sets no cookies until then. */
+function MapFrame({ site }: { site: SiteInfo }) {
   const { c } = useCopy()
   const [map, setMap] = useState(false)
   const s = site.studio
+  const src = googlePlace(s)?.embed ?? `https://www.google.com/maps?q=${encodeURIComponent(addressText(site))}&output=embed`
+  return (
+    <div className="sf-map">
+      {map ? <iframe title={`Map: ${s.name}`} src={src} loading="lazy" referrerPolicy="no-referrer-when-downgrade" />
+        : <div className="sf-map-cover">{PAGE_ART.contact}<button type="button" className="sf-btn" onClick={() => setMap(true)}>{c.common.showMap}</button></div>}
+    </div>
+  )
+}
+
+/** Directions and the Google listing, where people read and write reviews. */
+function PlaceLinks({ site, light = true }: { site: SiteInfo; light?: boolean }) {
+  const { c } = useCopy()
+  const g = googlePlace(site.studio)
+  return (
+    <>
+      <a href={mapsLink(site.studio, site.website)} target="_blank" rel="noreferrer" className={`sf-btn ${light ? 'sf-btn-light' : ''}`}>{Ic.pin(18)}{c.common.directions}</a>
+      {g && <a href={g.listing} target="_blank" rel="noreferrer" className="sf-btn">{Ic.star(18)}{c.common.reviews}</a>}
+    </>
+  )
+}
+
+/** Home: where the studio is, with the map, directions and Google reviews. */
+export function FindUs({ site }: { site: SiteInfo }) {
+  const { c } = useCopy()
+  return (
+    <Section title={c.visit.title} sub={c.visit.sub} id="visit">
+      <div className="sf-two">
+        <div style={{ display: 'grid', gap: 22, alignContent: 'start' }}>
+          <div><LiveChip site={site} /></div>
+          <address className="sf-address">{addressLines(site.studio).map((l) => <span key={l} style={{ display: 'block' }}>{l}</span>)}</address>
+          <div className="sf-ctas"><PlaceLinks site={site} /></div>
+        </div>
+        <MapFrame site={site} />
+      </div>
+    </Section>
+  )
+}
+
+export function ContactBlock({ site }: { site: SiteInfo }) {
+  const { c } = useCopy()
+  const s = site.studio
   const wa = whatsappLink(site.website.whatsapp || s.mobile, c.lead.waText)
-  const q = encodeURIComponent(addressText(site))
   return (
     <div className="sf-two">
       <div style={{ display: 'grid', gap: 28 }}>
@@ -704,7 +748,7 @@ export function ContactBlock({ site }: { site: SiteInfo }) {
           <address className="sf-address">{[s.street1, s.street2].filter(Boolean).join(', ')}<br />{[s.landmark, s.locality ?? s.branch].filter(Boolean).join(', ')}<br />{[s.city, s.state, s.pincode].filter(Boolean).join(', ')}</address>
         </div>
         <div className="sf-ctas">
-          <a href={mapsLink(s, site.website)} target="_blank" rel="noreferrer" className="sf-btn sf-btn-light">{Ic.pin(18)}{c.common.directions}</a>
+          <PlaceLinks site={site} />
           {s.mobile && <a href={telLink(s.mobile) ?? undefined} className="sf-btn">{Ic.phone(18)}{prettyPhone(s.mobile)}</a>}
           {wa && <a href={wa} target="_blank" rel="noreferrer" className="sf-btn">{Ic.whatsapp(18)}{c.nav.whatsapp}</a>}
         </div>
@@ -714,10 +758,7 @@ export function ContactBlock({ site }: { site: SiteInfo }) {
           <HoursTable site={site} />
         </div>
       </div>
-      <div className="sf-map">
-        {map ? <iframe title={`Map: ${s.name}`} src={`https://www.google.com/maps?q=${q}&output=embed`} loading="lazy" referrerPolicy="no-referrer-when-downgrade" />
-          : <div className="sf-map-cover">{PAGE_ART.contact}<button type="button" className="sf-btn" onClick={() => setMap(true)}>{c.common.showMap}</button></div>}
-      </div>
+      <MapFrame site={site} />
     </div>
   )
 }

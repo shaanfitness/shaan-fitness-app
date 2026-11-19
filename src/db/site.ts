@@ -155,6 +155,19 @@ export function prettyPhone(num: string | null | undefined) {
   const ten = d.length >= 10 ? d.slice(-10) : d
   return ten.length === 10 ? `+91 ${ten.slice(0, 5)} ${ten.slice(5)}` : num ?? ''
 }
+/** The studio's Google listing (its map pin and reviews), when we know it. */
+export function googlePlace(s: SiteStudio) {
+  if (!/shaan fitness/i.test(s.name)) return null
+  const cid = '3247743103325462572'
+  return {
+    lat: 16.9750607, lng: 82.2488998,
+    /** The listing on Google Maps, where people read and write reviews. */
+    listing: `https://www.google.com/maps?cid=${cid}`,
+    /** The map with the studio's own pin and listing card, for an iframe. */
+    embed: `https://maps.google.com/maps?cid=${cid}&output=embed`,
+  }
+}
+
 export function mapsLink(s: SiteStudio, w: SiteSettings) {
   if (w.map_url) return w.map_url
   // The studio's own Google Maps pin.

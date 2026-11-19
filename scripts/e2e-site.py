@@ -115,11 +115,32 @@ with sync_playwright() as p:
              "/events/dandiya-nights-2026": ("AuraPeak Dandiya Nights 2K26", "Dandiya Nights 2K26 Lucky Draw"),
              "/events/deadlift-december-2023": ("Deadlift December Challenge 2023", "Deadlift December Challenge 2023"),
              "/events/kids-fitness-workshop-2023": ("Kids Fitness Workshop at Summer Fiesta 2023", "Kids Fitness Workshop"),
+             "/semi-private-training-kakinada": ("Semi-private training in Kakinada", "Semi-Private Training in Kakinada"),
+             "/fitness-assessment-kakinada": ("The Shaan Assessment", "Fitness Assessment in Kakinada"),
+             "/strength-training-kakinada": ("Strength training in Kakinada", "Strength Training in Kakinada"),
+             "/fitness-after-40-kakinada": ("Strong at every age: training after 40", "Fitness After 40"),
+             "/athletic-training-kakinada": ("Athletic training in Kakinada", "Athletic Training in Kakinada"),
              "/contact": ("Visit Shaan Fitness in Kakinada", "Contact Shaan Fitness")}
     for path, (h1, title) in pages.items():
         page.goto(BASE + path)
         expect(page.get_by_role("heading", level=1)).to_have_text(h1)
         expect(page).to_have_title(re.compile("^" + re.escape(title)))
+    # The semi-private page explains before it sells: the ways to train as figures, a fair comparison, then plans.
+    page.goto(BASE + "/semi-private-training-kakinada")
+    expect(page.locator(".sf-ways li")).to_have_count(3)
+    expect(page.locator(".sf-compare tbody tr")).to_have_count(5)
+    expect(page.get_by_role("heading", name="What a session looks like")).to_be_visible()
+    ld = page.evaluate("[...document.querySelectorAll('script[type=\"application/ld+json\"]')].map((s) => s.textContent).join(' ')")
+    assert "What is semi-private training?" in ld and '"Service"' in ld, "semi-private page: FAQ and Service data for Google"
+    shot(page, "semi-desktop")
+    page.get_by_role("link", name="What happens at the assessment").click()
+    page.wait_for_url("**/fitness-assessment-kakinada")
+    expect(page.get_by_role("heading", name="What we check")).to_be_visible()
+    # The home page ends with the studio: map, directions and the Google listing for reviews.
+    page.goto(BASE + "/")
+    visit = page.locator("#visit")
+    expect(visit.get_by_role("link", name="Google reviews")).to_have_attribute("href", re.compile(r"google\.com/maps\?cid="))
+    expect(visit.get_by_role("link", name="Get directions")).to_be_visible()
     page.goto(BASE + "/events/dandiya-nights-2026")
     expect(page.get_by_text("Rekha & Manikanta")).to_be_visible()
     expect(page.locator("#gallery .sf-ig")).to_have_count(6)
@@ -138,7 +159,9 @@ with sync_playwright() as p:
     page.goto(BASE + "/contact")
     page.get_by_role("button", name="Show the map").click()
     expect(page.locator("iframe[title^='Map']")).to_be_attached()
+    expect(page.get_by_role("link", name="Google reviews")).to_be_visible()
     page.get_by_role("banner").get_by_role("button", name="Training").click()
+    expect(page.locator("#sf-training a")).to_have_count(7)
     page.get_by_role("banner").get_by_role("link", name="Weight loss").click()
     page.wait_for_url("**/weight-loss-kakinada")
     page.get_by_role("banner").get_by_role("link", name="Subscriptions").click()

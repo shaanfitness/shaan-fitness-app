@@ -2,15 +2,17 @@
 // people read (English and Telugu). Prices, timings, coaches and the address come from the CRM at run time.
 
 import { EVENTS, type EventId } from './events'
+import { GUIDES, type GuideId } from './guides'
 
 export type Lang = 'en' | 'te'
-export type PageId = 'home' | 'personal' | 'group' | 'weightLoss' | 'plans' | 'timings' | 'coaches' | 'results' | 'about' | 'contact' | 'events' | EventId
+export type PageId = 'home' | 'personal' | 'group' | 'weightLoss' | 'plans' | 'timings' | 'coaches' | 'results' | 'about' | 'contact' | 'events' | EventId | GuideId
 
 export const PATHS: Record<PageId, string> = {
   home: '/',
   personal: '/personal-training-kakinada',
   group: '/group-training-kakinada',
   weightLoss: '/weight-loss-kakinada',
+  ...(Object.fromEntries(GUIDES.map((g) => [g.id, g.path])) as Record<GuideId, string>),
   plans: '/membership-plans',
   timings: '/gym-timings',
   coaches: '/coaches',
@@ -28,9 +30,11 @@ export const pageForPath = (path: string) => PAGE_IDS.find((id) => PATHS[id] ===
 
 /** Search results: title (under 60 characters) and description (under 160). */
 const eventSeo = Object.fromEntries(EVENTS.map((e) => [e.id, { title: e.copy.en.seoTitle, description: e.copy.en.seoDesc }])) as Record<EventId, { title: string; description: string }>
+const guideSeo = Object.fromEntries(GUIDES.map((g) => [g.id, g.seo])) as Record<GuideId, { title: string; description: string }>
 
 export const SEO: Record<PageId, { title: string; description: string }> = {
   ...eventSeo,
+  ...guideSeo,
   events: {
     title: 'Events in Kakinada | Lung Run, Dandiya Nights | Shaan Fitness',
     description: 'Events and community projects by Shaan Fitness in Kakinada: the Community Lung Run, Dandiya Nights lucky draw, Deadlift December and kids’ workshops.',
@@ -89,7 +93,7 @@ const en = {
   },
   common: {
     seePlans: 'See the subscriptions', perCycle: '{{days}} days, {{sessions}} sessions', allPlans: 'All subscriptions', moreAbout: 'More about this',
-    readFaq: 'Questions people ask', directions: 'Get directions', showMap: 'Show the map', address: 'Address', hours: 'Hours',
+    readFaq: 'Questions people ask', directions: 'Get directions', showMap: 'Show the map', address: 'Address', hours: 'Hours', reviews: 'Google reviews',
     phone: 'Phone', email: 'Email', follow: 'Follow us', rights: '© {{year}} Shaan Fitness, Kakinada. All rights reserved.',
     privacy: 'Privacy notice', staffLogin: 'Staff and member login', closed: 'Closed', mornings: 'Morning batches', evenings: 'Evening batches',
     days: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'], daysLong: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
@@ -198,6 +202,7 @@ const en = {
     cta: 'Ask about the program',
   },
   coaches: { title: 'Coaches who know your numbers', sub: 'Your coach knows your name, your goal and what you lifted last time. That is the difference.', all: 'Meet all coaches' },
+  visit: { title: 'Visit the studio', sub: 'See where we are, read what members say on Google, and get directions to the door.' },
   results: { title: 'Real results', sub: 'Members who let us share their story.', empty: 'Transformation stories are being added. Ask at the front desk to see before-and-after progress from our members.' },
   check: {
     title: 'Check your BMI',
@@ -341,7 +346,7 @@ const te: Copy = {
   },
   common: {
     seePlans: 'సబ్‌స్క్రిప్షన్లు చూడండి', perCycle: '{{days}} రోజులు, {{sessions}} సెషన్లు', allPlans: 'అన్ని సబ్‌స్క్రిప్షన్లు', moreAbout: 'మరింత తెలుసుకోండి',
-    readFaq: 'తరచుగా అడిగే ప్రశ్నలు', directions: 'దారి చూపించు', showMap: 'మ్యాప్ చూపించు', address: 'చిరునామా', hours: 'సమయాలు',
+    readFaq: 'తరచుగా అడిగే ప్రశ్నలు', directions: 'దారి చూపించు', showMap: 'మ్యాప్ చూపించు', address: 'చిరునామా', hours: 'సమయాలు', reviews: 'గూగుల్ రివ్యూలు',
     phone: 'ఫోన్', email: 'ఈమెయిల్', follow: 'మమ్మల్ని ఫాలో అవ్వండి', rights: '© {{year}} షాన్ ఫిట్‌నెస్, కాకినాడ. అన్ని హక్కులు రిజర్వ్ చేయబడ్డాయి.',
     privacy: 'ప్రైవసీ నోటీసు', staffLogin: 'సిబ్బంది, సభ్యుల లాగిన్', closed: 'మూసి ఉంది', mornings: 'ఉదయం బ్యాచ్‌లు', evenings: 'సాయంత్రం బ్యాచ్‌లు',
     days: ['సోమ', 'మంగళ', 'బుధ', 'గురు', 'శుక్ర', 'శని', 'ఆది'], daysLong: ['సోమవారం', 'మంగళవారం', 'బుధవారం', 'గురువారం', 'శుక్రవారం', 'శనివారం', 'ఆదివారం'],
@@ -450,6 +455,7 @@ const te: Copy = {
     cta: 'ప్రోగ్రామ్ గురించి అడగండి',
   },
   coaches: { title: 'మీ లెక్కలు తెలిసిన కోచ్‌లు', sub: 'మీ పేరు, మీ లక్ష్యం, గతసారి మీరు ఎత్తిన బరువు మీ కోచ్‌కు తెలుసు. అదే తేడా.', all: 'అందరు కోచ్‌లను కలవండి' },
+  visit: { title: 'స్టూడియోకి రండి', sub: 'మేము ఎక్కడ ఉన్నామో చూడండి, గూగుల్‌లో సభ్యులు ఏమంటున్నారో చదవండి, తలుపు వరకు దారి పొందండి.' },
   results: { title: 'నిజమైన ఫలితాలు', sub: 'తమ కథ పంచుకోవడానికి అనుమతించిన సభ్యులు.', empty: 'ట్రాన్స్‌ఫర్మేషన్ కథలు జోడిస్తున్నాం. మా సభ్యుల ముందు-తర్వాత ప్రగతి చూడాలంటే ఫ్రంట్ డెస్క్‌లో అడగండి.' },
   check: {
     title: 'మీ BMI చెక్ చేయండి',

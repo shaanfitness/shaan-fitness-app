@@ -1,8 +1,9 @@
 import { useEffect } from 'react'
-import type { SiteInfo } from '../db/site'
+import { googlePlace, mapsLink, type SiteInfo } from '../db/site'
 import { COPY, PATHS, SEO, type Lang, type PageId } from './content'
 import { faqFor, offerTier, offers, openSpans, rupees } from './data'
 import { eventById, isEventId, type EventId } from './events'
+import { guideById, isGuideId, type GuideId } from './guides'
 
 // What search engines and link previews read: title, description, canonical address, Open Graph and the
 // structured data (gym, offers, breadcrumbs, FAQ). The build writes it into each page's HTML; the app keeps
@@ -32,11 +33,12 @@ export function jsonLd(id: PageId, site: SiteInfo | null, origin: string, lang: 
       address: { '@type': 'PostalAddress', streetAddress: [s.street1, s.street2].filter(Boolean).join(', '), addressLocality: s.city ?? 'Kakinada',
         addressRegion: s.state ?? 'Andhra Pradesh', postalCode: s.pincode ?? undefined, addressCountry: 'IN' },
       areaServed: { '@type': 'City', name: s.city ?? 'Kakinada' },
-      hasMap: w.map_url ?? undefined,
+      hasMap: googlePlace(s)?.listing ?? mapsLink(s, w),
+      ...(googlePlace(s) ? { geo: { '@type': 'GeoCoordinates', latitude: googlePlace(s)!.lat, longitude: googlePlace(s)!.lng } } : {}),
       openingHoursSpecification: Object.entries(hours).map(([k, days]) => ({ '@type': 'OpeningHoursSpecification', dayOfWeek: days, opens: k.slice(0, 5), closes: k.slice(6) })),
       priceRange: priced.length ? `${rupees(priced[0].price!)} - ${rupees(priced[priced.length - 1].price!)}` : '₹₹',
       amenityFeature: s.facilities.slice(0, 12).map((f) => ({ '@type': 'LocationFeatureSpecification', name: f, value: true })),
-      sameAs: [w.instagram, w.facebook, w.youtube, w.twitter, w.linkedin].filter((u): u is string => !!u && /^https:\/\//.test(u)),
+      sameAs: [googlePlace(s)?.listing, w.instagram, w.facebook, w.youtube, w.twitter, w.linkedin].filter((u): u is string => !!u && /^https:\/\//.test(u)),
       ...(priced.length ? {
         hasOfferCatalog: { '@type': 'OfferCatalog', name: 'Subscriptions', itemListElement: priced.map((o) => ({
           '@type': 'Offer', name: o.name, price: o.price, priceCurrency: 'INR', url: `${origin}${PATHS.plans}`,
@@ -65,6 +67,10 @@ export function jsonLd(id: PageId, site: SiteInfo | null, origin: string, lang: 
     out.push({ '@context': 'https://schema.org', '@type': 'Service', name: c[id].h1, serviceType: navName(id), provider: { '@id': gymId },
       areaServed: { '@type': 'City', name: site.studio.city ?? 'Kakinada' }, url, description: SEO[id].description })
   }
+  if (site && isGuideId(id) && guideById(id).service) {
+    out.push({ '@context': 'https://schema.org', '@type': 'Service', name: guideById(id).copy.en.h1, serviceType: guideById(id).service, provider: { '@id': gymId },
+      areaServed: { '@type': 'City', name: site.studio.city ?? 'Kakinada' }, url, description: SEO[id].description })
+  }
   if (site && id === 'coaches' && site.website.show_trainers !== false && site.trainers.length) {
     out.push({ '@context': 'https://schema.org', '@type': 'ItemList', itemListElement: site.trainers.map((t, i) => ({
       '@type': 'ListItem', position: i + 1, item: { '@type': 'Person', name: t.name, jobTitle: t.title || t.designation || 'Coach', worksFor: { '@id': gymId } } })) })
@@ -74,11 +80,11 @@ export function jsonLd(id: PageId, site: SiteInfo | null, origin: string, lang: 
   return out
 }
 
-const NAV_NAME: Record<Exclude<PageId, EventId>, string> = {
+const NAV_NAME: Record<Exclude<PageId, EventId | GuideId>, string> = {
   home: 'Home', personal: 'Personal training', group: 'Group training', weightLoss: 'Weight loss', plans: 'Membership plans',
   timings: 'Gym timings', coaches: 'Coaches', results: 'Transformations', about: 'About', contact: 'Contact', events: 'Events',
 }
-const navName = (id: PageId) => (isEventId(id) ? eventById(id).copy.en.name : NAV_NAME[id])
+const navName = (id: PageId) => (isEventId(id) ? eventById(id).copy.en.name : isGuideId(id) ? guideById(id).copy.en.nav : NAV_NAME[id])
 
 export interface Head { title: string; description: string; canonical: string; image: string; jsonld: Record<string, unknown>[] }
 /** The subscriptions page description carries live prices when the studio shows them. */

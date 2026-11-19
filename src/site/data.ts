@@ -1,5 +1,6 @@
 import { siteOffers, type SiteBatch, type SiteInfo, type SiteOffer, type SitePlan } from '../db/site'
 import { fill, type Copy, type Lang, type PageId } from './content'
+import { guideById, isGuideId } from './guides'
 
 // Facts the website works out from the CRM's public summary: the subscriptions, open hours and "open now",
 // money, and the questions each page answers (also sent to Google as FAQ data).
@@ -142,7 +143,9 @@ export function faqFor(id: PageId, site: SiteInfo | null, c: Copy, lang: Lang): 
     case 'timings': timings(); where(); break
     case 'contact': where(); timings(); out.push(f.assess); break
     case 'about': out.push(f.beginner, f.women); steam(); break
-    default: break
+    default:
+      if (isGuideId(id)) out.push(...guideById(id).copy[lang].faq)
+      break
   }
   return out
 }

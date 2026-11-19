@@ -8,6 +8,7 @@ import { Ic } from './art'
 import { COPY, PATHS, fill, type Copy, type Lang, type PageId } from './content'
 import { clock, openSpans } from './data'
 import { isEventId } from './events'
+import { guideById, isGuideId, type GuideId } from './guides'
 import { usePointerEffects, useScrolled } from './motion'
 import './site.css'
 
@@ -20,12 +21,19 @@ export function useCopy() {
   return { c: COPY[lang], lang }
 }
 
-export const TRAINING: { id: PageId; icon: keyof typeof Ic; desc: Record<Lang, string> }[] = [
+const guideItem = (id: GuideId, icon: keyof typeof Ic, goal = false) =>
+  ({ id, icon, goal, desc: { en: guideById(id).copy.en.desc, te: guideById(id).copy.te.desc } })
+/** The Training menu: the ways to train first, then the pages for a goal (shown without a line on phones). */
+export const TRAINING: { id: PageId; icon: keyof typeof Ic; desc: Record<Lang, string>; goal?: boolean }[] = [
+  guideItem('semi', 'squad'),
   { id: 'personal', icon: 'dumbbell', desc: { en: 'One coach, only you, with a plan written for your body.', te: 'ఒక కోచ్, మీరు మాత్రమే, మీ శరీరానికి రాసిన ప్లాన్‌తో.' } },
   { id: 'group', icon: 'people', desc: { en: 'Small coached batches, mornings and evenings.', te: 'ఉదయం, సాయంత్రం చిన్న కోచ్ బ్యాచ్‌లు.' } },
   { id: 'weightLoss', icon: 'flame', desc: { en: 'Fat loss with strength, conditioning and home food.', te: 'బలం, కండిషనింగ్, ఇంటి భోజనంతో ఫ్యాట్ లాస్.' } },
+  guideItem('strength', 'barbell', true),
+  guideItem('seniors', 'heart', true),
+  guideItem('athletes', 'bolt', true),
 ]
-const navLabel = (c: Copy, id: PageId) => (isEventId(id) ? c.nav.events : { home: c.nav.home, personal: c.nav.personal, group: c.nav.group, weightLoss: c.nav.weightLoss, plans: c.nav.plans,
+const navLabel = (c: Copy, id: PageId) => (isEventId(id) ? c.nav.events : isGuideId(id) ? guideById(id).copy[c === COPY.te ? 'te' : 'en'].nav : { home: c.nav.home, personal: c.nav.personal, group: c.nav.group, weightLoss: c.nav.weightLoss, plans: c.nav.plans,
   timings: c.nav.timings, coaches: c.nav.coaches, results: c.nav.results, about: c.nav.about, contact: c.nav.contact, events: c.nav.events }[id])
 
 export function LangSwitch() {
@@ -144,7 +152,7 @@ function PhoneMenu({ onClose }: { onClose: () => void }) {
   const wa = whatsappLink(site?.website.whatsapp || phone, c.lead.waText)
   const close = useRef<HTMLButtonElement>(null)
   useEffect(() => { close.current?.focus() }, [])
-  const items: PageId[] = ['home', 'personal', 'group', 'weightLoss', 'plans', 'timings', 'coaches', 'results', 'events', 'about', 'contact']
+  const items: PageId[] = ['home', ...TRAINING.map((t) => t.id), 'assessment', 'plans', 'timings', 'coaches', 'results', 'events', 'about', 'contact']
   return (
     <div className="sf-menu" id="sf-menu" role="dialog" aria-modal="true" aria-label={c.nav.menu}>
       <div className="sf-menu-top">
@@ -154,7 +162,7 @@ function PhoneMenu({ onClose }: { onClose: () => void }) {
       <nav aria-label="Website">
         {items.map((id, i) => (
           <NavLink key={id} to={PATHS[id]} viewTransition end onClick={onClose} style={{ animationDelay: `${i * 40}ms` }}>
-            {navLabel(c, id)}{TRAINING.find((t) => t.id === id) && <small>{TRAINING.find((t) => t.id === id)!.desc[lang]}</small>}
+            {navLabel(c, id)}{TRAINING.find((t) => t.id === id && !t.goal) && <small>{TRAINING.find((t) => t.id === id)!.desc[lang]}</small>}
           </NavLink>
         ))}
       </nav>
@@ -203,14 +211,14 @@ function Footer() {
           <nav aria-label={c.nav.training}>
             <h2>{c.nav.training}</h2>
             <ul>
-              {TRAINING.map((t) => <li key={t.id}><Link to={PATHS[t.id]} viewTransition>{lang === 'en' ? ({ personal: 'Personal trainer in Kakinada', group: 'Group fitness classes', weightLoss: 'Weight loss program' } as Record<string, string>)[t.id] : navLabel(c, t.id)}</Link></li>)}
+              {TRAINING.map((t) => <li key={t.id}><Link to={PATHS[t.id]} viewTransition>{(lang === 'en' && ({ personal: 'Personal trainer in Kakinada', group: 'Group fitness classes', weightLoss: 'Weight loss program' } as Record<string, string>)[t.id]) || navLabel(c, t.id)}</Link></li>)}
               <li><Link to={PATHS.plans} viewTransition>{lang === 'en' ? 'Gym membership fees' : c.nav.plans}</Link></li>
             </ul>
           </nav>
           <nav aria-label="Shaan Fitness">
             <h2>Shaan</h2>
             <ul>
-              {(['timings', 'coaches', 'results', 'events', 'about', 'contact'] as PageId[]).map((id) => <li key={id}><Link to={PATHS[id]} viewTransition>{navLabel(c, id)}</Link></li>)}
+              {(['assessment', 'timings', 'coaches', 'results', 'events', 'about', 'contact'] as PageId[]).map((id) => <li key={id}><Link to={PATHS[id]} viewTransition>{navLabel(c, id)}</Link></li>)}
             </ul>
           </nav>
           {spans && (

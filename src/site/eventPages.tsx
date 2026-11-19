@@ -24,7 +24,7 @@ function EventCard({ e, lang }: { e: ShaanEvent; lang: Lang }) {
   return (
     <article className="sf-ev-card sf-spot">
       <Link to={PATHS[e.id]} viewTransition className="sf-ev-media" tabIndex={-1} aria-hidden="true">
-        {e.image ? <img src={e.image} alt="" loading="lazy" decoding="async" /> : <span className="sf-ev-year">{year(e)}</span>}
+        {e.image ? <img src={e.image} alt={k.name} loading="lazy" decoding="async" /> : <span className="sf-ev-year">{year(e)}</span>}
       </Link>
       <div className="sf-ev-body">
         <p className="sf-ev-meta"><span>{k.when}</span><span>{k.role}</span></p>
@@ -114,7 +114,7 @@ export function EventPage({ id }: { id: EventId }) {
     <>
       <section className="sf-page-hero sf-ev-hero" aria-labelledby="sf-h1">
         <div className="sf-hero-bg" />
-        {e.image && <img className="sf-ev-hero-img" src={e.image} alt="" decoding="async" fetchPriority="high" />}
+        {e.image && <img className="sf-ev-hero-img" src={e.image} alt={k.name} decoding="async" fetchPriority="high" />}
         <div className="sf-wrap sf-enter">
           <nav aria-label={c.common.breadcrumb}>
             <ol className="sf-crumbs">
