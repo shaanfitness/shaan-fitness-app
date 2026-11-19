@@ -1,15 +1,13 @@
 import { useEffect, useRef, useState, type CSSProperties } from 'react'
-import { Link } from 'react-router-dom'
-import { telLink, whatsappLink, type SiteInfo, type SiteOffer } from '../../db/site'
+import { telLink, whatsappLink, type SiteInfo } from '../../db/site'
 import { Ic, Squad } from '../art'
-import { fill, PATHS } from '../content'
-import { offers, offerTier } from '../data'
+import { offers } from '../data'
 import { useCopy } from '../layout'
 import { prefersReducedMotion } from '../motion'
-import { LiveChip, OfferPrice, offerNote, sizeLine } from '../sections'
+import { LiveChip, sizeLine } from '../sections'
 import { LOGO, LOGO_COLORS } from './logoPaths'
 
-// The home page hero: the Shaan logo as a cinematic scroll sequence in four chapters. The section is tall and the
+// The home page hero: the Shaan logo as a cinematic scroll sequence in five chapters. The section is tall and the
 // stage sticks to the screen while you scroll; the 3D emblem (emblem.ts) follows the scroll. Before the 3D loads,
 // and wherever it can't run, the flat logo stands in with the same glow, and every chapter's words are in the page.
 
@@ -67,16 +65,15 @@ export function CineHero({ site }: { site: SiteInfo | null }) {
   const loaderDone = useRef(false)
   const wa = whatsappLink(site?.website.whatsapp || site?.studio.mobile, c.lead.waText)
   const tel = telLink(site?.studio.mobile)
-  // Chapters two to four are the subscriptions from Settings › Website (name, group size as figures, price), in
-  // order; a line about the method fills any slot the owner leaves empty. Chapter five: book an assessment.
-  const list = offers(site)
-  const slots: (SiteOffer | null)[] = [0, 1, 2].map((i) => list[i] ?? null)
-  const spare = [
+  // The hero tells the story before anything is sold: the studio, small numbers, coaching, the plan, then the
+  // assessment. No prices or plan names here; those come further down the page, once the visitor knows the studio.
+  // Chapter two draws the ways to train as figures (one coach and how many people), from Settings › Website.
+  const names = k.chapters
+  const ways = offers(site).filter((o) => o.size != null).slice(0, 3)
+  const beats = [
     { a: k.c2a, b: k.c2b, t: k.c2 },
     { a: k.c3a, b: k.c3b, t: k.c3 },
-    { a: k.s3a, b: k.s3b, t: k.s3 },
   ]
-  const names = [k.chapters[0], ...slots.map((o, i) => o?.name ?? `${spare[i].a} ${spare[i].b}`), k.chapters[1]]
 
   useEffect(() => {
     // Claimed once per page load (React runs effects twice in development; the second run carries on the loader).
@@ -198,39 +195,25 @@ export function CineHero({ site }: { site: SiteInfo | null }) {
           <div className={`sf-cine-ch ${ch === 0 ? 'is-on' : ''}`}>
             <h1 id="sf-h1" className="sf-cine-title">{custom ? custom : <><span>{k.h1a}</span> <em>{k.h1b}</em></>}</h1>
             <p>{site?.website.hero_text || k.lede}</p>
-            <div className="sf-ctas">
-              <Link to={PATHS.plans} viewTransition className="sf-btn sf-btn-red sf-magnet">{c.common.seePlans}</Link>
-              <a href="#assessment" className="sf-btn sf-btn-glass sf-magnet">{c.nav.trial}</a>
-            </div>
           </div>
-          {slots.map((o, i) => {
-            const n = i + 1
-            if (!o) {
-              const sp = spare[i]
-              return (
-                <div key={n} className={`sf-cine-ch ${ch === n ? 'is-on' : ''}`}>
-                  <h2 className="sf-cine-title"><span>{sp.a}</span> <em className={i === 1 ? 'is-blue' : undefined}>{sp.b}</em></h2>
-                  <p>{sp.t}</p>
-                </div>
-              )
-            }
-            const cut = o.name.indexOf(' ')
-            const note = offerNote(o, c)
-            const size = sizeLine(o, c)
-            return (
-              <div key={n} className={`sf-cine-ch ${ch === n ? 'is-on' : ''}`}>
-                <h2 className="sf-cine-title">{cut < 0 ? <em>{o.name}</em> : <><span>{o.name.slice(0, cut)}</span> <em className={i === 1 ? 'is-blue' : undefined}>{o.name.slice(cut + 1)}</em></>}</h2>
-                <div className="sf-cine-card">
-                  {note && <p className="sf-cine-note">{note}</p>}
-                  {o.size != null && <div className="sf-sub-people"><Squad size={o.size} label={size!} coach={c.subs.coach} /><span>{size}</span></div>}
-                  <OfferPrice o={o} />
-                </div>
-                <div className="sf-ctas">
-                  <a href="#assessment" className="sf-btn sf-btn-red sf-btn-sm sf-magnet" data-plan={o.name} data-tier={offerTier(o)}>{fill(c.subs.choose, { name: o.name })}</a>
-                </div>
-              </div>
-            )
-          })}
+          <div className={`sf-cine-ch ${ch === 1 ? 'is-on' : ''}`}>
+            <h2 className="sf-cine-title"><span>{k.s3a}</span> <em className="is-blue">{k.s3b}</em></h2>
+            <p>{k.s3}</p>
+            {ways.length > 0 && (
+              <ul className="sf-cine-ways">
+                {ways.map((o) => {
+                  const size = sizeLine(o, c)!
+                  return <li key={o.name}><Squad size={o.size!} label={size} coach={c.subs.coach} /><span>{size}</span></li>
+                })}
+              </ul>
+            )}
+          </div>
+          {beats.map((b, i) => (
+            <div key={b.a} className={`sf-cine-ch ${ch === i + 2 ? 'is-on' : ''}`}>
+              <h2 className="sf-cine-title"><span>{b.a}</span> <em className={i === 1 ? 'is-blue' : undefined}>{b.b}</em></h2>
+              <p>{b.t}</p>
+            </div>
+          ))}
           <div className={`sf-cine-ch ${ch === 4 ? 'is-on' : ''}`}>
             <h2 className="sf-cine-title"><span>{k.c4a}</span> <em>{k.c4b}</em></h2>
             <p>{k.c4}</p>

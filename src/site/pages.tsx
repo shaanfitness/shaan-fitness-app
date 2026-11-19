@@ -39,12 +39,12 @@ function Body({ id, site }: { id: PageId; site: SiteInfo | null }) {
       <>
         <CineHero site={site} />
         {site && <Marquee site={site} />}
-        {site && <Subscriptions site={site} />}
-        <JoinSteps />
         <Manifesto />
         <Method />
         {site && <CoachGrid site={site} limit={3} />}
         {site && <ResultsGrid site={site} />}
+        {site && <Subscriptions site={site} />}
+        <JoinSteps />
         {site && <DayRail site={site} />}
         <Athletic />
         <EventCards />

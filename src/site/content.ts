@@ -149,12 +149,12 @@ const en = {
   },
   cine: {
     place: 'Shaan Fitness, Kakinada', scroll: 'Scroll',
-    chapters: ['Studio', 'Assessment'],
+    chapters: ['Studio', 'Small numbers', 'Coaching', 'Your plan', 'Assessment'],
     h1a: 'Semi-private', h1b: 'training studio.',
     lede: 'Coached training in small numbers, in Kakinada. Your trusted health partner.',
     c2a: 'Every rep,', c2b: 'coached.', c2: 'Your coach plans your block, watches every set and tracks your progress week by week.',
     c3a: 'Planned for', c3b: 'your body.', c3: 'Posture, mobility, strength and health history first. Then a written plan built on five pillars: FORGE, BLAZE, FLOW, STRIKE and TRIBE.',
-    s3a: 'Small', s3b: 'numbers.', s3: 'One coach and a few people, so every set is watched and every rep is corrected.',
+    s3a: 'Small', s3b: 'numbers.', s3: 'One coach and only a few people. Train in a small group, side by side or one-on-one, and every set is watched.',
     c4a: 'Book your', c4b: 'assessment.', c4: 'Meet a coach first: posture, mobility, strength, health history and your goal. Then you choose how to train.',
   },
   subs: {
@@ -401,12 +401,12 @@ const te: Copy = {
   },
   cine: {
     place: 'షాన్ ఫిట్‌నెస్, కాకినాడ', scroll: 'స్క్రోల్ చేయండి',
-    chapters: ['స్టూడియో', 'అసెస్‌మెంట్'],
+    chapters: ['స్టూడియో', 'తక్కువ మంది', 'కోచింగ్', 'మీ ప్లాన్', 'అసెస్‌మెంట్'],
     h1a: 'సెమీ-ప్రైవేట్', h1b: 'ట్రైనింగ్ స్టూడియో.',
     lede: 'కాకినాడలో, తక్కువ మందితో, కోచ్ దగ్గరుండి చేయించే ట్రైనింగ్. మీ నమ్మకమైన ఆరోగ్య భాగస్వామి.',
     c2a: 'ప్రతి రెప్‌కూ', c2b: 'కోచ్.', c2: 'కోచ్ మీ బ్లాక్ ప్లాన్ చేస్తారు, ప్రతి సెట్ చూస్తారు, వారం వారం మీ ప్రగతి ట్రాక్ చేస్తారు.',
     c3a: 'మీ శరీరానికి', c3b: 'ప్లాన్.', c3: 'ముందు పోస్చర్, మొబిలిటీ, బలం, ఆరోగ్య చరిత్ర. తర్వాత ఐదు పిల్లర్ల మీద రాసిన ప్లాన్: FORGE, BLAZE, FLOW, STRIKE, TRIBE.',
-    s3a: 'తక్కువ', s3b: 'మంది.', s3: 'ఒక కోచ్, కొద్ది మంది, కాబట్టి ప్రతి సెట్ చూస్తారు, ప్రతి రెప్ సరిచేస్తారు.',
+    s3a: 'తక్కువ', s3b: 'మంది.', s3: 'ఒక కోచ్, కొద్ది మంది మాత్రమే. చిన్న గ్రూప్‌లో, పక్కపక్కనే, లేదా వన్-ఆన్-వన్ ట్రైన్ అవ్వండి; ప్రతి సెట్‌ను కోచ్ చూస్తారు.',
     c4a: 'మీ అసెస్‌మెంట్', c4b: 'బుక్ చేయండి.', c4: 'ముందు కోచ్‌ను కలవండి: పోస్చర్, మొబిలిటీ, బలం, ఆరోగ్య చరిత్ర, మీ లక్ష్యం. తర్వాతే ఎలా ట్రైన్ అవ్వాలో ఎంచుకుంటారు.',
   },
   subs: {

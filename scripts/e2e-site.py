@@ -49,9 +49,13 @@ with sync_playwright() as p:
     expect(page.get_by_role("heading", level=1)).to_contain_text("Semi-private")
     for h in ["The Shaan method", "Choose how you train", "How joining works", "Absolute Athleticism", "Outside the studio", "A day at Shaan", "Questions people ask"]:
         expect(page.get_by_role("heading", name=h)).to_be_visible()
-    # The logo hero's five chapters are all in the page (studio, the three subscriptions, assessment); no free trial anywhere.
+    # The logo hero's five chapters tell the story first (studio, small numbers, coaching, the plan, assessment):
+    # no prices or plan names there; the ways to train are drawn as figures. No free trial anywhere.
     expect(page.locator(".sf-cine-title")).to_have_count(5)
-    expect(page.locator(".sf-cine-ch").nth(1)).to_contain_text("₹4,999")
+    expect(page.locator(".sf-cine")).not_to_contain_text("₹")
+    expect(page.locator(".sf-cine")).not_to_contain_text("Advanced Training")
+    expect(page.locator(".sf-cine-ways li")).to_have_count(3)
+    expect(page.locator(".sf-cine-ways li").nth(0).locator(".sf-squad-row .sf-fig")).to_have_count(8)
     expect(page.locator(".sf-cine-ch").nth(4)).to_contain_text("Book your")
     expect(page.get_by_text("free trial", exact=False)).to_have_count(0)
     # The three subscriptions: name, the owner's line, one figure per person, the price.
@@ -223,7 +227,7 @@ with sync_playwright() as p:
     expect(first.locator(".sf-squad-row .sf-fig")).to_have_count(6)
     expect(first).to_contain_text("Group of 6 approx")
     expect(first).to_contain_text("₹5,499")
-    expect(page.locator(".sf-cine-ch").nth(1).locator(".sf-squad-row .sf-fig")).to_have_count(6)
+    expect(page.locator(".sf-cine-ways li").nth(0).locator(".sf-squad-row .sf-fig")).to_have_count(6)
     # Prices off, then group sizes off: neither reaches the page.
     page.goto(BASE + "/settings/website")
     page.get_by_label("Prices", exact=True).uncheck()
@@ -242,6 +246,7 @@ with sync_playwright() as p:
     page.goto(BASE + "/")
     expect(page.locator("#subscriptions .sf-sub")).to_have_count(2)
     expect(page.locator("#subscriptions .sf-squad")).to_have_count(0)
+    expect(page.locator(".sf-cine-ways")).to_have_count(0)
     expect(page.locator("#subscriptions .sf-sub").first).to_contain_text("₹5,499")
     # Back to the studio's three for the rest of the run.
     page.goto(BASE + "/settings/website")
