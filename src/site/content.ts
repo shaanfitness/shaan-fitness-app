@@ -1,8 +1,10 @@
 // The public website's words: every page's search title and description (English, for Google), and the copy
 // people read (English and Telugu). Prices, timings, coaches and the address come from the CRM at run time.
 
+import { EVENTS, type EventId } from './events'
+
 export type Lang = 'en' | 'te'
-export type PageId = 'home' | 'personal' | 'group' | 'weightLoss' | 'plans' | 'timings' | 'coaches' | 'results' | 'about' | 'contact'
+export type PageId = 'home' | 'personal' | 'group' | 'weightLoss' | 'plans' | 'timings' | 'coaches' | 'results' | 'about' | 'contact' | 'events' | EventId
 
 export const PATHS: Record<PageId, string> = {
   home: '/',
@@ -15,12 +17,24 @@ export const PATHS: Record<PageId, string> = {
   results: '/transformations',
   about: '/about',
   contact: '/contact',
+  events: '/events',
+  dandiya: '/events/dandiya-nights-2026',
+  lungRun: '/events/community-lung-run-2026',
+  deadlift: '/events/deadlift-december-2023',
+  summerFiesta: '/events/kids-fitness-workshop-2023',
 }
 export const PAGE_IDS = Object.keys(PATHS) as PageId[]
 export const pageForPath = (path: string) => PAGE_IDS.find((id) => PATHS[id] === path.replace(/\/+$/, '') || (id === 'home' && path === '/')) ?? null
 
 /** Search results: title (under 60 characters) and description (under 160). */
+const eventSeo = Object.fromEntries(EVENTS.map((e) => [e.id, { title: e.copy.en.seoTitle, description: e.copy.en.seoDesc }])) as Record<EventId, { title: string; description: string }>
+
 export const SEO: Record<PageId, { title: string; description: string }> = {
+  ...eventSeo,
+  events: {
+    title: 'Events in Kakinada | Lung Run, Dandiya Nights | Shaan Fitness',
+    description: 'Events and community projects by Shaan Fitness in Kakinada: the Community Lung Run, Dandiya Nights lucky draw, Deadlift December and kids’ workshops.',
+  },
   home: {
     title: 'Shaan Fitness | Semi-Private Training Studio in Kakinada',
     description: 'Shaan Fitness is a semi-private training studio in Kakinada: coached small-group, side-by-side and one-on-one training. Book an assessment with a coach.',
@@ -66,7 +80,7 @@ export const SEO: Record<PageId, { title: string; description: string }> = {
 const en = {
   nav: {
     training: 'Training', personal: 'Personal training', group: 'Group training', weightLoss: 'Weight loss', plans: 'Subscriptions',
-    timings: 'Timings', coaches: 'Coaches', results: 'Transformations', about: 'About', contact: 'Contact', home: 'Home',
+    timings: 'Timings', coaches: 'Coaches', results: 'Transformations', about: 'About', contact: 'Contact', home: 'Home', events: 'Events',
     menu: 'Menu', close: 'Close menu', login: 'Log in', join: 'Join online', openApp: 'My Shaan app', openDashboard: 'Staff dashboard',
     trial: 'Book assessment', call: 'Call', whatsapp: 'WhatsApp', skip: 'Skip to content',
   },
@@ -135,11 +149,12 @@ const en = {
   },
   cine: {
     place: 'Shaan Fitness, Kakinada', scroll: 'Scroll',
-    chapters: ['Studio', 'Coached', 'Planned', 'Assessment'],
+    chapters: ['Studio', 'Assessment'],
     h1a: 'Semi-private', h1b: 'training studio.',
     lede: 'Coached training in small numbers, in Kakinada. Your trusted health partner.',
     c2a: 'Every rep,', c2b: 'coached.', c2: 'Your coach plans your block, watches every set and tracks your progress week by week.',
     c3a: 'Planned for', c3b: 'your body.', c3: 'Posture, mobility, strength and health history first. Then a written plan built on five pillars: FORGE, BLAZE, FLOW, STRIKE and TRIBE.',
+    s3a: 'Small', s3b: 'numbers.', s3: 'One coach and a few people, so every set is watched and every rep is corrected.',
     c4a: 'Book your', c4b: 'assessment.', c4: 'Meet a coach first: posture, mobility, strength, health history and your goal. Then you choose how to train.',
   },
   subs: {
@@ -267,6 +282,12 @@ const en = {
   },
   coachesPage: { h1: 'Meet your coaches', intro: 'The people who plan and coach every session at Shaan Fitness, Kakinada.' },
   resultsPage: { h1: 'Real results from real members', intro: 'Fat loss, strength and confidence, shared with permission by Shaan Fitness members in Kakinada.' },
+  eventsPage: {
+    h1: 'Events and community',
+    intro: 'Runs, challenges, workshops and celebrations: what Shaan Fitness has organised and supported in Kakinada.',
+    see: 'See the event', all: 'All events', gallery: 'Gallery', gallerySub: 'From Instagram.', story: 'The story',
+    more: 'More events', follow: 'More on Instagram', soon: 'More events are on the way. Follow us on Instagram to hear first.',
+  },
   about: {
     h1: 'About Shaan Fitness',
     intro: 'Shaan Fitness is a semi-private training studio on the 5th floor of PNR Enclave, near D-Mart on RTO Office Road, Kakinada: coached training in a small group, side by side or one-on-one, six days a week.',
@@ -311,7 +332,7 @@ export type Copy = typeof en
 const te: Copy = {
   nav: {
     training: 'ట్రైనింగ్', personal: 'పర్సనల్ ట్రైనింగ్', group: 'గ్రూప్ ట్రైనింగ్', weightLoss: 'వెయిట్ లాస్', plans: 'సబ్‌స్క్రిప్షన్లు',
-    timings: 'టైమింగ్స్', coaches: 'కోచ్‌లు', results: 'ట్రాన్స్‌ఫర్మేషన్స్', about: 'మా గురించి', contact: 'సంప్రదించండి', home: 'హోమ్',
+    timings: 'టైమింగ్స్', coaches: 'కోచ్‌లు', results: 'ట్రాన్స్‌ఫర్మేషన్స్', about: 'మా గురించి', contact: 'సంప్రదించండి', home: 'హోమ్', events: 'ఈవెంట్లు',
     menu: 'మెనూ', close: 'మెనూ మూసివేయండి', login: 'లాగిన్', join: 'ఆన్‌లైన్‌లో చేరండి', openApp: 'నా షాన్ యాప్', openDashboard: 'స్టాఫ్ డాష్‌బోర్డ్',
     trial: 'అసెస్‌మెంట్ బుక్ చేయండి', call: 'కాల్', whatsapp: 'WhatsApp', skip: 'కంటెంట్‌కు వెళ్ళండి',
   },
@@ -380,11 +401,12 @@ const te: Copy = {
   },
   cine: {
     place: 'షాన్ ఫిట్‌నెస్, కాకినాడ', scroll: 'స్క్రోల్ చేయండి',
-    chapters: ['స్టూడియో', 'కోచింగ్', 'ప్లాన్', 'అసెస్‌మెంట్'],
+    chapters: ['స్టూడియో', 'అసెస్‌మెంట్'],
     h1a: 'సెమీ-ప్రైవేట్', h1b: 'ట్రైనింగ్ స్టూడియో.',
     lede: 'కాకినాడలో, తక్కువ మందితో, కోచ్ దగ్గరుండి చేయించే ట్రైనింగ్. మీ నమ్మకమైన ఆరోగ్య భాగస్వామి.',
     c2a: 'ప్రతి రెప్‌కూ', c2b: 'కోచ్.', c2: 'కోచ్ మీ బ్లాక్ ప్లాన్ చేస్తారు, ప్రతి సెట్ చూస్తారు, వారం వారం మీ ప్రగతి ట్రాక్ చేస్తారు.',
     c3a: 'మీ శరీరానికి', c3b: 'ప్లాన్.', c3: 'ముందు పోస్చర్, మొబిలిటీ, బలం, ఆరోగ్య చరిత్ర. తర్వాత ఐదు పిల్లర్ల మీద రాసిన ప్లాన్: FORGE, BLAZE, FLOW, STRIKE, TRIBE.',
+    s3a: 'తక్కువ', s3b: 'మంది.', s3: 'ఒక కోచ్, కొద్ది మంది, కాబట్టి ప్రతి సెట్ చూస్తారు, ప్రతి రెప్ సరిచేస్తారు.',
     c4a: 'మీ అసెస్‌మెంట్', c4b: 'బుక్ చేయండి.', c4: 'ముందు కోచ్‌ను కలవండి: పోస్చర్, మొబిలిటీ, బలం, ఆరోగ్య చరిత్ర, మీ లక్ష్యం. తర్వాతే ఎలా ట్రైన్ అవ్వాలో ఎంచుకుంటారు.',
   },
   subs: {
@@ -512,6 +534,12 @@ const te: Copy = {
   },
   coachesPage: { h1: 'మీ కోచ్‌లను కలవండి', intro: 'కాకినాడ షాన్ ఫిట్‌నెస్‌లో ప్రతి సెషన్ ప్లాన్ చేసి, నడిపించే వ్యక్తులు.' },
   resultsPage: { h1: 'నిజమైన సభ్యుల నిజమైన ఫలితాలు', intro: 'కాకినాడ షాన్ ఫిట్‌నెస్ సభ్యులు అనుమతితో పంచుకున్న ఫ్యాట్ లాస్, బలం, ఆత్మవిశ్వాసం.' },
+  eventsPage: {
+    h1: 'ఈవెంట్లు, కమ్యూనిటీ',
+    intro: 'రన్‌లు, ఛాలెంజ్‌లు, వర్క్‌షాప్‌లు, వేడుకలు: కాకినాడలో షాన్ ఫిట్‌నెస్ నిర్వహించినవి, సపోర్ట్ చేసినవి.',
+    see: 'ఈవెంట్ చూడండి', all: 'అన్ని ఈవెంట్లు', gallery: 'గ్యాలరీ', gallerySub: 'Instagram నుంచి.', story: 'కథ',
+    more: 'మరిన్ని ఈవెంట్లు', follow: 'Instagramలో మరిన్ని', soon: 'మరిన్ని ఈవెంట్లు రాబోతున్నాయి. ముందుగా తెలుసుకోవడానికి Instagramలో ఫాలో అవ్వండి.',
+  },
   about: {
     h1: 'షాన్ ఫిట్‌నెస్ గురించి',
     intro: 'షాన్ ఫిట్‌నెస్ కాకినాడ RTO ఆఫీస్ రోడ్, D-Mart దగ్గర, PNR ఎన్‌క్లేవ్ 5వ అంతస్తులో ఉన్న సెమీ-ప్రైవేట్ ట్రైనింగ్ స్టూడియో: చిన్న గ్రూప్‌లో, పక్కపక్కనే, లేదా వన్-ఆన్-వన్ కోచ్ ట్రైనింగ్, వారానికి ఆరు రోజులు.',

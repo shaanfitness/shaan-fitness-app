@@ -157,6 +157,8 @@ export function prettyPhone(num: string | null | undefined) {
 }
 export function mapsLink(s: SiteStudio, w: SiteSettings) {
   if (w.map_url) return w.map_url
+  // The studio's own Google Maps pin.
+  if (/shaan fitness/i.test(s.name)) return 'https://maps.app.goo.gl/XndstPw936uQW7DL9'
   const q = [s.name, s.street1, s.street2, s.locality ?? s.branch, s.city, s.state, s.pincode].filter(Boolean).join(', ')
   return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(q)}`
 }

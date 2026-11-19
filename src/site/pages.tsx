@@ -4,11 +4,13 @@ import { PATHS, type Copy, type PageId } from './content'
 import { faqFor, offerTier, offers, openSpans } from './data'
 import { SiteLayout, useCopy } from './layout'
 import {
-  AppShowcase, Athletic, BmiCheck, Cards, Checks, CoachGrid, Community, ContactBlock, Cta, DayRail, Faq, HoursTable, JoinSteps,
+  AppShowcase, Athletic, BmiCheck, Cards, Checks, CoachGrid, ContactBlock, Cta, DayRail, Faq, HoursTable, JoinSteps,
   Manifesto, Marquee, Method, PageHero, ResultsGrid, Section, Studio, Subscriptions,
 } from './sections'
 import { useHead } from './seo'
 import { CineHero } from './hero/CineHero'
+import { EventCards, EventPage, EventsList } from './eventPages'
+import { isEventId, type EventId } from './events'
 
 // One component per page. Each page answers one search ("personal trainer in Kakinada", "gym timings", …), ends with
 // its own questions (also sent to Google as FAQ data) and the assessment form.
@@ -25,7 +27,7 @@ function Story({ title, text, aside }: { title: string; text: string; aside?: Re
   )
 }
 
-const hero = (c: Copy, id: Exclude<PageId, 'home'>) => {
+const hero = (c: Copy, id: Exclude<PageId, 'home' | 'events' | EventId>) => {
   const k = id === 'coaches' ? c.coachesPage : id === 'results' ? c.resultsPage : c[id]
   return { title: k.h1, intro: k.intro }
 }
@@ -45,10 +47,12 @@ function Body({ id, site }: { id: PageId; site: SiteInfo | null }) {
         {site && <ResultsGrid site={site} />}
         {site && <DayRail site={site} />}
         <Athletic />
-        <Community site={site} />
+        <EventCards />
       </>
     )
   }
+  if (id === 'events') return <EventsList site={site} />
+  if (isEventId(id)) return <EventPage id={id} />
   const h = hero(c, id)
   const top = <PageHero id={id} title={h.title} intro={h.intro} site={site} />
   switch (id) {

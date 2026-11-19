@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<base href="/luckydraw/">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Lucky Draw · Dandiya Nights 2K26 · Shaan Fitness</title>
+<meta name="description" content="Apply for the Shaan Fitness lucky draw at AuraPeak Dandiya Nights 2K26. Two fitness prizes worth ₹53,000 combined.">
+<meta property="og:title" content="Apply for the ₹53,000 Fitness Lucky Draw · Dandiya Nights 2K26">
+<meta property="og:description" content="Free for event attendees. Couples or Singles. Watch the draw live on your phone.">
+<meta property="og:image" content="https://www.shaanfitness.com/luckydraw/assets/og.jpg">
+<meta name="theme-color" content="#1e0508">
+<link rel="canonical" href="https://www.shaanfitness.com/luckydraw/">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- fonts load without holding up the page on a weak network -->
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600&family=Cormorant+Garamond:wght@600;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+<link rel="stylesheet" href="style.css">
+<link rel="icon" href="assets/sf-logo.png">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="assets/icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="SF Lucky Draw">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+</head>
+<body>
+<canvas id="cf"></canvas>
+
+<div class="stickyhead">
+<header class="topbar">
+  <a class="lk" href="./" aria-label="Home"><img class="sf" src="assets/sf-lockup.png" width="90" height="40" alt="Shaan Fitness"><span class="x">×</span><img class="ap" src="assets/aurapeak.jpg" width="34" height="34" alt="AuraPeak"></a>
+  <div id="acct"></div>
+</header>
+<div class="livebar" id="livebar"><i></i><span id="livebarTxt">THE DRAW IS LIVE NOW · TAP TO WATCH</span></div>
+</div>
+
+<main class="wrap" id="app"></main>
+
+<!-- pop-ups -->
+<div class="modal" id="modal" role="dialog" aria-modal="true"><div class="sheet" id="sheet"></div></div>
+<div class="toast" id="toast"></div>
+
+<script src="config.js"></script>
+<script src="app.js"></script>
+<script src="followup.js"></script>
+<!-- realtime library: loads in the background; the page already works without it -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.js" async onload="window.__sbReady && window.__sbReady()"></script>
+</body>
+</html>

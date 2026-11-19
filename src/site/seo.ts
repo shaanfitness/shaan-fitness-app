@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 import type { SiteInfo } from '../db/site'
 import { COPY, PATHS, SEO, type Lang, type PageId } from './content'
 import { faqFor, offerTier, offers, openSpans, rupees } from './data'
+import { eventById, isEventId, type EventId } from './events'
 
 // What search engines and link previews read: title, description, canonical address, Open Graph and the
 // structured data (gym, offers, breadcrumbs, FAQ). The build writes it into each page's HTML; the app keeps
@@ -46,10 +47,19 @@ export function jsonLd(id: PageId, site: SiteInfo | null, origin: string, lang: 
   }
   if (id === 'home') out.push({ '@context': 'https://schema.org', '@type': 'WebSite', name: 'Shaan Fitness', url: `${origin}/`, inLanguage: ['en-IN', 'te-IN'] })
   else {
-    out.push({ '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: [
-      { '@type': 'ListItem', position: 1, name: 'Shaan Fitness', item: `${origin}/` },
-      { '@type': 'ListItem', position: 2, name: navName(id), item: url },
-    ] })
+    const crumbs = [{ name: 'Shaan Fitness', item: `${origin}/` }]
+    if (isEventId(id)) crumbs.push({ name: 'Events', item: `${origin}${PATHS.events}` })
+    crumbs.push({ name: navName(id), item: url })
+    out.push({ '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: crumbs.map((x, i) => ({ '@type': 'ListItem', position: i + 1, ...x })) })
+  }
+  // Each event page is described as an Event (date, place, organiser) for search results.
+  if (isEventId(id)) {
+    const e = eventById(id), k = e.copy.en
+    out.push({ '@context': 'https://schema.org', '@type': 'Event', name: k.name, description: k.seoDesc, startDate: e.start, endDate: e.end ?? undefined,
+      eventStatus: 'https://schema.org/EventScheduled', eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
+      location: { '@type': 'Place', name: e.place.name, address: { '@type': 'PostalAddress', streetAddress: e.place.address, addressLocality: 'Kakinada', addressRegion: 'Andhra Pradesh', addressCountry: 'IN' } },
+      image: e.image ? `${origin}${e.image}` : `${origin}/og.png`, url,
+      organizer: { '@type': 'Organization', name: 'Shaan Fitness', url: `${origin}/` } })
   }
   if (site && (id === 'personal' || id === 'group' || id === 'weightLoss')) {
     out.push({ '@context': 'https://schema.org', '@type': 'Service', name: c[id].h1, serviceType: navName(id), provider: { '@id': gymId },
@@ -64,11 +74,11 @@ export function jsonLd(id: PageId, site: SiteInfo | null, origin: string, lang: 
   return out
 }
 
-const NAV_NAME: Record<PageId, string> = {
+const NAV_NAME: Record<Exclude<PageId, EventId>, string> = {
   home: 'Home', personal: 'Personal training', group: 'Group training', weightLoss: 'Weight loss', plans: 'Membership plans',
-  timings: 'Gym timings', coaches: 'Coaches', results: 'Transformations', about: 'About', contact: 'Contact',
+  timings: 'Gym timings', coaches: 'Coaches', results: 'Transformations', about: 'About', contact: 'Contact', events: 'Events',
 }
-const navName = (id: PageId) => NAV_NAME[id]
+const navName = (id: PageId) => (isEventId(id) ? eventById(id).copy.en.name : NAV_NAME[id])
 
 export interface Head { title: string; description: string; canonical: string; image: string; jsonld: Record<string, unknown>[] }
 /** The subscriptions page description carries live prices when the studio shows them. */
@@ -82,7 +92,8 @@ function describe(id: PageId, site: SiteInfo | null) {
 }
 
 export function headFor(id: PageId, site: SiteInfo | null, origin: string): Head {
-  return { title: SEO[id].title, description: describe(id, site), canonical: origin + (PATHS[id] === '/' ? '/' : PATHS[id]), image: `${origin}/og.png`, jsonld: jsonLd(id, site, origin) }
+  const image = isEventId(id) && eventById(id).image ? `${origin}${eventById(id).image}` : `${origin}/og.png`
+  return { title: SEO[id].title, description: describe(id, site), canonical: origin + (PATHS[id] === '/' ? '/' : PATHS[id]), image, jsonld: jsonLd(id, site, origin) }
 }
 
 const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;')

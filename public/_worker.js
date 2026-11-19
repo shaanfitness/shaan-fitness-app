@@ -11,6 +11,11 @@ export default {
     const res = await env.ASSETS.fetch(request)
     const isPage = (request.method === 'GET' || request.method === 'HEAD') && !/\.[a-z0-9]{1,8}$/i.test(url.pathname)
     if (res.status !== 404 || !isPage) return res
+    // The Dandiya Nights lucky draw is its own small app under /luckydraw/ (its /live, /admin, /display pages).
+    if (url.pathname.startsWith('/luckydraw/')) {
+      const ld = await env.ASSETS.fetch(new Request(new URL('/luckydraw/', url), { headers: request.headers }))
+      return new Response(request.method === 'HEAD' ? null : ld.body, { status: 200, headers: ld.headers })
+    }
     const shell = await env.ASSETS.fetch(new Request(new URL('/app', url), { headers: request.headers }))
     return new Response(request.method === 'HEAD' ? null : shell.body, { status: 200, headers: shell.headers })
   },

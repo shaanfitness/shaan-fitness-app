@@ -7,6 +7,7 @@ import { prettyPhone, telLink, useSite, whatsappLink } from '../db/site'
 import { Ic } from './art'
 import { COPY, PATHS, fill, type Copy, type Lang, type PageId } from './content'
 import { clock, openSpans } from './data'
+import { isEventId } from './events'
 import { usePointerEffects, useScrolled } from './motion'
 import './site.css'
 
@@ -24,8 +25,8 @@ export const TRAINING: { id: PageId; icon: keyof typeof Ic; desc: Record<Lang, s
   { id: 'group', icon: 'people', desc: { en: 'Small coached batches, mornings and evenings.', te: 'ఉదయం, సాయంత్రం చిన్న కోచ్ బ్యాచ్‌లు.' } },
   { id: 'weightLoss', icon: 'flame', desc: { en: 'Fat loss with strength, conditioning and home food.', te: 'బలం, కండిషనింగ్, ఇంటి భోజనంతో ఫ్యాట్ లాస్.' } },
 ]
-const navLabel = (c: Copy, id: PageId) => ({ home: c.nav.home, personal: c.nav.personal, group: c.nav.group, weightLoss: c.nav.weightLoss, plans: c.nav.plans,
-  timings: c.nav.timings, coaches: c.nav.coaches, results: c.nav.results, about: c.nav.about, contact: c.nav.contact }[id])
+const navLabel = (c: Copy, id: PageId) => (isEventId(id) ? c.nav.events : { home: c.nav.home, personal: c.nav.personal, group: c.nav.group, weightLoss: c.nav.weightLoss, plans: c.nav.plans,
+  timings: c.nav.timings, coaches: c.nav.coaches, results: c.nav.results, about: c.nav.about, contact: c.nav.contact, events: c.nav.events }[id])
 
 export function LangSwitch() {
   const { lang } = useCopy()
@@ -97,7 +98,7 @@ function TrainingMenu() {
   )
 }
 
-const MAIN_NAV: PageId[] = ['plans', 'timings', 'coaches', 'about', 'contact']
+const MAIN_NAV: PageId[] = ['plans', 'timings', 'coaches', 'events', 'about', 'contact']
 
 function Header() {
   const { c } = useCopy()
@@ -143,7 +144,7 @@ function PhoneMenu({ onClose }: { onClose: () => void }) {
   const wa = whatsappLink(site?.website.whatsapp || phone, c.lead.waText)
   const close = useRef<HTMLButtonElement>(null)
   useEffect(() => { close.current?.focus() }, [])
-  const items: PageId[] = ['home', 'personal', 'group', 'weightLoss', 'plans', 'timings', 'coaches', 'results', 'about', 'contact']
+  const items: PageId[] = ['home', 'personal', 'group', 'weightLoss', 'plans', 'timings', 'coaches', 'results', 'events', 'about', 'contact']
   return (
     <div className="sf-menu" id="sf-menu" role="dialog" aria-modal="true" aria-label={c.nav.menu}>
       <div className="sf-menu-top">
@@ -209,7 +210,7 @@ function Footer() {
           <nav aria-label="Shaan Fitness">
             <h2>Shaan</h2>
             <ul>
-              {(['timings', 'coaches', 'results', 'about', 'contact'] as PageId[]).map((id) => <li key={id}><Link to={PATHS[id]} viewTransition>{navLabel(c, id)}</Link></li>)}
+              {(['timings', 'coaches', 'results', 'events', 'about', 'contact'] as PageId[]).map((id) => <li key={id}><Link to={PATHS[id]} viewTransition>{navLabel(c, id)}</Link></li>)}
             </ul>
           </nav>
           {spans && (

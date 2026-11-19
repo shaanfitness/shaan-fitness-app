@@ -1,11 +1,12 @@
 import { useEffect, useRef, useState, type CSSProperties } from 'react'
 import { Link } from 'react-router-dom'
-import { telLink, whatsappLink, type SiteInfo } from '../../db/site'
-import { Ic } from '../art'
-import { PATHS } from '../content'
+import { telLink, whatsappLink, type SiteInfo, type SiteOffer } from '../../db/site'
+import { Ic, Squad } from '../art'
+import { fill, PATHS } from '../content'
+import { offers, offerTier } from '../data'
 import { useCopy } from '../layout'
 import { prefersReducedMotion } from '../motion'
-import { LiveChip } from '../sections'
+import { LiveChip, OfferPrice, offerNote, sizeLine } from '../sections'
 import { LOGO, LOGO_COLORS } from './logoPaths'
 
 // The home page hero: the Shaan logo as a cinematic scroll sequence in four chapters. The section is tall and the
@@ -23,7 +24,7 @@ export function LogoMark({ className }: { className?: string }) {
   )
 }
 
-const CHAPTERS = 4
+const CHAPTERS = 5
 
 /** A heads-up display around the emblem: rings that turn with the scroll, a sweep, brackets and the chapter readout. */
 function Hud({ ch, names }: { ch: number; names: string[] }) {
@@ -43,7 +44,7 @@ function Hud({ ch, names }: { ch: number; names: string[] }) {
         <g className="sf-hud-sweep"><path d="M0 0 L0 -262 A262 262 0 0 1 92 -245 Z" /></g>
         {[0, 90, 180, 270].map((r) => <path key={r} d="M -26 -298 L -40 -298 L -40 -284 M 26 -298 L 40 -298 L 40 -284" className="sf-hud-bracket" transform={`rotate(${r + 45})`} />)}
       </svg>
-      <span className="sf-hud-read sf-hud-read-a"><b>{String(ch + 1).padStart(2, '0')}</b>{names[ch]}</span>
+      <span className="sf-hud-read sf-hud-read-a"><b>{ch + 1} / {names.length}</b>{names[ch]}</span>
       <span className="sf-hud-read sf-hud-read-b">SF / KKD</span>
     </div>
   )
@@ -66,6 +67,16 @@ export function CineHero({ site }: { site: SiteInfo | null }) {
   const loaderDone = useRef(false)
   const wa = whatsappLink(site?.website.whatsapp || site?.studio.mobile, c.lead.waText)
   const tel = telLink(site?.studio.mobile)
+  // Chapters two to four are the subscriptions from Settings › Website (name, group size as figures, price), in
+  // order; a line about the method fills any slot the owner leaves empty. Chapter five: book an assessment.
+  const list = offers(site)
+  const slots: (SiteOffer | null)[] = [0, 1, 2].map((i) => list[i] ?? null)
+  const spare = [
+    { a: k.c2a, b: k.c2b, t: k.c2 },
+    { a: k.c3a, b: k.c3b, t: k.c3 },
+    { a: k.s3a, b: k.s3b, t: k.s3 },
+  ]
+  const names = [k.chapters[0], ...slots.map((o, i) => o?.name ?? `${spare[i].a} ${spare[i].b}`), k.chapters[1]]
 
   useEffect(() => {
     // Claimed once per page load (React runs effects twice in development; the second run carries on the loader).
@@ -192,15 +203,35 @@ export function CineHero({ site }: { site: SiteInfo | null }) {
               <a href="#assessment" className="sf-btn sf-btn-glass sf-magnet">{c.nav.trial}</a>
             </div>
           </div>
-          <div className={`sf-cine-ch ${ch === 1 ? 'is-on' : ''}`}>
-            <h2 className="sf-cine-title"><span>{k.c2a}</span> <em>{k.c2b}</em></h2>
-            <p>{k.c2}</p>
-          </div>
-          <div className={`sf-cine-ch is-right ${ch === 2 ? 'is-on' : ''}`}>
-            <h2 className="sf-cine-title"><span>{k.c3a}</span> <em className="is-blue">{k.c3b}</em></h2>
-            <p>{k.c3}</p>
-          </div>
-          <div className={`sf-cine-ch ${ch === 3 ? 'is-on' : ''}`}>
+          {slots.map((o, i) => {
+            const n = i + 1
+            if (!o) {
+              const sp = spare[i]
+              return (
+                <div key={n} className={`sf-cine-ch ${ch === n ? 'is-on' : ''}`}>
+                  <h2 className="sf-cine-title"><span>{sp.a}</span> <em className={i === 1 ? 'is-blue' : undefined}>{sp.b}</em></h2>
+                  <p>{sp.t}</p>
+                </div>
+              )
+            }
+            const cut = o.name.indexOf(' ')
+            const note = offerNote(o, c)
+            const size = sizeLine(o, c)
+            return (
+              <div key={n} className={`sf-cine-ch ${ch === n ? 'is-on' : ''}`}>
+                <h2 className="sf-cine-title">{cut < 0 ? <em>{o.name}</em> : <><span>{o.name.slice(0, cut)}</span> <em className={i === 1 ? 'is-blue' : undefined}>{o.name.slice(cut + 1)}</em></>}</h2>
+                <div className="sf-cine-card">
+                  {note && <p className="sf-cine-note">{note}</p>}
+                  {o.size != null && <div className="sf-sub-people"><Squad size={o.size} label={size!} coach={c.subs.coach} /><span>{size}</span></div>}
+                  <OfferPrice o={o} />
+                </div>
+                <div className="sf-ctas">
+                  <a href="#assessment" className="sf-btn sf-btn-red sf-btn-sm sf-magnet" data-plan={o.name} data-tier={offerTier(o)}>{fill(c.subs.choose, { name: o.name })}</a>
+                </div>
+              </div>
+            )
+          })}
+          <div className={`sf-cine-ch ${ch === 4 ? 'is-on' : ''}`}>
             <h2 className="sf-cine-title"><span>{k.c4a}</span> <em>{k.c4b}</em></h2>
             <p>{k.c4}</p>
             <div className="sf-ctas">
@@ -211,11 +242,11 @@ export function CineHero({ site }: { site: SiteInfo | null }) {
           </div>
         </div>
 
-        <Hud ch={ch} names={k.chapters} />
+        <Hud ch={ch} names={names} />
 
         <div className="sf-wrap sf-cine-foot">
           <ol className="sf-cine-steps" aria-hidden="true">
-            {k.chapters.map((name, i) => <li key={name} className={ch === i ? 'is-on' : ch > i ? 'is-past' : ''}><b>{String(i + 1).padStart(2, '0')}</b>{name}</li>)}
+            {names.map((name, i) => <li key={i} className={ch === i ? 'is-on' : ch > i ? 'is-past' : ''}><b>{i + 1}</b>{name}</li>)}
           </ol>
           <div className="sf-cine-bar" aria-hidden="true"><i /></div>
           <span className={`sf-cine-cue ${ch === 0 ? 'is-on' : ''}`} aria-hidden="true">{k.scroll}<i /></span>

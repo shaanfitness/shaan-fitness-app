@@ -396,7 +396,8 @@ export function startEmblem(canvas: HTMLCanvasElement, opts: Options): Emblem | 
     const coached = smooth(0.2, 0.32, p) * (1 - smooth(0.42, 0.5, p))
     const plan = smooth(0.5, 0.57, p) * (1 - smooth(0.68, 0.75, p))
     const ignite = smooth(0.76, 0.88, p)
-    const breakup = smooth(0.9, 1, p)
+    // The emblem stays whole to the end (it used to break into embers, which read as a glitch).
+    const breakup = 0 * p
     const sweep = Math.sin(time * 0.6)
 
     // In the last chapter the heat comes from the plates; the crimson key steps back so the chrome doesn't flare.

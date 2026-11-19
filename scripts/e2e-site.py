@@ -49,8 +49,10 @@ with sync_playwright() as p:
     expect(page.get_by_role("heading", level=1)).to_contain_text("Semi-private")
     for h in ["The Shaan method", "Choose how you train", "How joining works", "Absolute Athleticism", "Outside the studio", "A day at Shaan", "Questions people ask"]:
         expect(page.get_by_role("heading", name=h)).to_be_visible()
-    # The logo hero's four chapters are all in the page; no free trial anywhere.
-    expect(page.locator(".sf-cine-title")).to_have_count(4)
+    # The logo hero's five chapters are all in the page (studio, the three subscriptions, assessment); no free trial anywhere.
+    expect(page.locator(".sf-cine-title")).to_have_count(5)
+    expect(page.locator(".sf-cine-ch").nth(1)).to_contain_text("₹4,999")
+    expect(page.locator(".sf-cine-ch").nth(4)).to_contain_text("Book your")
     expect(page.get_by_text("free trial", exact=False)).to_have_count(0)
     # The three subscriptions: name, the owner's line, one figure per person, the price.
     subs = page.locator("#subscriptions .sf-sub")
@@ -104,11 +106,20 @@ with sync_playwright() as p:
              "/coaches": ("Meet your coaches", "Fitness Coaches in Kakinada"),
              "/transformations": ("Real results from real members", "Body Transformations in Kakinada"),
              "/about": ("About Shaan Fitness", "About Shaan Fitness"),
+             "/events": ("Events and community", "Events in Kakinada"),
+             "/events/community-lung-run-2026": ("Community Lung Run 2026", "Community Lung Run 2026"),
+             "/events/dandiya-nights-2026": ("AuraPeak Dandiya Nights 2K26", "Dandiya Nights 2K26 Lucky Draw"),
+             "/events/deadlift-december-2023": ("Deadlift December Challenge 2023", "Deadlift December Challenge 2023"),
+             "/events/kids-fitness-workshop-2023": ("Kids Fitness Workshop at Summer Fiesta 2023", "Kids Fitness Workshop"),
              "/contact": ("Visit Shaan Fitness in Kakinada", "Contact Shaan Fitness")}
     for path, (h1, title) in pages.items():
         page.goto(BASE + path)
         expect(page.get_by_role("heading", level=1)).to_have_text(h1)
         expect(page).to_have_title(re.compile("^" + re.escape(title)))
+    page.goto(BASE + "/events/dandiya-nights-2026")
+    expect(page.get_by_text("Rekha & Manikanta")).to_be_visible()
+    expect(page.locator("#gallery .sf-ig")).to_have_count(6)
+    page.goto(BASE + "/contact")
     page.get_by_role("button", name="Show the map").click()
     expect(page.locator("iframe[title^='Map']")).to_be_attached()
     page.get_by_role("banner").get_by_role("button", name="Training").click()
@@ -200,6 +211,7 @@ with sync_playwright() as p:
     expect(first.locator(".sf-squad-row .sf-fig")).to_have_count(6)
     expect(first).to_contain_text("Group of 6 approx")
     expect(first).to_contain_text("₹5,499")
+    expect(page.locator(".sf-cine-ch").nth(1).locator(".sf-squad-row .sf-fig")).to_have_count(6)
     # Prices off, then group sizes off: neither reaches the page.
     page.goto(BASE + "/settings/website")
     page.get_by_label("Prices", exact=True).uncheck()

@@ -58,7 +58,7 @@ export default function Privacy() {
         <Part title="On your device">
           <p>
             The website and app remember your login and your chosen language on your device. We use no advertising or tracking cookies.
-            The app loads some fonts from Google Fonts, and the map on the contact page loads from Google Maps only when you choose to show it.
+            The app loads some fonts from Google Fonts, the map on the contact page loads from Google Maps only when you choose to show it, and event galleries show our posts embedded from Instagram, which loads when you reach them.
           </p>
         </Part>
 
