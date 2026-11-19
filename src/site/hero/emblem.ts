@@ -294,7 +294,7 @@ export function startEmblem(canvas: HTMLCanvasElement, opts: Options): Emblem | 
 
   // Smoke.
   const smokes: Mesh[] = []
-  const smokeCount = lite ? 4 : 7
+  const smokeCount = direct ? 3 : lite ? 4 : 7
   const frontCount = lite ? 1 : 2
   const frag = direct ? SMOKE_LITE : smokeFrag(lite ? 4 : 5)
   const noise = direct ? noiseTexture() : null
@@ -349,8 +349,8 @@ export function startEmblem(canvas: HTMLCanvasElement, opts: Options): Emblem | 
     const r = canvas.getBoundingClientRect()
     const w = Math.max(1, Math.round(r.width)), h = Math.max(1, Math.round(r.height))
     wide = w / h > 1.05
-    // Older graphics: at most about a million pixels a frame, whatever the screen.
-    if (direct) renderer.setPixelRatio(Math.min(dpr, Math.sqrt(1.0e6 / (w * h))))
+    // Older graphics: at most about 800,000 pixels a frame whatever the screen, fewer at each quality step.
+    if (direct) renderer.setPixelRatio(Math.min(dpr, Math.sqrt((0.8e6 * [1, 0.75, 0.55, 0.4][level]) / (w * h))))
     renderer.setSize(w, h, false)
     composer.setSize(w, h)
     const br = lite || level > 0 ? 0.4 : 0.75
