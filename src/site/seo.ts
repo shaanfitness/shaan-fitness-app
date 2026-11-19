@@ -7,7 +7,7 @@ import { faqFor, offerTier, offers, openSpans, rupees } from './data'
 // structured data (gym, offers, breadcrumbs, FAQ). The build writes it into each page's HTML; the app keeps
 // it current when people move between pages.
 
-export const DEFAULT_ORIGIN = 'https://shaanfitness-app.netlify.app'
+export const DEFAULT_ORIGIN = 'https://www.shaanfitness.com'
 
 const hhmm = (min: number) => `${String(Math.floor(min / 60)).padStart(2, '0')}:${String(min % 60).padStart(2, '0')}`
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
