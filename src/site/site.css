@@ -6,6 +6,13 @@
 @font-face { font-family: 'Lovelo'; src: url('/fonts/lovelo-black.woff2') format('woff2'); font-weight: 100 900; font-style: normal; font-display: swap; }
 @font-face { font-family: 'Garet'; src: url('/fonts/garet-book.woff2') format('woff2'); font-weight: 100 600; font-style: normal; font-display: swap; }
 @font-face { font-family: 'Garet'; src: url('/fonts/garet-heavy.woff2') format('woff2'); font-weight: 601 900; font-style: normal; font-display: swap; }
+/* Text: Garet Book for reading, Glacial Indifference Bold wherever text is bold (buttons, labels, questions, menus).
+   Garet Heavy at small sizes looked smudged. Glacial Indifference is free under the SIL Open Font License
+   (public/fonts/glacial-indifference-OFL.txt). Characters it lacks, such as ₹, come from Garet. */
+@font-face { font-family: 'SF Text'; src: url('/fonts/garet-book.woff2') format('woff2'); font-weight: 100 600; font-style: normal; font-display: swap; }
+@font-face { font-family: 'SF Text'; src: url('/fonts/glacial-indifference-700.woff2') format('woff2'); font-weight: 601 900; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Glacial Indifference'; src: url('/fonts/glacial-indifference-400.woff2') format('woff2'); font-weight: 100 600; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Glacial Indifference'; src: url('/fonts/glacial-indifference-700.woff2') format('woff2'); font-weight: 601 900; font-style: normal; font-display: swap; }
 
 .sf {
   --sf-night: #08080B;
@@ -23,7 +30,7 @@
   --sf-line: rgba(244, 242, 238, .1);
   --sf-line-strong: rgba(244, 242, 238, .22);
   --sf-display: 'Lovelo', 'Manrope Variable', 'Noto Sans Telugu', 'Arial Black', sans-serif;
-  --sf-body: 'Garet', 'Manrope Variable', 'Noto Sans Telugu', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --sf-body: 'SF Text', 'Garet', 'Manrope Variable', 'Noto Sans Telugu', system-ui, -apple-system, 'Segoe UI', sans-serif;
   --sf-serif: 'Garet', 'Manrope Variable', 'Noto Sans Telugu', system-ui, sans-serif;
   --sf-wrap: 1280px;
   --sf-gutter: clamp(20px, 5vw, 64px);
@@ -192,7 +199,7 @@
 
 /* Manifesto: the words light up as you read down the page. */
 .sf-manifesto p { font-family: var(--sf-serif); font-size: clamp(32px, 4.6vw, 64px); line-height: 1.12; letter-spacing: .005em; max-width: 24ch; text-wrap: pretty; }
-.sf-manifesto p span { color: rgba(238, 240, 247, .2); transition: color .35s; }
+.sf-manifesto p span { color: rgba(238, 240, 247, .42); transition: color .35s; }
 .sf-manifesto p span.is-lit { color: var(--sf-porcelain); }
 .sf-manifesto p span.is-lit.is-key { color: var(--sf-champagne); }
 .sf-manifesto footer { margin-top: 34px; display: flex; align-items: center; gap: 14px; color: var(--sf-mist); font-size: 15px; }
@@ -384,7 +391,7 @@
 .sf-phone-notch { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); width: 92px; height: 26px; border-radius: 20px; background: #000; z-index: 2; }
 .sf-screen { position: absolute; inset: 0; padding: 54px 20px 20px; display: flex; flex-direction: column; gap: 12px; opacity: 0; transform: translateY(12px) scale(.98); transition: opacity .5s, transform .6s var(--sf-ease-out); }
 .sf-screen.is-on { opacity: 1; transform: none; }
-.sf-screen h4 { font-family: var(--sf-display); font-weight: 900; font-size: 30px; line-height: 1; }
+.sf-screen h3 { font-family: var(--sf-display); font-weight: 900; font-size: 30px; line-height: 1; }
 .sf-screen .row { display: flex; align-items: center; gap: 10px; padding: 12px; border-radius: 14px; background: #17171B; font-size: 14px; }
 .sf-screen .tick { width: 20px; height: 20px; border-radius: 6px; border: 2px solid #E8283B; flex: none; display: grid; place-items: center; }
 .sf-screen .tick.is-done { background: #E8283B; }
@@ -501,6 +508,12 @@
 .sf-cta h2 { color: var(--sf-porcelain); }
 .sf-cta h2 { font-family: var(--sf-display); font-weight: 900; font-size: clamp(38px, 6.4vw, 96px); line-height: 1.02; letter-spacing: .005em; }
 .sf-cta p { font-size: clamp(18px, 1.7vw, 22px); max-width: 44ch; color: #D8D4DC; }
+/* The form card is light: its own text stays dark (the rule above is for the dark section around it). */
+.sf-cta .sf-form p { max-width: none; font-size: 16px; color: var(--sf-ink); }
+.sf-cta .sf-form .sf-small { font-size: 14px; color: #4A5072; }
+.sf-cta .sf-form-ok p { font-size: 20px; font-weight: 700; }
+.sf-cta .sf-form .sf-form-err { font-size: 15px; color: #9B1022; }
+.sf-cta .sf-form .sf-field-err { font-size: 14px; color: #B3132A; }
 .sf-cta .sf-btn { border-color: rgba(255, 255, 255, .7); }
 .sf-cta .sf-btn:hover { border-color: #fff; }
 .sf-cta-row { display: grid; gap: 28px; }
@@ -866,3 +879,22 @@ html[data-intro='1'] .sf-loader, .sf-loader.is-on { display: grid; }
   .sf-compare thead th { font-size: 12px; }
   .sf-yes { width: 26px; height: 26px; }
 }
+
+/* Form errors sit under the field they belong to. */
+.sf-field-err { display: flex; align-items: center; gap: 6px; margin: 0; font-size: 14px; font-weight: 700; color: #B3132A; }
+.sf-field-err::before { content: '!'; display: inline-grid; place-items: center; width: 18px; height: 18px; border-radius: 50%; background: #B3132A; color: #fff; font-size: 12px; font-weight: 800; }
+.sf-field input[aria-invalid] { border-color: #B3132A; box-shadow: 0 0 0 3px rgba(179, 19, 42, .14); }
+/* Phones: the breadcrumb stays on one line and the page name shortens with an ellipsis. */
+@media (max-width: 640px) {
+  .sf-crumbs { flex-wrap: nowrap; white-space: nowrap; }
+  .sf-crumbs li:last-child { overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+}
+
+/* Phones: every link and button is at least 44px tall, so it is easy to hit with a thumb. */
+.sf-tap { display: inline-flex; align-items: center; min-height: 44px; min-width: 44px; }
+@media (max-width: 760px) {
+  .sf-foot li { padding: 0; }
+  .sf-foot li a { display: inline-flex; align-items: center; min-height: 44px; }
+  .sf-ig figcaption a { min-height: 44px; }
+}
+@media (max-width: 760px) { .sf-foot-legal a { display: inline-flex; align-items: center; min-height: 44px; } }

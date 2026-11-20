@@ -41,7 +41,7 @@ import ComingSoon from './screens/ComingSoon'
 import { PageHeader } from './components/ui'
 import { MemberShell } from './components/MemberShell'
 import Website from './site/Website'
-import { SITE_ROUTES, SitePage } from './site/pages'
+import { NotFoundPage, SITE_ROUTES, SitePage } from './site/pages'
 import Privacy from './site/Privacy'
 import { ForgotPassword, Join, Login, ResetPassword } from './site/Auth'
 import WebsiteSettings from './screens/staff/WebsiteSettings'
@@ -482,7 +482,7 @@ export default function App() {
           <Route path="/more" element={<Only roles={STAFF}><More /></Only>} />
         </Route>
       </Route>
-      <Route path="*" element={<Navigate to="/" replace />} />
+      <Route path="*" element={<NotFoundPage />} />
     </Routes>
     </>
   )

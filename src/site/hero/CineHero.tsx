@@ -217,10 +217,11 @@ export function CineHero({ site }: { site: SiteInfo | null }) {
           <div className={`sf-cine-ch ${ch === 4 ? 'is-on' : ''}`}>
             <h2 className="sf-cine-title"><span>{k.c4a}</span> <em>{k.c4b}</em></h2>
             <p>{k.c4}</p>
+            {/* Only reachable by keyboard once the chapter is on screen; until then Tab skips these invisible buttons. */}
             <div className="sf-ctas">
-              <a href="#assessment" className="sf-btn sf-btn-red sf-magnet">{c.nav.trial}</a>
-              {wa && <a href={wa} target="_blank" rel="noreferrer" className="sf-btn sf-btn-glass sf-magnet">{Ic.whatsapp(18)}{c.nav.whatsapp}</a>}
-              {tel && <a href={tel} className="sf-btn sf-btn-glass sf-magnet">{Ic.phone(18)}{c.nav.call}</a>}
+              <a href="#assessment" tabIndex={ch === 4 ? undefined : -1} className="sf-btn sf-btn-red sf-magnet">{c.nav.trial}</a>
+              {wa && <a href={wa} tabIndex={ch === 4 ? undefined : -1} target="_blank" rel="noreferrer" className="sf-btn sf-btn-glass sf-magnet">{Ic.whatsapp(18)}{c.nav.whatsapp}</a>}
+              {tel && <a href={tel} tabIndex={ch === 4 ? undefined : -1} className="sf-btn sf-btn-glass sf-magnet">{Ic.phone(18)}{c.nav.call}</a>}
             </div>
           </div>
         </div>

@@ -45,7 +45,7 @@ await writeFile(path.join(dist, 'app.html'), shell)
 await writeFile(path.join(dist, '404.html'), shell)
 
 // The website's own fonts, preloaded so the headline paints in them straight away.
-const preload = ['lovelo-black', 'garet-book', 'garet-heavy'].map((f) => `<link rel="preload" href="/fonts/${f}.woff2" as="font" type="font/woff2" crossorigin />`).join('\n    ')
+const preload = ['lovelo-black', 'garet-book', 'glacial-indifference-700'].map((f) => `<link rel="preload" href="/fonts/${f}.woff2" as="font" type="font/woff2" crossorigin />`).join('\n    ')
 
 // Home only: on the first visit in a session, a black screen covers the page until the opening loader takes over
 // (hero/CineHero.tsx), so the static page never flashes first. It lifts itself after 9 seconds whatever happens.

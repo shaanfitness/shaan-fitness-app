@@ -52,7 +52,7 @@ function Block({ b, site }: { b: GuideBlock; site: SiteInfo | null }) {
     case 'compare':
       return (
         <Section title={b.title} sub={b.sub} tone={b.tone}>
-          <div className="sf-compare" role="region" aria-label={b.title} tabIndex={0}>
+          <div className="sf-compare" role="region" aria-label={b.cols.join(', ')} tabIndex={0}>
             <table>
               <thead><tr><td />{b.cols.map((col, i) => <th key={col} scope="col" className={i === b.cols.length - 1 ? 'is-us' : undefined}>{col}</th>)}</tr></thead>
               <tbody>

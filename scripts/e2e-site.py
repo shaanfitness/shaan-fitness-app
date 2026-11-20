@@ -85,6 +85,10 @@ with sync_playwright() as p:
     # The enquiry form: no account needed --------------------------------------------------------------
     page.get_by_role("button", name="Book my assessment").click()
     expect(page.get_by_text("Enter your name.")).to_be_visible()
+    # The error sits under its field, the field is marked invalid and has the focus; the text is dark red, readable.
+    expect(page.locator("#sf-l-name")).to_have_attribute("aria-invalid", "true")
+    expect(page.locator("#sf-l-name")).to_be_focused()
+    expect(page.locator("#sf-l-err")).to_have_css("color", "rgb(179, 19, 42)")
     page.fill("#sf-l-name", "Kavya Lakshmi")
     page.fill("#sf-l-phone", "12345")
     page.get_by_role("button", name="Book my assessment").click()
@@ -95,6 +99,7 @@ with sync_playwright() as p:
     page.fill("#sf-l-msg", "Knee pain sometimes")
     page.get_by_role("button", name="Book my assessment").click()
     expect(page.get_by_text("Thank you, Kavya. We’ll call you soon to fix your assessment.")).to_be_visible()
+    expect(page.locator(".sf-form-ok p")).to_have_css("color", "rgb(2, 2, 3)")
     shot(page, "assessment-sent", full=False)
     page.goto(BASE + "/contact")
     page.fill("#sf-l-name", "Kavya")
@@ -156,6 +161,10 @@ with sync_playwright() as p:
     lung.get_by_role("link", name=re.compile("^Event gallery")).click()
     page.wait_for_url("**/events/community-lung-run-2026")
     expect(page.get_by_role("link", name="Open the Lung Run page")).to_have_attribute("href", "https://lung-cancer-day.netlify.app/")
+    # An address that isn't on the site says so and offers the main pages, instead of jumping to the home page.
+    page.goto(BASE + "/old-page-that-moved")
+    expect(page.get_by_role("heading", level=1)).to_have_text("This page isn’t here")
+    expect(page.get_by_role("link", name="Go to the home page")).to_be_visible()
     page.goto(BASE + "/contact")
     page.get_by_role("button", name="Show the map").click()
     expect(page.locator("iframe[title^='Map']")).to_be_attached()

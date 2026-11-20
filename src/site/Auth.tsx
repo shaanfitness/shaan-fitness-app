@@ -51,7 +51,7 @@ export function AuthFrame({ title, sub, children }: { title: string; sub?: React
           <Link to="/" className="flex min-h-11 items-center gap-1.5 text-[14px] font-semibold no-underline lg:invisible">
             <Icon name="chevronLeft" size={18} />{t('auth.backToSite')}
           </Link>
-          <LangToggle compact />
+          <div className="lang-tall"><LangToggle /></div>
         </div>
         <div className="mx-auto my-auto flex w-full max-w-[420px] flex-col gap-6 py-8">
           <img src="/icon-192.png" alt="Shaan Fitness" width="64" height="64" className="h-16 w-16 rounded-[16px] border border-line lg:hidden" />
@@ -71,7 +71,7 @@ function Password({ id, value, onChange, autoComplete }: { id: string; value: st
   return (
     <div className="relative">
       <TextInput id={id} type={show ? 'text' : 'password'} autoComplete={autoComplete} value={value} onChange={onChange} className="pr-14" />
-      <button type="button" className="absolute top-1/2 right-1.5 flex h-9 w-11 -translate-y-1/2 items-center justify-center rounded-lg text-muted hover:text-ink"
+      <button type="button" className="absolute top-1/2 right-1 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-lg text-muted hover:text-ink"
         aria-label={show ? 'Hide password' : 'Show password'} aria-pressed={show} onClick={() => setShow((s) => !s)}>
         <Icon name="eye" size={18} />
       </button>
@@ -109,7 +109,7 @@ export function Login() {
       <form className="flex flex-col gap-4" onSubmit={(e) => { e.preventDefault(); submit() }} noValidate>
         <Field label={t('auth.email')} id="email"><TextInput id="email" type="email" inputMode="email" autoComplete="username" value={email} onChange={setEmail} /></Field>
         <Field label={t('auth.password')} id="password"><Password id="password" autoComplete="current-password" value={password} onChange={setPassword} /></Field>
-        <Link to="/forgot-password" className="-mt-1 self-end text-[13px] font-semibold no-underline">{t('auth.forgot')}</Link>
+        <Link to="/forgot-password" className="-mt-1 inline-flex min-h-11 items-center self-end text-[13px] font-semibold no-underline">{t('auth.forgot')}</Link>
         {error && <Notice tone="error">{error}</Notice>}
         {unconfirmed && (
           <Notice tone="warn">
@@ -249,7 +249,7 @@ export function Join() {
         <div className="flex flex-col gap-1">
           <label htmlFor="jconsent" className="flex cursor-pointer items-start gap-3 text-[14px] leading-normal text-ink-soft">
             <input id="jconsent" type="checkbox" className="check mt-0.5" checked={consent} onChange={(e) => setConsent(e.target.checked)} aria-invalid={!!errors.consent} />
-            <span>{t('auth.consentA')} <Link to="/privacy" target="_blank" rel="noreferrer">{t('auth.consentLink')}</Link> {t('auth.consentB')}</span>
+            <span>{t('auth.consentA')} <Link to="/privacy" target="_blank" rel="noreferrer" className="underline underline-offset-2">{t('auth.consentLink')}</Link> {t('auth.consentB')}</span>
           </label>
           {errors.consent && <span className="pl-8 text-[12px] text-red" role="alert">{errors.consent}</span>}
         </div>
@@ -297,7 +297,7 @@ export function ForgotPassword() {
           <button type="submit" className="btn-gold min-h-[54px] text-[15px]" disabled={busy}>{busy ? t('auth.sending') : t('auth.send')}</button>
         </form>
       )}
-      <Link to="/login" className="text-[14px] font-semibold no-underline">← {t('auth.signIn')}</Link>
+      <Link to="/login" className="inline-flex min-h-11 items-center text-[14px] font-semibold no-underline">← {t('auth.signIn')}</Link>
     </AuthFrame>
   )
 }

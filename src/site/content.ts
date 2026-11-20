@@ -203,6 +203,7 @@ const en = {
   },
   coaches: { title: 'Coaches who know your numbers', sub: 'Your coach knows your name, your goal and what you lifted last time. That is the difference.', all: 'Meet all coaches' },
   visit: { title: 'Visit the studio', sub: 'See where we are, read what members say on Google, and get directions to the door.' },
+  notFound: { title: 'Page not found', h1: 'This page isn’t here', p: 'The address may be old or mistyped. These are the main pages.', home: 'Go to the home page' },
   results: { title: 'Real results', sub: 'Members who let us share their story.', empty: 'Transformation stories are being added. Ask at the front desk to see before-and-after progress from our members.' },
   check: {
     title: 'Check your BMI',
@@ -456,6 +457,7 @@ const te: Copy = {
   },
   coaches: { title: 'మీ లెక్కలు తెలిసిన కోచ్‌లు', sub: 'మీ పేరు, మీ లక్ష్యం, గతసారి మీరు ఎత్తిన బరువు మీ కోచ్‌కు తెలుసు. అదే తేడా.', all: 'అందరు కోచ్‌లను కలవండి' },
   visit: { title: 'స్టూడియోకి రండి', sub: 'మేము ఎక్కడ ఉన్నామో చూడండి, గూగుల్‌లో సభ్యులు ఏమంటున్నారో చదవండి, తలుపు వరకు దారి పొందండి.' },
+  notFound: { title: 'పేజీ కనబడలేదు', h1: 'ఈ పేజీ ఇక్కడ లేదు', p: 'చిరునామా పాతది లేదా తప్పుగా టైప్ చేసి ఉండొచ్చు. ముఖ్యమైన పేజీలు ఇవే.', home: 'హోమ్ పేజీకి వెళ్ళండి' },
   results: { title: 'నిజమైన ఫలితాలు', sub: 'తమ కథ పంచుకోవడానికి అనుమతించిన సభ్యులు.', empty: 'ట్రాన్స్‌ఫర్మేషన్ కథలు జోడిస్తున్నాం. మా సభ్యుల ముందు-తర్వాత ప్రగతి చూడాలంటే ఫ్రంట్ డెస్క్‌లో అడగండి.' },
   check: {
     title: 'మీ BMI చెక్ చేయండి',

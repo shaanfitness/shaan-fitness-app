@@ -99,7 +99,7 @@ function SubCard({ o, site }: { o: SiteOffer; site: SiteInfo }) {
       {o.size != null && <div className="sf-sub-people"><Squad size={o.size} label={size!} coach={c.subs.coach} /><span>{size}</span></div>}
       <p className="sf-sub-text">{c.subs.text[tier]}</p>
       <footer>
-        {o.price != null ? <OfferPrice o={o} /> : wa && <a className="sf-link" href={wa} target="_blank" rel="noreferrer">{c.subs.askFee}</a>}
+        {o.price != null ? <OfferPrice o={o} /> : wa && <a className="sf-link sf-tap" href={wa} target="_blank" rel="noreferrer">{c.subs.askFee}</a>}
         <a href="#assessment" className="sf-btn sf-btn-red sf-magnet" data-plan={o.name} data-tier={tier}>{fill(c.subs.choose, { name: o.name })}</a>
       </footer>
     </article>
@@ -168,7 +168,8 @@ export function Method() {
           <h2 id="sf-method" className="sf-h2">{c.method.title}</h2>
           <p className="sf-lede">{c.method.sub}</p>
         </div>
-        <div className="sf-film-window">
+        {/* On phones the pillars scroll sideways: the strip can then take keyboard focus and be scrolled with the arrows. */}
+        <div className="sf-film-window" tabIndex={0} role="region" aria-label={c.method.pillars.map((p) => p.name).join(', ')}>
           <div ref={track} className="sf-film-track">
             {c.method.pillars.map((p, i) => (
               <article key={p.name} data-i={i} className={`sf-frame ${active === i ? 'is-on' : ''}`} aria-label={`${p.name}: ${p.label}`}>
@@ -326,7 +327,7 @@ export function DayRail({ site, only, title, sub, link = true }: { site: SiteInf
         </div>
         <div className="sf-legend">
           {(['group', 'semi', 'elite'] as Tier[]).filter((t) => placed.some((x) => batchTier(x.b) === t)).map((t) => <span key={t}><i className={t === 'group' ? '' : `is-${t}`} />{label(t)}</span>)}
-          {link && <Link to={PATHS.timings} viewTransition className="sf-link">{c.day.fullTimings}</Link>}
+          {link && <Link to={PATHS.timings} viewTransition className="sf-link sf-tap">{c.day.fullTimings}</Link>}
         </div>
       </div>
     </section>
@@ -360,12 +361,12 @@ export function AppShowcase() {
   }, [seen, paused])
   const a = c.app
   const screens: ReactNode[] = [
-    <><h4>{a.screens[0]}</h4><span className="muted">{a.done}</span><div className="bar"><i style={{ width: '75%' }} /></div>
+    <><h3>{a.screens[0]}</h3><span className="muted">{a.done}</span><div className="bar"><i style={{ width: '75%' }} /></div>
       {[a.w1, a.w2, a.w3, a.w4].map((w, k) => <div key={w} className="row"><span className={`tick ${k < 3 ? 'is-done' : ''}`}>{k < 3 && Ic.check(14)}</span>{w}</div>)}</>,
-    <><h4>{a.screens[1]}</h4><span className="muted">1,240 / 1,800 kcal</span><div className="bar"><i style={{ width: '69%' }} /></div>
+    <><h3>{a.screens[1]}</h3><span className="muted">1,240 / 1,800 kcal</span><div className="bar"><i style={{ width: '69%' }} /></div>
       {['Moong dal chilla', 'Curd', 'Phulka, dal', 'Roasted chana'].map((w, k) => <div key={w} className="row"><span className={`tick ${k < 3 ? 'is-done' : ''}`}>{k < 3 && Ic.check(14)}</span>{w}</div>)}</>,
-    <><h4>{a.screens[2]}</h4><span className="muted">{a.glasses}</span><div className="sf-glasses">{Array.from({ length: 12 }, (_, k) => <i key={k} className={k < 6 ? 'is-full' : ''} />)}</div></>,
-    <><h4>{a.screens[3]}</h4><span className="muted">{a.lost}</span>
+    <><h3>{a.screens[2]}</h3><span className="muted">{a.glasses}</span><div className="sf-glasses">{Array.from({ length: 12 }, (_, k) => <i key={k} className={k < 6 ? 'is-full' : ''} />)}</div></>,
+    <><h3>{a.screens[3]}</h3><span className="muted">{a.lost}</span>
       <svg viewBox="0 0 240 140" style={{ width: '100%' }} aria-hidden="true"><polyline points="0,30 40,40 80,52 120,66 160,80 200,96 240,104" fill="none" stroke="#E8283B" strokeWidth="3" /><polyline points="0,30 40,40 80,52 120,66 160,80 200,96 240,104 240,140 0,140" fill="rgba(232,40,59,.15)" stroke="none" /></svg>
       <div className="row">82.0 kg <span className="muted" style={{ marginLeft: 'auto' }}>78.4 kg</span></div></>,
   ]
@@ -377,7 +378,7 @@ export function AppShowcase() {
           <p className="sf-lede" style={{ marginTop: 18 }}>{a.sub}</p>
           <div className="sf-app-tabs" role="group" aria-label={a.title}>
             {a.screens.map((s, k) => <button key={s} type="button" aria-pressed={i === k} onClick={() => { setI(k); setPaused(true) }}>{s}</button>)}
-            <button type="button" aria-label={paused ? 'Play' : 'Pause'} onClick={() => setPaused((p) => !p)}>{paused ? Ic.play(16) : Ic.pause(16)}</button>
+            <button type="button" className="sf-tap" aria-label={paused ? 'Play' : 'Pause'} onClick={() => setPaused((p) => !p)}>{paused ? Ic.play(16) : Ic.pause(16)}</button>
           </div>
         </div>
         <div className="sf-phone-stage" aria-hidden="true">
@@ -397,8 +398,9 @@ export function CoachGrid({ site, limit, heading = true }: { site: SiteInfo; lim
   const list = [...site.trainers].sort((a, b) => Number(b.star) - Number(a.star)).slice(0, limit ?? 99)
   const initials = (n: string) => n.split(/\s+/).filter(Boolean).slice(0, 2).map((x) => x[0]).join('').toUpperCase()
   return (
-    <section className="sf-section" aria-labelledby={heading ? 'sf-coaches' : undefined} aria-label={heading ? undefined : c.nav.coaches}>
+    <section className="sf-section" aria-labelledby="sf-coaches">
       <div className="sf-wrap">
+        {!heading && <h2 id="sf-coaches" className="sf-sr">{c.coaches.title}</h2>}
         {heading && (
           <div className="sf-head-split">
             <h2 id="sf-coaches" className="sf-h2">{c.coaches.title}</h2>
@@ -519,7 +521,13 @@ function LeadForm({ site, page }: { site: SiteInfo | null; page: PageId }) {
   const [f, setF] = useState({ name: '', phone: '', interest: PAGE_INTEREST[page] ?? 'trial' as Interest, time: 'any', message: '', website: '' })
   const [state, setState] = useState<'idle' | 'sending' | 'sent' | 'already'>('idle')
   const [error, setError] = useState<string | null>(null)
+  /** Which field the error belongs to; the message then sits under that field, which gets the focus. */
+  const [bad, setBad] = useState<'name' | 'phone' | null>(null)
   const [sentName, setSentName] = useState('')
+  const flag = (field: 'name' | 'phone', msg: string) => {
+    setBad(field); setError(msg)
+    requestAnimationFrame(() => document.getElementById(field === 'name' ? 'sf-l-name' : 'sf-l-phone')?.focus())
+  }
   const wa = whatsappLink(site?.website.whatsapp || site?.studio.mobile, c.lead.waText)
   // A plan chosen higher up the page ("Choose 1:1 Elite") fills the interest.
   useEffect(() => {
@@ -534,16 +542,18 @@ function LeadForm({ site, page }: { site: SiteInfo | null; page: PageId }) {
     return () => document.removeEventListener('click', on)
   }, [])
   const submit = async () => {
-    setError(null)
-    if (f.name.trim().length < 2) return setError(c.lead.errName)
-    if (!/^[6-9]\d{9}$/.test(f.phone.replace(/\D/g, '').slice(-10)) || f.phone.replace(/\D/g, '').length < 10) return setError(c.lead.errPhone)
+    setError(null); setBad(null)
+    if (f.name.trim().length < 2) return flag('name', c.lead.errName)
+    if (!/^[6-9]\d{9}$/.test(f.phone.replace(/\D/g, '').slice(-10)) || f.phone.replace(/\D/g, '').length < 10) return flag('phone', c.lead.errPhone)
     setState('sending')
     const res = await supabase.rpc('site_enquiry', { p: { ...f, studio: site?.studio.slug ?? null, page: PATHS[page] } })
     if (res.error) {
       // Our own checks explain themselves; anything else (no connection, the server not ready) offers a call or WhatsApp.
       const m = res.error.message
       setState('idle')
-      setError(/10-digit/.test(m) ? c.lead.errPhone : /Enter your name/.test(m) ? c.lead.errName : /Too many/.test(m) ? c.lead.busy : c.lead.failed)
+      if (/10-digit/.test(m)) return flag('phone', c.lead.errPhone)
+      if (/Enter your name/.test(m)) return flag('name', c.lead.errName)
+      setError(/Too many/.test(m) ? c.lead.busy : c.lead.failed)
       return
     }
     setSentName(f.name.trim().split(/\s+/)[0])
@@ -563,8 +573,18 @@ function LeadForm({ site, page }: { site: SiteInfo | null; page: PageId }) {
   return (
     <form className="sf-form" noValidate aria-labelledby="sf-lead-h" onSubmit={(e) => { e.preventDefault(); void submit() }}>
       <h3 id="sf-lead-h" className="sf-h3" style={{ color: 'var(--sf-ink)' }}>{c.lead.title}</h3>
-      <div className="sf-field"><label htmlFor="sf-l-name">{c.lead.name}</label><input id="sf-l-name" type="text" autoComplete="name" value={f.name} onChange={(e) => setF({ ...f, name: e.target.value })} maxLength={80} /></div>
-      <div className="sf-field"><label htmlFor="sf-l-phone">{c.lead.phone}</label><input id="sf-l-phone" type="tel" inputMode="tel" autoComplete="tel" value={f.phone} onChange={(e) => setF({ ...f, phone: e.target.value })} maxLength={16} placeholder="98480 12345" /></div>
+      <div className="sf-field">
+        <label htmlFor="sf-l-name">{c.lead.name}</label>
+        <input id="sf-l-name" type="text" autoComplete="name" value={f.name} onChange={(e) => { setF({ ...f, name: e.target.value }); if (bad === 'name') setBad(null) }} maxLength={80}
+          aria-invalid={bad === 'name' || undefined} aria-describedby={bad === 'name' ? 'sf-l-err' : undefined} />
+        {bad === 'name' && <p id="sf-l-err" className="sf-field-err" role="alert">{error}</p>}
+      </div>
+      <div className="sf-field">
+        <label htmlFor="sf-l-phone">{c.lead.phone}</label>
+        <input id="sf-l-phone" type="tel" inputMode="tel" autoComplete="tel" value={f.phone} onChange={(e) => { setF({ ...f, phone: e.target.value }); if (bad === 'phone') setBad(null) }} maxLength={16} placeholder="98480 12345"
+          aria-invalid={bad === 'phone' || undefined} aria-describedby={bad === 'phone' ? 'sf-l-err' : undefined} />
+        {bad === 'phone' && <p id="sf-l-err" className="sf-field-err" role="alert">{error}</p>}
+      </div>
       <fieldset>
         <legend>{c.lead.interest}</legend>
         <div className="sf-chips">
@@ -583,7 +603,7 @@ function LeadForm({ site, page }: { site: SiteInfo | null; page: PageId }) {
       </fieldset>
       <div className="sf-field"><label htmlFor="sf-l-msg">{c.lead.message}</label><textarea id="sf-l-msg" value={f.message} onChange={(e) => setF({ ...f, message: e.target.value })} maxLength={500} /></div>
       <div className="sf-hp" aria-hidden="true"><label htmlFor="sf-l-web">Website</label><input id="sf-l-web" type="text" tabIndex={-1} autoComplete="off" value={f.website} onChange={(e) => setF({ ...f, website: e.target.value })} /></div>
-      {error && <p className="sf-form-err" role="alert">{error}</p>}
+      {error && !bad && <p className="sf-form-err" role="alert">{error}</p>}
       <button type="submit" className="sf-btn sf-btn-red" disabled={state === 'sending'}>{state === 'sending' ? c.lead.sending : c.lead.send}</button>
       <p className="sf-small">{c.lead.privacy}{wa && <> {c.lead.orWhatsapp} <a href={wa} target="_blank" rel="noreferrer" className="sf-link" style={{ color: 'var(--sf-ink)' }}>{c.lead.whatsappIt}</a></>}</p>
     </form>

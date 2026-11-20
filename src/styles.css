@@ -58,6 +58,7 @@
   --color-muted: #A3AEC2;
   --color-faint: #6F7C94;
   --color-gold: #D92D3A;
+  --color-link: #FF5C6A;
   --color-gold-hover: #C42633;
   --color-gold-light: #FF7A70;
   --color-on-gold: #FFFFFF;
@@ -125,7 +126,7 @@
   html, body { background: var(--color-ground); color: var(--color-ink); }
   body { margin: 0; font-family: var(--font-sans); -webkit-font-smoothing: antialiased; }
   :lang(te) body, [lang="te"] { font-family: "Noto Sans Telugu", var(--font-sans); }
-  a { color: var(--color-gold); }
+  a { color: var(--color-link, var(--color-gold)); }
   a:hover { color: var(--color-gold-light); }
   :focus-visible { outline: 2px solid var(--color-gold); outline-offset: 2px; }
   input, select, textarea, button { font: inherit; }
@@ -205,6 +206,8 @@
   .lang-switch { display: flex; flex: none; padding: 3px; border-radius: 12px; border: 1px solid var(--color-line); }
   .lang-switch button { min-height: 36px; padding: 0 12px; border-radius: 10px; border: 0; background: transparent; color: var(--color-muted); font-size: 12px; font-weight: 600; cursor: pointer; }
   .lang-switch button[aria-pressed="true"] { background: var(--color-ink); color: var(--color-ground); }
+  /* Sign-in pages have room: a full-size, easy-to-tap language switch. */
+  .lang-tall .lang-switch button { min-height: 44px; padding: 0 14px; font-size: 13px; }
   .me-avatar { display: inline-flex; width: 44px; height: 44px; flex: none; align-items: center; justify-content: center; border-radius: 50%; border: 1px solid var(--color-gold); font-family: var(--font-display); color: var(--color-gold-light); font-size: 15px; text-decoration: none; }
   .stripes { display: flex; gap: 10px; }
   .stripes span { display: block; width: 16px; height: 104px; background: var(--color-gold); transform: skewX(-20deg); }

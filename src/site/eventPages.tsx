@@ -68,6 +68,7 @@ export function EventsList({ site }: { site: SiteInfo | null }) {
         </div>
       </section>
       <Section>
+        <h2 className="sf-sr">{c.eventsPage.all}</h2>
         <div className="sf-ev-grid">{EVENTS.map((e) => <EventCard key={e.id} e={e} lang={lang} />)}</div>
         <p className="sf-lede" style={{ marginTop: 36 }}>{c.eventsPage.soon}</p>
         <p style={{ marginTop: 18 }}><a className="sf-btn sf-btn-glass" href={ig} target="_blank" rel="noreferrer">{Ic.instagram(18)}{c.community.follow}</a></p>

@@ -1,4 +1,5 @@
-import type { ReactNode } from 'react'
+import { useEffect, type ReactNode } from 'react'
+import { Link } from 'react-router-dom'
 import { useSite, type SiteInfo } from '../db/site'
 import { PATHS, type Copy, type PageId } from './content'
 import { faqFor, offerTier, offers, openSpans } from './data'
@@ -12,7 +13,7 @@ import { CineHero } from './hero/CineHero'
 import { EventCards, EventPage, EventsList } from './eventPages'
 import { isEventId, type EventId } from './events'
 import { GuidePage } from './guidePages'
-import { isGuideId, type GuideId } from './guides'
+import { guideById, isGuideId, type GuideId } from './guides'
 
 // One component per page. Each page answers one search ("personal trainer in Kakinada", "gym timings", …), ends with
 // its own questions (also sent to Google as FAQ data) and the assessment form.
@@ -184,6 +185,33 @@ export function SitePage({ id }: { id: PageId }) {
       <Body id={id} site={site} />
       <Faq items={faqFor(id, site, c, lang)} />
       <Cta site={site} page={id} />
+    </SiteLayout>
+  )
+}
+
+/** An address that isn't on the site (an old link, a typo): say so and offer the main pages. Never indexed. */
+export function NotFoundPage() {
+  const { c, lang } = useCopy()
+  useEffect(() => {
+    document.title = `${c.notFound.title} | Shaan Fitness`
+    const m = document.createElement('meta'); m.name = 'robots'; m.content = 'noindex'
+    document.head.appendChild(m)
+    return () => m.remove()
+  }, [c])
+  const links: PageId[] = ['semi', 'plans', 'timings', 'contact']
+  return (
+    <SiteLayout>
+      <section className="sf-page-hero" aria-labelledby="sf-h1">
+        <div className="sf-hero-bg" />
+        <div className="sf-wrap sf-enter">
+          <h1 id="sf-h1" className="sf-h1">{c.notFound.h1}</h1>
+          <p className="sf-lede">{c.notFound.p}</p>
+          <div className="sf-ctas" style={{ marginTop: 28 }}>
+            <Link to="/" viewTransition className="sf-btn sf-btn-red sf-magnet">{c.notFound.home}</Link>
+            {links.map((id) => <Link key={id} to={PATHS[id]} viewTransition className="sf-btn sf-magnet">{id === 'semi' ? guideById('semi').copy[lang].nav : c.nav[id as 'plans' | 'timings' | 'contact']}</Link>)}
+          </div>
+        </div>
+      </section>
     </SiteLayout>
   )
 }
