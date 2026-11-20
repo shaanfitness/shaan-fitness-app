@@ -49,10 +49,9 @@ const preload = ['lovelo-black', 'garet-book', 'glacial-indifference-700'].map((
 
 // Home only: on the first visit in a session, a black screen covers the page until the opening loader takes over
 // (hero/CineHero.tsx), so the static page never flashes first. It lifts itself after 9 seconds whatever happens.
-// On devices likely to get the 3D hero (hero/fx.ts makes the full check), its code starts downloading here, alongside
-// the page's own, instead of after it: the loader is shorter for it.
+// The 3D hero's code starts downloading here, alongside the page's own, instead of after it: the loader is shorter.
 const emblemFile = (await readdir(path.join(dist, 'assets'))).find((f) => /^emblem-.*\.js$/.test(f))
-const warm3d = emblemFile ? `var n=navigator,c=n.connection||{};var slow=0;try{slow=Date.now()-Number(localStorage.getItem('sf.fx.slow'))<2592e6}catch(e){}if(!slow&&!c.saveData&&!/2g/.test(c.effectiveType||'')&&!(n.deviceMemory<3)&&!(n.hardwareConcurrency<=2)&&!matchMedia('(prefers-reduced-motion: reduce)').matches){var l=document.createElement('link');l.rel='modulepreload';l.fetchPriority='low';l.href='/assets/${emblemFile}';document.head.appendChild(l)}` : ''
+const warm3d = emblemFile ? `var l=document.createElement('link');l.rel='modulepreload';l.fetchPriority='low';l.href='/assets/${emblemFile}';document.head.appendChild(l)` : ''
 const introVeil = `<script>(function(){try{${warm3d}}catch(e){}try{var d=document.documentElement;if(sessionStorage.getItem('sf.intro'))return;if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;d.setAttribute('data-intro','1');setTimeout(function(){d.removeAttribute('data-intro')},9000)}catch(e){}})()</script>`
 // Every website page is dark: say so before the stylesheet arrives, so the browser never paints a white page first.
 const darkFirst = `<meta name="color-scheme" content="dark" />\n    <style id="sf-dark">html{background:#040406}</style>`

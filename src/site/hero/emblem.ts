@@ -472,11 +472,11 @@ export function startEmblem(canvas: HTMLCanvasElement, opts: Options): Emblem | 
     if (direct) renderer.render(scene, camera); else composer.render(dt)
     if (!ready) { ready = true; opts.onReady() }
   }
-  // Quality steps: 0 as started, 1 at most one pixel per screen pixel, 2 no glow and half the smoke. Never blurrier
-  // than that: a device that still can't keep up hands back to the flat logo, which looks better than a smeared,
-  // stuttering 3D. The first windows are short and run while the loader still covers the page, so the page opens at a
-  // quality the device can hold (onSteady); after that the check carries on every two seconds while the hero is on
-  // screen. 26 frames a second passes, so phones capped at 30 (battery saver) keep the full scene.
+  // Quality steps: 0 as started, 1 at most one pixel per screen pixel, 2 no glow and half the smoke. The first
+  // windows are short and run while the loader still covers the page, so the page opens at a quality the device can
+  // hold (onSteady); after that the check carries on every two seconds while the hero is on screen. 26 frames a second
+  // passes, so phones capped at 30 (battery saver, screen recording) keep the full scene. The 3D always stays: only a
+  // device that can't draw even the lightest scene at 10 frames a second, twice running, gets the flat logo.
   let winStart = 0, winFrames = 0, failed = false, steady = false, strikes = 0
   const settle = () => { if (!steady) { steady = true; opts.onSteady?.(level) } }
   const govern = (now: number) => {
@@ -499,10 +499,8 @@ export function startEmblem(canvas: HTMLCanvasElement, opts: Options): Emblem | 
       resize()
       return
     }
-    // The lightest scene: fine at 22 frames a second or more; under that it hands back (twice in a row once the page
-    // is open, so one hiccup doesn't switch it off).
-    if (fps >= 22) { strikes = 0; settle(); return }
-    if (!steady || ++strikes >= 2) { failed = true; opts.onFail?.() }
+    if (fps >= 10) { strikes = 0; settle(); return }
+    if (++strikes >= 2) { failed = true; opts.onFail?.() }
   }
   const loop = (now: number) => {
     raf = requestAnimationFrame(loop)

@@ -6,7 +6,7 @@ import { useCopy } from '../layout'
 import { prefersReducedMotion } from '../motion'
 import { LiveChip, sizeLine } from '../sections'
 import type { Emblem } from './emblem'
-import { chooseFx, rememberSlow, type Fx } from './fx'
+import { chooseFx, type Fx } from './fx'
 import { LOGO, LOGO_COLORS } from './logoPaths'
 
 // The home page hero: the Shaan logo as a cinematic scroll sequence in five chapters. The section is tall and the
@@ -52,9 +52,9 @@ function Hud({ ch, names }: { ch: number; names: string[] }) {
 
 // How long things may take. Times count from the page's first request, as the loader's drawing does.
 const LOADER_MIN = 2200     // the logo draws and fills
-const LOADER_BUDGET = 5500  // the longest the loader waits for the 3D; after that the page opens on the flat logo
+const LOADER_BUDGET = 5500  // the longest the loader waits for the 3D; after that the page opens and the 3D fades in
+                            // as soon as it is ready (a slow network), as it always did
 const LOADER_CAP = 7000     // the longest the loader shows at all, whatever the network does
-const LATE = 4000           // no loader (a later visit): the 3D may still take over this long after the hero appears
 
 /** What the opening loader and the 3D know about each other. */
 interface Ctl {
@@ -65,8 +65,8 @@ interface Ctl {
   ready: boolean
   steady: boolean
   dropped: boolean
-  /** Give up on the 3D for this visit (too slow to be ready in time). */
-  giveUp: () => void
+  /** The loader stopped waiting for the 3D: it fades in over the page when it's ready. */
+  late: boolean
 }
 
 /** The opening loader: the logo draws itself while the page and, where it runs, the 3D load behind it. The count is
@@ -81,8 +81,8 @@ function Loader({ ctl, state, place, onDone }: { ctl: RefObject<Ctl>; state: 'wa
     const finish = () => { if (done) return; done = true; setPct(100); onDone() }
     const tick = (now: number) => {
       const c = ctl.current
-      if (c.fx === '3d' && !c.steady && !c.dropped && now > LOADER_BUDGET) c.giveUp()
-      const real = c.fx === '2d' || c.dropped
+      if (c.fx === '3d' && !c.steady && now > LOADER_BUDGET) c.late = true
+      const real = c.fx === '2d' || c.dropped || c.late
         ? (c.fonts ? 100 : 80)
         : (c.fonts ? 25 : 0) + (c.code ? 35 : 0) + (c.ready ? 20 : 0) + (c.steady ? 20 : 0)
       // Eases by time, not by frame, so a slow phone gets there too.
@@ -95,7 +95,7 @@ function Loader({ ctl, state, place, onDone }: { ctl: RefObject<Ctl>; state: 'wa
       if (n >= 100) finish(); else raf = requestAnimationFrame(tick)
     }
     raf = requestAnimationFrame(tick)
-    const cap = window.setTimeout(() => { if (!ctl.current.steady) ctl.current.giveUp(); finish() }, Math.max(800, LOADER_CAP - performance.now()))
+    const cap = window.setTimeout(() => { if (!ctl.current.steady) ctl.current.late = true; finish() }, Math.max(800, LOADER_CAP - performance.now()))
     return () => { cancelAnimationFrame(raf); window.clearTimeout(cap) }
   }, [ctl, onDone, active])
   // One element from the built page to the end, so the logo's drawing carries on when the loader takes over.
@@ -158,7 +158,7 @@ export function CineHero({ site }: { site: SiteInfo | null }) {
   // over ('on'), and wipes it away ('out') once the page and the hero are ready, or removes it straight away when it
   // wasn't asked for.
   const [intro, setIntro] = useState<'wait' | 'off' | 'on' | 'out'>('wait')
-  const ctl = useRef<Ctl>({ fx: '2d', loader: false, fonts: false, code: false, ready: false, steady: false, dropped: false, giveUp: () => undefined })
+  const ctl = useRef<Ctl>({ fx: '2d', loader: false, fonts: false, code: false, ready: false, steady: false, dropped: false, late: false })
   const emblemRef = useRef<Emblem | null>(null)
   const claimed = useRef(false)
   const timers = useRef<number[]>([])
@@ -214,8 +214,7 @@ export function CineHero({ site }: { site: SiteInfo | null }) {
     html.dataset.fxWhy = choice.why
 
     let emblem: Emblem | null = null
-    let cancelled = false, raf = 0, p = 0, codeAt = 0
-    const shownAt = performance.now()
+    let cancelled = false, raf = 0, p = 0
     const read = () => {
       raf = 0
       const r = sec.getBoundingClientRect()
@@ -230,11 +229,10 @@ export function CineHero({ site }: { site: SiteInfo | null }) {
     window.addEventListener('scroll', on, { passive: true })
     window.addEventListener('resize', on)
 
-    // Back to the flat logo for this visit; remembered when the device itself was the reason.
-    const drop = (slow: boolean) => {
+    // Back to the flat logo for this visit: no WebGL after all, or the device can't draw even the lightest scene.
+    const drop = () => {
       if (cur.dropped) return
       cur.dropped = true
-      if (slow) rememberSlow()
       html.dataset.fx = '2d'
       setWarm(false)
       setLive(false)
@@ -243,9 +241,6 @@ export function CineHero({ site }: { site: SiteInfo | null }) {
       emblemRef.current = null
       timers.current.push(window.setTimeout(() => e?.stop(), 900))
     }
-    // Out of time: slow if its code had arrived a while ago and it still wasn't running smoothly.
-    cur.giveUp = () => drop(codeAt > 0 && performance.now() - codeAt > 3000)
-    const heroOnScreen = () => { const r = sec.getBoundingClientRect(); return r.bottom > 0 && r.top < window.innerHeight }
 
     if (cur.fx === '3d' && !cur.dropped) {
       if (cur.loader) setWarm(true)
@@ -255,34 +250,29 @@ export function CineHero({ site }: { site: SiteInfo | null }) {
         emblem = startEmblem(cv, {
           mobile, still: prefersReducedMotion(),
           onReady: () => { cur.ready = true },
-          onSteady: (level) => {
+          onSteady: () => {
             if (cancelled || cur.dropped) return
             cur.steady = true
-            // Running, but only after stepping down twice or taking long to settle: the flat logo next time.
-            if (level >= 2 || performance.now() - codeAt > 4500) rememberSlow()
-            if (cur.loader) return
-            // A later visit, no loader: take over from the flat logo while that still reads as the page opening
-            // (or out of sight); otherwise this visit stays on the flat logo.
-            if (performance.now() - shownAt <= LATE || !heroOnScreen()) { setLive(true); emblem?.replay() }
-            else drop(false)
+            // Behind the loader, the loader opens the page on it. Otherwise (a later visit, or the loader stopped
+            // waiting) it fades in over the flat logo, arriving out of the dark.
+            if (cur.loader && !cur.late) return
+            setLive(true)
+            emblem?.replay()
           },
-          onFail: () => { if (!cancelled) drop(true) },
+          onFail: () => { if (!cancelled) drop() },
         })
         emblemRef.current = emblem
-        if (!emblem) drop(false)
+        if (!emblem) drop()
         else emblem.setProgress(p)
       }
       import('./emblem').then(({ startEmblem }) => {
         if (cancelled || cur.dropped) return
-        // Arrived too late to be ready before the loader's time is up (a slow network): open on the flat logo.
-        if (cur.loader && performance.now() > LOADER_BUDGET - 800) { cur.giveUp(); return }
         cur.code = true
-        codeAt = performance.now()
         // Behind the loader it starts straight away; otherwise when the page is idle, so it never holds up a tap.
         const ric = (window as { requestIdleCallback?: (f: () => void, o?: { timeout: number }) => number }).requestIdleCallback
         if (cur.loader || !ric) run(startEmblem)
         else ric(() => run(startEmblem), { timeout: 300 })
-      }).catch(() => drop(false))
+      }).catch(() => drop())
     }
 
     return () => {
@@ -295,7 +285,7 @@ export function CineHero({ site }: { site: SiteInfo | null }) {
       emblem?.stop()
       emblemRef.current = null
       // React runs this twice in development: start the next run clean.
-      Object.assign(cur, { code: false, ready: false, steady: false, dropped: false })
+      Object.assign(cur, { code: false, ready: false, steady: false, dropped: false, late: false })
     }
   }, [])
 
