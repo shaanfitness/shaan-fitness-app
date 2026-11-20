@@ -22,6 +22,7 @@ import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js'
 import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js'
 import { OutputPass } from 'three/examples/jsm/postprocessing/OutputPass.js'
 import { LOGO } from './logoPaths'
+import { fixedQuality, gpuName } from './gpu'
 
 export interface Emblem { setProgress: (p: number) => void; stop: () => void }
 interface Options {
@@ -144,18 +145,12 @@ function wordTexture() {
 
 export function startEmblem(canvas: HTMLCanvasElement, opts: Options): Emblem | null {
   // Pinned to full quality, even on a software renderer (for recording the sequence in a headless browser).
-  const fixed = (window as { __sfFixedQuality?: boolean }).__sfFixedQuality === true
+  const fixed = fixedQuality()
   // Older laptop graphics (Intel HD and the like) get a lighter scene from the first frame: drawn straight to the
   // screen (no glow pipeline), simpler metal, baked smoke and a pixel budget. Phones get fewer layers. Every chapter
   // still plays. The graphics chip is read from a throwaway context first, because anti-aliasing is set when the
   // real one is made.
-  let gpu = ''
-  try {
-    const probe = document.createElement('canvas').getContext('webgl2')
-    const info = probe?.getExtension('WEBGL_debug_renderer_info')
-    if (probe && info) gpu = String(probe.getParameter(info.UNMASKED_RENDERER_WEBGL))
-    probe?.getExtension('WEBGL_lose_context')?.loseContext()
-  } catch { /* unknown chip: full quality, the frame-rate governor still watches */ }
+  const gpu = gpuName()
   // (window.__sfLite forces the lighter scene, to check how it looks.)
   const weakGpu = (window as { __sfLite?: boolean }).__sfLite === true || !fixed && /Intel.*HD Graphics|GMA|Mali-[4T]|Adreno \(TM\) [2-5]\d\d|PowerVR|SwiftShader|llvmpipe|Basic Render/i.test(gpu) && !/Iris|Arc/i.test(gpu)
   const lite = weakGpu || (!fixed && opts.mobile)

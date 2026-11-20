@@ -5,6 +5,7 @@ import { offers } from '../data'
 import { useCopy } from '../layout'
 import { prefersReducedMotion } from '../motion'
 import { LiveChip, sizeLine } from '../sections'
+import { fixedQuality, softwareGpu } from './gpu'
 import { LOGO, LOGO_COLORS } from './logoPaths'
 
 // The home page hero: the Shaan logo as a cinematic scroll sequence in five chapters. The section is tall and the
@@ -135,18 +136,22 @@ export function CineHero({ site }: { site: SiteInfo | null }) {
     window.addEventListener('scroll', on, { passive: true })
     window.addEventListener('resize', on)
     const mobile = window.matchMedia('(max-width: 760px), (pointer: coarse)').matches
-    const begin = () => import('./emblem').then(({ startEmblem }) => {
-      progress.current.code = true
-      if (cancelled) return
-      emblem = startEmblem(cv, {
-        mobile, still,
-        onReady: () => { progress.current.ready = true; if (!cancelled) setLive(true) },
-        // Too slow even at the lowest quality: back to the flat logo, and the 3D stops using the battery.
-        onFail: () => { if (cancelled) return; setLive(false); const e = emblem; emblem = null; window.setTimeout(() => e?.stop(), 900) },
-      })
-      if (!emblem) progress.current.ready = true
-      emblem?.setProgress(p)
-    }).catch(() => { progress.current.code = progress.current.ready = true })
+    const begin = () => {
+      // No graphics chip: keep the flat logo and don't download the 3D at all.
+      if (!fixedQuality() && softwareGpu()) { progress.current.code = progress.current.ready = true; return }
+      return import('./emblem').then(({ startEmblem }) => {
+        progress.current.code = true
+        if (cancelled) return
+        emblem = startEmblem(cv, {
+          mobile, still,
+          onReady: () => { progress.current.ready = true; if (!cancelled) setLive(true) },
+          // Too slow even at the lowest quality: back to the flat logo, and the 3D stops using the battery.
+          onFail: () => { if (cancelled) return; setLive(false); const e = emblem; emblem = null; window.setTimeout(() => e?.stop(), 900) },
+        })
+        if (!emblem) progress.current.ready = true
+        emblem?.setProgress(p)
+      }).catch(() => { progress.current.code = progress.current.ready = true })
+    }
     const ric = (window as { requestIdleCallback?: (f: () => void, o?: { timeout: number }) => number }).requestIdleCallback
     // Wait for the opening loader to finish, then load the 3D when the page is idle.
     let waitT = 0
