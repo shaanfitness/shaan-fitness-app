@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
-import { supabase } from '../lib/supabase'
-import { fmtClock } from '../lib/dates'
+import { getSupabase, publicRpc } from '../lib/rest'
+import { fmtClock } from '../lib/clock'
 
 // The public website's data: one safe summary from the database (no personal details),
 // readable without a login.
@@ -71,20 +71,18 @@ export function normalizeSite(d: SiteInfo | null): SiteInfo | null {
 }
 
 export async function siteInfo(slug?: string) {
-  const res = await supabase.rpc('site_info', { p_slug: slug ?? null })
-  if (res.error) throw new Error(res.error.message)
-  return normalizeSite(res.data as SiteInfo | null)
+  return normalizeSite(await publicRpc<SiteInfo | null>('site_info', { p_slug: slug ?? null }))
 }
 
 export const useSite = () => useQuery({ queryKey: ['site'], queryFn: () => siteInfo(), staleTime: 5 * 60_000 })
 
 export async function saveWebsite(studioId: string, p: { website?: Partial<SiteSettings>; studio?: Partial<SiteStudio> }) {
-  const res = await supabase.rpc('save_website', { p_studio: studioId, p })
+  const res = await (await getSupabase()).rpc('save_website', { p_studio: studioId, p })
   if (res.error) throw new Error(res.error.message)
 }
 
 export async function requestCallback(memberId: string, what: 'trial' | 'callback' | 'plan', note?: string) {
-  const res = await supabase.rpc('request_callback', { p_member: memberId, p_what: what, p_note: note ?? null })
+  const res = await (await getSupabase()).rpc('request_callback', { p_member: memberId, p_what: what, p_note: note ?? null })
   if (res.error) throw new Error(res.error.message)
   return res.data as 'sent' | 'already'
 }

@@ -1,7 +1,8 @@
+import './strings'
 import { Link, Navigate, Outlet, Route, Routes, useLocation } from 'react-router-dom'
 import { Suspense, lazy, type ComponentType, type ReactNode } from 'react'
 import { AppShell, StaffMenu } from './components/AppShell'
-import { homeFor, useAuth } from './auth'
+import { homeFor, startAuth, useAuth } from './auth'
 import type { Role } from './db/types'
 import { ALL_PAGES, pageFor } from './nav'
 import { useAccess } from './access'
@@ -54,6 +55,9 @@ import { prettyPhone, telLink, useSite } from './db/site'
 import { Notice } from './components/controls'
 
 // The analysis reports load on first visit, so the member app and other pages stay light.
+// The app needs the signed-in state straight away (the website loads it only for people who signed in before).
+void startAuth()
+
 const people = () => import('./screens/staff/analysis/People')
 const money = () => import('./screens/staff/analysis/Money')
 type Mod = Record<string, ComponentType>

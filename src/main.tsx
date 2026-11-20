@@ -1,4 +1,4 @@
-import { StrictMode } from 'react'
+import { StrictMode, startTransition } from 'react'
 import { createRoot, hydrateRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
@@ -40,5 +40,6 @@ const tree = (
 
 const root = document.getElementById('root')!
 // The HTML is in English: pick it up where it is, unless this visitor reads the site in Telugu.
-if (document.documentElement.dataset.prerendered === '1' && root.firstElementChild && i18n.language === 'en') hydrateRoot(root, tree)
+// Hydrating as a transition lets the browser answer taps in between, instead of one long freeze on big pages.
+if (document.documentElement.dataset.prerendered === '1' && root.firstElementChild && i18n.language === 'en') startTransition(() => { hydrateRoot(root, tree) })
 else createRoot(root).render(tree)

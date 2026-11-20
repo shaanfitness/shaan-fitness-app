@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { supabase } from './lib/supabase'
+import { getSupabase } from './lib/rest'
 import { useAuth } from './auth'
 import type { Role } from './db/types'
 
@@ -41,14 +41,14 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   const studio = useQuery({
     queryKey: ['studio-themes', user?.studioId], enabled: !!user, staleTime: 5 * 60_000,
     queryFn: async () => {
-      const res = await supabase.from('studios').select('settings').eq('id', user!.studioId).maybeSingle()
+      const res = await (await getSupabase()).from('studios').select('settings').eq('id', user!.studioId).maybeSingle()
       if (res.error) throw new Error(res.error.message)
       return (res.data?.settings ?? null) as Record<string, unknown> | null
     },
   })
   const profile = useQuery({
     queryKey: ['profile-theme', user?.userId], enabled: !!user, staleTime: 5 * 60_000,
-    queryFn: async () => (await supabase.from('profiles').select('theme').eq('id', user!.userId).maybeSingle()).data?.theme ?? null,
+    queryFn: async () => (await (await getSupabase()).from('profiles').select('theme').eq('id', user!.userId).maybeSingle()).data?.theme ?? null,
   })
   const saved = (studio.data?.themes ?? {}) as Partial<Record<ThemeGroup, string>>
   const defaults: Record<ThemeGroup, ThemeId> = {
@@ -69,14 +69,14 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     theme, personal, defaults, force: setForced,
     setPersonal: async (t) => {
       if (!user) return
-      const res = await supabase.from('profiles').update({ theme: t }).eq('id', user.userId)
+      const res = await (await getSupabase()).from('profiles').update({ theme: t }).eq('id', user.userId)
       if (res.error) throw new Error(res.error.message)
       qc.setQueryData(['profile-theme', user.userId], t)
     },
     setDefault: async (g, t) => {
       if (!user || !studio.data) return
       const settings = { ...studio.data, themes: { ...defaults, [g]: t } }
-      const res = await supabase.from('studios').update({ settings }).eq('id', user.studioId)
+      const res = await (await getSupabase()).from('studios').update({ settings }).eq('id', user.studioId)
       if (res.error) throw new Error(res.error.message)
       qc.setQueryData(['studio-themes', user.studioId], settings)
       qc.invalidateQueries({ queryKey: ['studio'] })

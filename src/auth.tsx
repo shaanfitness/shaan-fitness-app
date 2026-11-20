@@ -1,8 +1,21 @@
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react'
-import type { Session } from '@supabase/supabase-js'
+import type { Session, SupabaseClient } from '@supabase/supabase-js'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { supabase } from './lib/supabase'
+import { getSupabase } from './lib/rest'
 import type { Role, StaffRole } from './db/types'
+
+// The database client is large, so a visitor reading the website never downloads it. It loads when someone has
+// signed in before on this device (to show their app or dashboard button), or the moment the app itself opens
+// (log in, join, the member app, the dashboard): App.tsx calls startAuth().
+let client: Promise<SupabaseClient> | null = null
+const waiting = new Set<() => void>()
+export function startAuth() {
+  if (!client) { client = getSupabase(); waiting.forEach((f) => f()) }
+  return client
+}
+const signedInBefore = () => {
+  try { return Object.keys(localStorage).some((k) => /^sb-.+-auth-token$/.test(k)) } catch { return false }
+}
 
 // Who is signed in, and as what. One login can hold several roles
 // (Sabir is owner and coach); the app opens the highest one and lets them switch.
@@ -23,6 +36,7 @@ const PRIORITY: Role[] = ['owner', 'front_desk', 'coach', 'doctor', 'member']
 async function loadRoles(userId: string): Promise<RoleRecord[]> {
   // Wait until the client holds the new session's token, so the first reads after signing in
   // aren't sent with the signed-out key.
+  const supabase = await startAuth()
   await supabase.auth.getSession()
   const [staff, members] = await Promise.all([
     supabase.from('staff').select('id,studio_id,role,full_name,active').eq('user_id', userId).eq('active', true),
@@ -57,9 +71,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const qc = useQueryClient()
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => { setSession(data.session); setSessionReady(true) })
-    const { data } = supabase.auth.onAuthStateChange((_event, s) => setSession(s))
-    return () => data.subscription.unsubscribe()
+    let alive = true
+    let unsubscribe: (() => void) | undefined
+    const begin = () => {
+      void startAuth().then((supabase) => {
+        if (!alive) return
+        supabase.auth.getSession().then(({ data }) => { if (alive) { setSession(data.session); setSessionReady(true) } })
+        const { data } = supabase.auth.onAuthStateChange((_event, s) => setSession(s))
+        unsubscribe = () => data.subscription.unsubscribe()
+      })
+    }
+    if (client || signedInBefore()) begin()
+    else { setSessionReady(true); waiting.add(begin) }
+    return () => { alive = false; unsubscribe?.(); waiting.delete(begin) }
   }, [])
 
   const userId = session?.user.id
@@ -82,7 +106,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     noAccess: !!session && roles.isSuccess && roles.data.length === 0,
     switchRole: (role) => { setPreferred(role); try { localStorage.setItem('sf.role', role) } catch { /* this visit only */ } },
     signOut: async () => {
-      await supabase.auth.signOut()
+      await (await startAuth()).auth.signOut()
       qc.clear()
       try { localStorage.removeItem('sf.role') } catch { /* nothing stored */ }
       setPreferred(null)

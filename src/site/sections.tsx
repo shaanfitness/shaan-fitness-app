@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import { addressLines, googlePlace, siteHours, telLink, whatsappLink, prettyPhone, mapsLink, type SiteInfo, type SiteOffer } from '../db/site'
-import { supabase } from '../lib/supabase'
+import { publicRpc } from '../lib/rest'
 import { Crest, GLYPHS, Ic, PAGE_ART, Squad, cosd, sind } from './art'
 import { PATHS, fill, type PageId } from './content'
 import { addressText, batchTier, clock, liveStatus, offerTier, offers, openSpans, rupees, services, weeksText, type Tier } from './data'
@@ -546,10 +546,12 @@ function LeadForm({ site, page }: { site: SiteInfo | null; page: PageId }) {
     if (f.name.trim().length < 2) return flag('name', c.lead.errName)
     if (!/^[6-9]\d{9}$/.test(f.phone.replace(/\D/g, '').slice(-10)) || f.phone.replace(/\D/g, '').length < 10) return flag('phone', c.lead.errPhone)
     setState('sending')
-    const res = await supabase.rpc('site_enquiry', { p: { ...f, studio: site?.studio.slug ?? null, page: PATHS[page] } })
-    if (res.error) {
+    let data: string | null = null
+    try {
+      data = await publicRpc<string>('site_enquiry', { p: { ...f, studio: site?.studio.slug ?? null, page: PATHS[page] } })
+    } catch (e) {
       // Our own checks explain themselves; anything else (no connection, the server not ready) offers a call or WhatsApp.
-      const m = res.error.message
+      const m = (e as Error).message
       setState('idle')
       if (/10-digit/.test(m)) return flag('phone', c.lead.errPhone)
       if (/Enter your name/.test(m)) return flag('name', c.lead.errName)
@@ -557,7 +559,7 @@ function LeadForm({ site, page }: { site: SiteInfo | null; page: PageId }) {
       return
     }
     setSentName(f.name.trim().split(/\s+/)[0])
-    setState(res.data === 'already' ? 'already' : 'sent')
+    setState(data === 'already' ? 'already' : 'sent')
   }
   if (state === 'sent' || state === 'already') {
     return (

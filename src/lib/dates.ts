@@ -74,11 +74,7 @@ export const fmtDateTime = (s: string | null | undefined) =>
 /** The time of an instant in India time, e.g. 7:05 AM. */
 export const fmtTime = (s: string | null | undefined) =>
   s ? new Intl.DateTimeFormat('en-IN', { timeZone: 'Asia/Kolkata', hour: 'numeric', minute: '2-digit' }).format(new Date(s)) : ''
-export const fmtClock = (hhmm: string | null | undefined) => {
-  if (!hhmm) return ''
-  const [h, m] = hhmm.split(':').map(Number)
-  return `${h % 12 === 0 ? 12 : h % 12}:${String(m).padStart(2, '0')} ${h < 12 ? 'AM' : 'PM'}`
-}
+export { fmtClock } from './clock'
 /** A local date and time from an <input type="datetime-local"> as an ISO instant in India time. */
 export const localInputToIso = (v: string) => (v ? new Date(`${v}:00+05:30`).toISOString() : '')
 /** Now plus n days at a given hour, formatted for <input type="datetime-local"> in India time. */
