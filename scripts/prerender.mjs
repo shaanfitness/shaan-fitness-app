@@ -6,7 +6,7 @@
 // Hosting: Cloudflare Pages (public/_worker.js sends unknown addresses to the app shell) or Netlify (netlify.toml).
 // The pages use the gym's live public summary (plans, timings, coaches) read with the public anon key at build time.
 // If it can't be read, the pages are still written, just without those details, and the build carries on.
-import { mkdir, readFile, writeFile } from 'node:fs/promises'
+import { mkdir, readFile, readdir, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 import { pathToFileURL } from 'node:url'
 
@@ -49,7 +49,13 @@ const preload = ['lovelo-black', 'garet-book', 'glacial-indifference-700'].map((
 
 // Home only: on the first visit in a session, a black screen covers the page until the opening loader takes over
 // (hero/CineHero.tsx), so the static page never flashes first. It lifts itself after 9 seconds whatever happens.
-const introVeil = `<script>(function(){try{var d=document.documentElement;if(sessionStorage.getItem('sf.intro'))return;if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;d.setAttribute('data-intro','1');setTimeout(function(){d.removeAttribute('data-intro')},9000)}catch(e){}})()</script>`
+// On devices likely to get the 3D hero (hero/fx.ts makes the full check), its code starts downloading here, alongside
+// the page's own, instead of after it: the loader is shorter for it.
+const emblemFile = (await readdir(path.join(dist, 'assets'))).find((f) => /^emblem-.*\.js$/.test(f))
+const warm3d = emblemFile ? `var n=navigator,c=n.connection||{};var slow=0;try{slow=Date.now()-Number(localStorage.getItem('sf.fx.slow'))<2592e6}catch(e){}if(!slow&&!c.saveData&&!/2g/.test(c.effectiveType||'')&&!(n.deviceMemory<3)&&!(n.hardwareConcurrency<=2)&&!matchMedia('(prefers-reduced-motion: reduce)').matches){var l=document.createElement('link');l.rel='modulepreload';l.fetchPriority='low';l.href='/assets/${emblemFile}';document.head.appendChild(l)}` : ''
+const introVeil = `<script>(function(){try{${warm3d}}catch(e){}try{var d=document.documentElement;if(sessionStorage.getItem('sf.intro'))return;if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;d.setAttribute('data-intro','1');setTimeout(function(){d.removeAttribute('data-intro')},9000)}catch(e){}})()</script>`
+// Every website page is dark: say so before the stylesheet arrives, so the browser never paints a white page first.
+const darkFirst = `<meta name="color-scheme" content="dark" />\n    <style id="sf-dark">html{background:#040406}</style>`
 
 let count = 0
 for (const id of ssr.PAGE_IDS) {
@@ -57,6 +63,7 @@ for (const id of ssr.PAGE_IDS) {
   if (!page.html.includes('id="sf-h1"')) throw new Error(`prerender: ${id} rendered without its headline`)
   const html = template
     .replace('<html lang="en">', '<html lang="en" data-prerendered="1">')
+    .replace('<meta charset="UTF-8" />', `<meta charset="UTF-8" />\n    ${darkFirst}`)
     .replace(/<title>[^<]*<\/title>/, '')
     .replace(/<meta name="description"[^>]*>/, '')
     .replace('</head>', `    ${page.head}\n    ${preload}\n    ${id === 'home' ? introVeil : ''}\n  </head>`)

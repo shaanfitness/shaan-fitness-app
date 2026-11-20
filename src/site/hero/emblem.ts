@@ -5,9 +5,10 @@
 //   planned  the metal falls away to a glowing blue blueprint over a grid
 //   ignite   the barbell burns hot and throws sparks
 //   (exit)   the emblem breaks apart into embers that drift up as you scroll on into the site
-// Loaded only in the browser after the page has painted; lighter on phones; one still frame for reduced motion.
-// It watches its own frame rate: on a slow device it first renders fewer pixels, then drops the glow, and if that
-// still isn't smooth it hands back to the flat logo.
+// Loaded only in the browser, and only on devices that can run it (fx.ts); lighter on phones. On the first visit it
+// starts behind the opening loader: shaders compile and the frame rate is measured there, so the page opens on a
+// 3D emblem that is already running smoothly. On a slow device it first renders fewer pixels, then drops the glow,
+// and if that still isn't smooth it hands back to the flat logo rather than showing a blurred, stuttering 3D.
 import {
   ACESFilmicToneMapping, AdditiveBlending, BufferAttribute, BufferGeometry, CanvasTexture, Color, EdgesGeometry, ExtrudeGeometry,
   DataTexture, Group, LineBasicMaterial, LineSegments, Matrix4, Mesh, MeshBasicMaterial, MeshPhysicalMaterial, MeshStandardMaterial, NormalBlending,
@@ -24,12 +25,20 @@ import { OutputPass } from 'three/examples/jsm/postprocessing/OutputPass.js'
 import { LOGO } from './logoPaths'
 import { fixedQuality, gpuName } from './gpu'
 
-export interface Emblem { setProgress: (p: number) => void; stop: () => void }
+export interface Emblem {
+  setProgress: (p: number) => void
+  /** Play the arrival again (the page has just been revealed). */
+  replay: () => void
+  stop: () => void
+}
 interface Options {
   mobile: boolean
   still: boolean
   onReady: () => void
-  /** The device can't keep up even at the lowest quality: the flat logo takes over. */
+  /** The frame rate has been measured and the scene runs smoothly at this quality level (0 full, 1 fewer pixels,
+   *  2 no glow): the page can open on it. */
+  onSteady?: (level: number) => void
+  /** The device can't keep up even at the lightest quality: the flat logo takes over. */
   onFail?: () => void
 }
 
@@ -345,7 +354,7 @@ export function startEmblem(canvas: HTMLCanvasElement, opts: Options): Emblem | 
     const w = Math.max(1, Math.round(r.width)), h = Math.max(1, Math.round(r.height))
     wide = w / h > 1.05
     // Older graphics: at most about 800,000 pixels a frame whatever the screen, fewer at each quality step.
-    if (direct) renderer.setPixelRatio(Math.min(dpr, Math.sqrt((0.8e6 * [1, 0.75, 0.55, 0.4][level]) / (w * h))))
+    if (direct) renderer.setPixelRatio(Math.min(dpr, Math.sqrt((0.8e6 * [1, 0.75, 0.6][level]) / (w * h))))
     renderer.setSize(w, h, false)
     composer.setSize(w, h)
     const br = lite || level > 0 ? 0.4 : 0.75
@@ -463,31 +472,37 @@ export function startEmblem(canvas: HTMLCanvasElement, opts: Options): Emblem | 
     if (direct) renderer.render(scene, camera); else composer.render(dt)
     if (!ready) { ready = true; opts.onReady() }
   }
-  // Quality steps: 0 as started, 1 fewer pixels, 2 no glow and fewer pixels again, 3 fewest pixels and half the
-  // smoke. Measured over two-second windows while the hero is on screen, after the first second (shaders compiling).
-  // It never gives up on the animation unless the device manages almost nothing (under 5 frames a second).
-  let winStart = 0, winFrames = 0, failed = false
+  // Quality steps: 0 as started, 1 at most one pixel per screen pixel, 2 no glow and half the smoke. Never blurrier
+  // than that: a device that still can't keep up hands back to the flat logo, which looks better than a smeared,
+  // stuttering 3D. The first windows are short and run while the loader still covers the page, so the page opens at a
+  // quality the device can hold (onSteady); after that the check carries on every two seconds while the hero is on
+  // screen. 26 frames a second passes, so phones capped at 30 (battery saver) keep the full scene.
+  let winStart = 0, winFrames = 0, failed = false, steady = false, strikes = 0
+  const settle = () => { if (!steady) { steady = true; opts.onSteady?.(level) } }
   const govern = (now: number) => {
-    if (fixed || failed) return
-    if (!winStart) { winStart = now + 1000; winFrames = 0; return }
+    if (failed) return
+    if (fixed) { settle(); return }
+    if (!winStart) { winStart = now + (steady ? 1000 : 250); winFrames = 0; return }
     if (now < winStart) return
     winFrames++
     const span = now - winStart
-    if (span < 2000) return
+    if (span < (steady ? 2000 : 700)) return
     const fps = (winFrames * 1000) / span
     winStart = now; winFrames = 0
-    if (fps >= 26) return
-    if (level === 3) {
-      if (fps < 5) { failed = true; opts.onFail?.() }
+    if (fps >= 26) { strikes = 0; settle(); return }
+    if (level < 2) {
+      level++
+      if (level === 1) dpr = Math.min(dpr, 1)
+      if (level === 2) { bloom.enabled = false; smokes.forEach((m, i) => { if (i % 2) m.visible = false }) }
+      renderer.setPixelRatio(dpr)
+      composer.setPixelRatio(dpr)
+      resize()
       return
     }
-    level++
-    dpr = Math.min(dpr, level === 1 ? 1 : level === 2 ? 0.75 : 0.55)
-    if (level >= 2) bloom.enabled = false
-    if (level === 3) smokes.forEach((m, i) => { if (i % 2) m.visible = false })
-    renderer.setPixelRatio(dpr)
-    composer.setPixelRatio(dpr)
-    resize()
+    // The lightest scene: fine at 22 frames a second or more; under that it hands back (twice in a row once the page
+    // is open, so one hiccup doesn't switch it off).
+    if (fps >= 22) { strikes = 0; settle(); return }
+    if (!steady || ++strikes >= 2) { failed = true; opts.onFail?.() }
   }
   const loop = (now: number) => {
     raf = requestAnimationFrame(loop)
@@ -499,25 +514,32 @@ export function startEmblem(canvas: HTMLCanvasElement, opts: Options): Emblem | 
     if (stopped || started) return
     started = true
     t0 = last = performance.now()
-    if (opts.still) { frame(t0); frame(t0) } else raf = requestAnimationFrame(loop)
+    if (opts.still) { frame(t0); frame(t0); settle() } else raf = requestAnimationFrame(loop)
   }
-  // Compile every shader before the first frame, in the background where the browser can (KHR_parallel_shader_compile),
-  // so the page doesn't stall; elsewhere they compile with the first frame. The scene renders into the glow pipeline's buffer, not the screen, and three.js picks
-  // shader variants by where they draw, so compile for that. The embers of the break-up are hidden until the end;
-  // they're shown just for this so they don't stall the last chapter.
+  // Compile every shader before the first frame, so no chapter stalls when it first comes on screen. In the background
+  // where the browser can (KHR_parallel_shader_compile); elsewhere straight away, which is fine because on the first
+  // visit the loader still covers the page. The scene renders into the glow pipeline's buffer, not the screen, and
+  // three.js picks shader variants by where they draw, so compile for that. The embers of the break-up are hidden
+  // until the end; they're shown just for this.
+  dust.visible = true
+  renderer.setRenderTarget(direct ? null : composer.readBuffer)
   if (renderer.extensions.has('KHR_parallel_shader_compile')) {
-    dust.visible = true
-    renderer.setRenderTarget(direct ? null : composer.readBuffer)
     let compiling: Promise<unknown>
     try { compiling = renderer.compileAsync(scene, camera) } catch { compiling = Promise.resolve() }
     renderer.setRenderTarget(null)
     dust.visible = false
     // Some graphics drivers never report back: start anyway after a few seconds.
     Promise.race([compiling.catch(() => undefined), new Promise((r) => window.setTimeout(r, 3500))]).then(start)
-  } else start()
+  } else {
+    try { renderer.compile(scene, camera) } catch { /* they compile with the first frame instead */ }
+    renderer.setRenderTarget(null)
+    dust.visible = false
+    start()
+  }
 
   return {
     setProgress: (p: number) => { target = clamp(p); if (opts.still && started) frame(performance.now()) },
+    replay: () => { t0 = performance.now() },
     stop: () => {
       stopped = true
       cancelAnimationFrame(raf)

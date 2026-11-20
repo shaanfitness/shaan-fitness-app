@@ -47,7 +47,7 @@ export const GUIDES: Guide[] = [
         nav: 'Semi-private training',
         desc: 'Your own plan, with only a few people sharing the coach.',
         h1: 'Semi-private training in Kakinada',
-        intro: 'Personal coaching in small numbers. You follow a plan written for you, a coach watches every set, and you train with a few people instead of a crowd.',
+        intro: 'Personal coaching in small numbers: the model many of the world’s leading studios coach by. You follow a plan written for you, a coach watches every set, and you train with a few people instead of a crowd.',
         blocks: [
           { kind: 'ways', title: 'One coach, a few people', sub: 'The coach is the same every time. You choose how many people share the coach.' },
           {
@@ -100,7 +100,7 @@ export const GUIDES: Guide[] = [
         nav: 'సెమీ-ప్రైవేట్ ట్రైనింగ్',
         desc: 'మీ సొంత ప్లాన్, కోచ్‌ను పంచుకునేది కొద్ది మంది మాత్రమే.',
         h1: 'కాకినాడలో సెమీ-ప్రైవేట్ ట్రైనింగ్',
-        intro: 'తక్కువ మందితో పర్సనల్ కోచింగ్. మీ కోసం రాసిన ప్లాన్‌ను మీరు ఫాలో అవుతారు, ప్రతి సెట్‌ను కోచ్ చూస్తారు, గుంపుతో కాకుండా కొద్ది మందితో ట్రైన్ అవుతారు.',
+        intro: 'తక్కువ మందితో పర్సనల్ కోచింగ్: ప్రపంచంలోని ఎన్నో అగ్రశ్రేణి స్టూడియోలు పాటించే పద్ధతి. మీ కోసం రాసిన ప్లాన్‌ను మీరు ఫాలో అవుతారు, ప్రతి సెట్‌ను కోచ్ చూస్తారు, గుంపుతో కాకుండా కొద్ది మందితో ట్రైన్ అవుతారు.',
         blocks: [
           { kind: 'ways', title: 'ఒక కోచ్, కొద్ది మంది', sub: 'కోచ్ ఎప్పుడూ అదే. కోచ్‌ను ఎంత మంది పంచుకోవాలో మీరే ఎంచుకుంటారు.' },
           {

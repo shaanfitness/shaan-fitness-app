@@ -56,7 +56,11 @@ with sync_playwright() as p:
     expect(page.locator(".sf-cine")).not_to_contain_text("Advanced Training")
     expect(page.locator(".sf-cine-ways li")).to_have_count(3)
     expect(page.locator(".sf-cine-ways li").nth(0).locator(".sf-squad-row .sf-fig")).to_have_count(8)
-    expect(page.locator(".sf-cine-ch").nth(4)).to_contain_text("Book your")
+    expect(page.locator(".sf-cine-ch").nth(4)).to_contain_text("an assessment")
+    # The hero picks what this device can play (3D emblem or the flat logo) and says which on <html>.
+    expect(page.locator("html")).to_have_attribute("data-fx", re.compile(r"^(2d|3d)$"))
+    # The positioning is carried by what the studio does, never by the words "premium" or "premier".
+    assert not re.search(r"premium|premier", page.locator("body").inner_text(), re.I), "premium/premier on the home page"
     expect(page.get_by_text("free trial", exact=False)).to_have_count(0)
     # The three subscriptions: name, the owner's line, one figure per person, the price.
     subs = page.locator("#subscriptions .sf-sub")

@@ -468,7 +468,7 @@
 /* Lead form */
 .sf-lead { display: grid; gap: 40px; }
 @media (min-width: 980px) { .sf-lead { grid-template-columns: .9fr 1.1fr; align-items: start; } }
-.sf-form { position: relative; display: grid; gap: 18px; padding: clamp(22px, 3vw, 40px); border-radius: 32px; background: var(--sf-porcelain); color: var(--sf-ink); }
+.sf-form { color-scheme: light; position: relative; display: grid; gap: 18px; padding: clamp(22px, 3vw, 40px); border-radius: 32px; background: var(--sf-porcelain); color: var(--sf-ink); }
 .sf-form label, .sf-form legend { font-size: 14px; font-weight: 700; color: #2B3150; }
 .sf-field { display: grid; gap: 7px; }
 .sf-form input[type='text'], .sf-form input[type='tel'], .sf-form textarea { width: 100%; min-height: 52px; padding: 12px 16px; border-radius: 14px; border: 1.5px solid #C9CDE0; background: #fff; color: var(--sf-ink); font: inherit; font-size: 17px; transition: border-color .2s, box-shadow .2s; }
@@ -635,13 +635,25 @@
   radial-gradient(30% 40% at 84% 56%, rgba(47, 140, 255, .18), transparent 70%), #040406; }
 .sf-cine-poster { position: absolute; z-index: -2; right: 7vw; top: 50%; width: min(44vw, 640px); height: auto; transform: translateY(-50%);
   filter: drop-shadow(0 0 40px rgba(232, 40, 59, .35)) drop-shadow(0 0 80px rgba(47, 140, 255, .2)); transition: opacity 1s ease; animation: sf-float 7s ease-in-out infinite; }
-.sf-cine-canvas { position: absolute; inset: 0; z-index: -1; width: 100%; height: 100%; opacity: 0; transition: opacity 1.4s ease; }
+.sf-cine-canvas { position: absolute; inset: 0; z-index: -1; width: 100%; height: 100%; opacity: 0; transition: opacity .9s ease; }
 .sf-cine.is-live .sf-cine-canvas { opacity: 1; }
-.sf-cine.is-live .sf-cine-poster { opacity: 0; }
+.sf-cine.is-live .sf-cine-poster { opacity: 0; transition-duration: .6s; }
+/* The 3D running behind the opening loader: already in place, no fades, when the loader lifts. */
+.sf-cine.is-warm .sf-cine-canvas { opacity: 1; transition: none; }
+.sf-cine.is-warm .sf-cine-poster { opacity: 0; transition: none; }
+/* The flat logo's own motion (devices without the 3D, and until it's there): a band of light sweeps across the
+   metal every few seconds and the glow breathes. Paused, not removed, under the 3D, so nothing jumps as it fades. */
+.sf-shine { animation: sf-shine 6.5s cubic-bezier(.45, .05, .3, 1) 1.4s infinite; }
+@keyframes sf-shine { 0% { transform: translateX(0); } 24%, 100% { transform: translateX(1040px); } }
+.sf-cine-glow { animation: sf-glow 7s ease-in-out infinite; }
+@keyframes sf-glow { 50% { opacity: .7; } }
+.sf-cine.is-live .sf-shine, .sf-cine.is-live .sf-cine-poster, .sf-cine.is-live .sf-cine-glow,
+.sf-cine.is-warm .sf-shine, .sf-cine.is-warm .sf-cine-poster, .sf-cine.is-warm .sf-cine-glow { animation-play-state: paused; }
 .sf-cine-vignette { position: absolute; inset: 0; pointer-events: none; background:
   linear-gradient(90deg, rgba(4, 4, 6, .78) 0%, rgba(4, 4, 6, .2) 42%, transparent 60%),
   linear-gradient(180deg, transparent 62%, rgba(4, 4, 6, .9) 100%); }
 @keyframes sf-float { 50% { transform: translateY(calc(-50% - 10px)) rotate(-.6deg); } }
+@keyframes sf-float-m { 50% { translate: 0 -8px; } }
 /* Without the 3D (no WebGL), the flat logo still plays the chapters: it turns, comes closer and changes light. */
 .sf-cine-stage { perspective: 1400px; }
 .sf-cine-poster { rotate: y calc(sin(calc(var(--p, 0) * 1turn)) * 32deg - 8deg); scale: calc(1 + var(--p, 0) * .2); }
@@ -687,7 +699,7 @@
 
 @media (max-width: 760px) {
   .sf-cine { height: calc(var(--n, 4) * 100svh); }
-  .sf-cine-poster { right: 50%; top: 34%; width: 74vw; transform: translate(50%, -50%); animation: none; }
+  .sf-cine-poster { right: 50%; top: 34%; width: 74vw; transform: translate(50%, -50%); animation: sf-float-m 7s ease-in-out infinite; }
   .sf-cine-vignette { background: linear-gradient(180deg, rgba(4, 4, 6, .5) 0%, transparent 22%, transparent 42%, rgba(4, 4, 6, .92) 70%); }
   .sf-cine-hud { top: 84px; }
   .sf-cine-tag { display: none; }
@@ -705,6 +717,7 @@
   .sf-cine-copy { position: relative; bottom: auto; padding-top: 62svh; display: grid; gap: 56px; }
   .sf-cine-ch { position: relative; left: auto; opacity: 1; transform: none; filter: none; pointer-events: auto; width: auto; padding-inline: var(--sf-gutter); }
   .sf-cine-canvas { height: 70svh; }
+  .sf-shine, .sf-cine-glow, .sf-cine-poster { animation: none; }
   .sf-cine-quote, .sf-cine-foot { display: none; }
 }
 
@@ -790,7 +803,11 @@ html[data-intro='1'] body::before { content: ''; position: fixed; inset: 0; z-in
   clip-path: inset(0 0 0 0); transition: clip-path 1s cubic-bezier(.76, 0, .24, 1); }
 .sf-loader.is-out { clip-path: inset(0 0 100% 0); }
 html[data-intro='1'] .sf-loader, .sf-loader.is-on { display: grid; }
-.sf-loader svg { width: min(46vw, 320px); height: auto; overflow: visible; }
+.sf-loader svg { position: relative; width: min(46vw, 320px); height: auto; overflow: visible; }
+/* While the 3D finishes loading behind it, a slow red glow breathes behind the drawn logo. */
+.sf-loader::before { content: ''; position: absolute; inset: 0; margin: auto; width: min(90vw, 620px); height: min(90vw, 620px); border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(232, 40, 59, .2), rgba(47, 140, 255, .06) 60%, transparent); opacity: 0; animation: sf-loader-glow 2.8s ease-in-out 2.1s infinite; }
+@keyframes sf-loader-glow { 50% { opacity: 1; } }
 .sf-loader path { stroke-width: 1.4; fill-opacity: 0; stroke-dasharray: 2600; stroke-dashoffset: 2600; animation: sf-logo-draw 1.6s cubic-bezier(.65, 0, .35, 1) forwards, sf-logo-fill .7s 1.3s ease forwards; }
 .sf-loader path:nth-child(2) { animation-delay: .15s, 1.4s; }
 .sf-loader path:nth-child(3) { animation-delay: .3s, 1.5s; }

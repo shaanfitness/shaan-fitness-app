@@ -54,6 +54,9 @@ import { AppContact, AppFeedback, AppNotices, AppPlans, AppResults } from './scr
 import { prettyPhone, telLink, useSite } from './db/site'
 import { Notice } from './components/controls'
 
+// The website's pages tell the browser they're dark before their styles load; the app has light themes too.
+if (typeof document !== 'undefined') document.querySelectorAll('meta[name="color-scheme"], #sf-dark').forEach((el) => el.remove())
+
 // The analysis reports load on first visit, so the member app and other pages stay light.
 // The app needs the signed-in state straight away (the website loads it only for people who signed in before).
 void startAuth()
