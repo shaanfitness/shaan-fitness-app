@@ -49,7 +49,7 @@ import WebsiteSettings from './screens/staff/WebsiteSettings'
 import { BiometricManager, CenterEdit, CenterList, CenterView, CurrencySetting, EmailManager, InvoiceSettings, OtpManager } from './screens/staff/Center'
 import { AppPermissions, CenterSettings, MeasurementSettings } from './screens/staff/CenterSettings'
 import { Equipment, FeedbackList, Holidays, Notices, Rules } from './screens/staff/CenterLists'
-import { ActionForm, ActionList, BannerForm, BannerList, GalleryForm, GalleryList, ServicesList, SocialLinks } from './screens/staff/AppContent'
+import { ActionForm, ActionList, BannerForm, BannerList, GalleryForm, GalleryList, QrLinks, ServicesList, SocialLinks } from './screens/staff/AppContent'
 import { AppContact, AppFeedback, AppNotices, AppPlans, AppResults } from './screens/member/AppPages'
 import { prettyPhone, telLink, useSite } from './db/site'
 import { Notice } from './components/controls'
@@ -291,6 +291,7 @@ const BUILT: Record<string, { el: ReactNode; roles: Role[] }> = {
   '/app-settings/banners/new': { el: <BannerForm key="new" />, roles: DESK },
   '/app-settings/banners': { el: <BannerList />, roles: DESK },
   '/app-settings/social': { el: <SocialLinks />, roles: DESK },
+  '/qr-links': { el: <QrLinks />, roles: DESK },
   '/app-settings/measurements': { el: <MeasurementSettings />, roles: DESK },
   // App Settings › Workouts & Diet
   '/workouts': { el: <Lazy c={TR.workoutList} />, roles: DC },

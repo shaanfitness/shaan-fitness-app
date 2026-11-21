@@ -5,15 +5,16 @@ import { useQuery } from '@tanstack/react-query'
 import { useMe } from '../../auth'
 import { batchSummary, celebrations, dashboardSummary, expiredSubscriptions, upcomingRenewals } from '../../db/dashboard'
 import { listFollowUps } from '../../db/followUps'
+import { listClients } from '../../db/clients'
 import { useLists, useStudio, useTeam } from '../../db/studio'
 import type { FollowUpOverview } from '../../db/types'
-import { fmtClock, fmtDateTime, fmtDay, presets, rangeLabel, studioToday, type Range } from '../../lib/dates'
+import { fmtClock, fmtDateTime, fmtDay, plusDays, presets, rangeLabel, studioToday, type Range } from '../../lib/dates'
 import { money } from '../../lib/format'
 import { ClientCell, ContactButtons } from '../../components/client'
 import { Select, TextInput, opts } from '../../components/controls'
 import { FollowUpDialog, FollowUpHistory, type FollowUpTarget } from '../../components/FollowUp'
 import { DataTable, type Column } from '../../components/table'
-import { Icon, PageHeader } from '../../components/ui'
+import { Icon, PageHeader, Sheet } from '../../components/ui'
 import { AlertsBell } from './Alerts'
 
 // YDL dashboard, section by section: alerts, filters, expected payments, my follow-ups,
@@ -53,6 +54,38 @@ function Block({ title, right, children, id }: { title: React.ReactNode; right?:
   )
 }
 
+// YDL "Quick Follow Up": find an enquiry or a member by name or number, then schedule a follow-up for them.
+function QuickFollowUp({ open, onClose, onPick }: { open: boolean; onClose: () => void; onPick: (t: FollowUpTarget) => void }) {
+  const me = useMe()
+  const [kind, setKind] = useState<'enquiry' | 'member'>('enquiry')
+  const [q, setQ] = useState('')
+  const found = useQuery({
+    queryKey: ['clients', 'quick-follow-up', kind, q], enabled: open && q.trim().length >= 3,
+    queryFn: () => listClients(me.studioId, { kind, search: q.trim() }, 0, 10, 'created_at.desc'),
+  })
+  return (
+    <Sheet open={open} onClose={onClose} title="Quick follow ups">
+      <div className="flex flex-col gap-3">
+        <div className="flex flex-wrap gap-2">
+          <Select small ariaLabel="Enquiry or member" value={kind} onChange={(v) => setKind(v as 'enquiry' | 'member')} options={[{ value: 'enquiry', label: 'Enquiry' }, { value: 'member', label: 'Member' }]} className="w-auto" />
+          <TextInput small value={q} onChange={setQ} placeholder="Name, mobile number or code" className="min-w-[220px] flex-1" />
+        </div>
+        {q.trim().length < 3 && <p className="m-0 text-[13px] text-muted">Type at least 3 letters or digits.</p>}
+        {found.isLoading && q.trim().length >= 3 && <p className="m-0 text-[13px] text-muted" role="status">Searching…</p>}
+        {found.data && found.data.rows.length === 0 && <p className="m-0 text-[13px] text-muted">No {kind === 'enquiry' ? 'enquiry' : 'member'} matches “{q.trim()}”.</p>}
+        <div className="flex flex-col">
+          {(found.data?.rows ?? []).map((m) => (
+            <button key={m.id} type="button" className="row text-left" onClick={() => { onPick({ memberId: m.id, memberName: m.full_name }); setQ('') }}>
+              <span className="min-w-0 flex-1"><span className="font-semibold">{m.full_name}</span><span className="block text-[12px] text-muted">{m.client_code} · {m.phone ?? ''}</span></span>
+              <span className="btn btn-sm">Follow up</span>
+            </button>
+          ))}
+        </div>
+      </div>
+    </Sheet>
+  )
+}
+
 export default function Dashboard() {
   const access = useAccess()
   const me = useMe()
@@ -72,6 +105,7 @@ export default function Dashboard() {
   const [batchRange, setBatchRange] = useState({ key: 'today', range: presets('batch')[0].range })
   const [respond, setRespond] = useState<FollowUpTarget | null>(null)
   const [history, setHistory] = useState<{ id: string; name: string } | null>(null)
+  const [quick, setQuick] = useState(false)
 
   const summary = useQuery({ queryKey: ['dashboard', 'summary', sid], queryFn: () => dashboardSummary(sid) })
   const expected = useQuery({
@@ -101,6 +135,19 @@ export default function Dashboard() {
 
   const s = summary.data
   const expectedTotal = useMemo(() => (expected.data?.rows ?? []).reduce((a, r) => a + Number(r.expected_amount ?? 0), 0), [expected.data])
+  // YDL splits the expected amount: renewals, balance payments and new joinings (everything else).
+  const expectedSplit = useMemo(() => {
+    const t = { renewals: 0, balance: 0, fresh: 0 }
+    for (const r of expected.data?.rows ?? []) {
+      const a = Number(r.expected_amount ?? 0)
+      if (r.type === 'Membership Renewal' || r.type === 'PT Renewal') t.renewals += a
+      else if (r.type === 'Balance due') t.balance += a
+      else t.fresh += a
+    }
+    return t
+  }, [expected.data])
+  const ydl = s?.present_expired !== undefined   // the database has the YDL counts (migration 24)
+  const yesterday = plusDays(today, -1)
   const staffOptions = team.everyone.filter((x) => x.role !== 'doctor').map((x) => ({ value: x.id, label: x.full_name }))
   const followUpTypes = opts((lists?.followup_type ?? []).filter((i) => i.active).map((i) => i.label))
 
@@ -153,7 +200,7 @@ export default function Dashboard() {
     { label: 'Total open enquiries', value: String(s.open_enquiries), to: '/enquiries', right: 'open_enquiries' },
     { label: 'Total active members', value: String(s.active_members), to: '/members', right: 'active_members' },
     { label: 'Present check-ins', value: String(s.present_checkins), to: '/attendance/clients' },
-    { label: 'Live app installs', value: String(s.app_installs), to: '/members' },
+    { label: 'Live app installs', value: s.members_total ? `${s.app_installs} (${Math.round((s.app_installs / s.members_total) * 100)}%)` : String(s.app_installs), to: '/members' },
     { label: 'Active PT subscriptions', value: String(s.active_pt), to: '/registers/sessions', right: 'active_pt' },
     { label: 'Expired PT subscriptions', value: String(s.expired_pt), to: '/registers/expired', right: 'expired_pt' },
   ] as { label: string; value: string; to?: string; right?: string }[]).filter((c) => !c.right || access.can('dashboard_cards', c.right)) : []
@@ -164,27 +211,46 @@ export default function Dashboard() {
   return (
     <>
       <PageHeader title="Dashboard" sub={`${studio?.name ?? ''}${studio?.branch_name ? ` (${studio.branch_name})` : ''} · ${fmtDay(today, 'EEEE, d MMMM yyyy')}`}
-        actions={<>
-          <AlertsBell />
-          <Link to="/enquiries/new" className="btn-gold min-h-11"><Icon name="userPlus" size={18} />Add enquiry</Link>
-        </>} />
+        actions={<AlertsBell />} />
+
+      {/* YDL's shortcut bar */}
+      <nav aria-label="Shortcuts" className="no-scrollbar flex gap-2 overflow-x-auto px-5 pt-5 sm:flex-wrap lg:px-8 [&>*]:shrink-0">
+        <Link to="/enquiries/new" className="btn-gold min-h-11"><Icon name="userPlus" size={18} />Add enquiry</Link>
+        <Link to="/quick-billing" className="btn min-h-11"><Icon name="receipt" size={18} />Quick billing</Link>
+        <Link to="/registers/receipts" className="btn min-h-11"><Icon name="doc" size={18} />Receipts</Link>
+        <button type="button" className="btn min-h-11" onClick={() => setQuick(true)}><Icon name="list" size={18} />Quick follow up</button>
+        <Link to="/qr-links" className="btn min-h-11"><Icon name="qr" size={18} />QR codes &amp; links</Link>
+        <Link to="/members/quick" className="btn min-h-11"><Icon name="person" size={18} />Add quick member</Link>
+      </nav>
+      <nav aria-label="Lists to act on" className="no-scrollbar flex gap-2 overflow-x-auto px-5 pt-3 sm:flex-wrap lg:px-8 [&>*]:shrink-0">
+        {[
+          { to: '/attendance/clients?who=irregular_3d', label: 'Irregular members' },
+          { to: '/registers/balance-due', label: 'Balance due register' },
+          { to: '/registers/expired?preset=next_7&f_expiry=soon', label: 'Upcoming renewals' },
+          { to: `/follow-ups?mode=due&from=${plusDays(today, -60)}&to=${yesterday}`, label: 'Missed follow-ups of 60 days' },
+          { to: '/registers/expired?preset=last_30&f_expiry=expired', label: 'Expired membership register' },
+          { to: '/registers/expired?preset=over_7&f_expiry=expired', label: 'Pending renewals (more than 7 days)' },
+          ...(me.role === 'owner' ? [{ to: '/analysis/branches', label: 'View branch analysis' }] : []),
+        ].map((l) => <Link key={l.label} to={l.to} className="chip chip-muted min-h-9 no-underline">{l.label}</Link>)}
+      </nav>
 
       {/* Alerts */}
       <div className="grid grid-cols-1 gap-3 px-5 pt-5 sm:grid-cols-3 lg:px-8">
-        <Link to="/registers/expired" className="kpi border-red/30">
+        {/* YDL counts the clients in today's traffic (checked in today); before the database update, all clients. */}
+        <Link to={ydl ? '/attendance/clients?day=today&with=expired' : '/registers/expired'} className="kpi border-red/30">
           <span className="kpi-label">Clients with expired membership</span>
-          <span className="kpi-value text-red">{s?.expired_recent ?? '–'}</span>
-          <span className="text-[12px] text-muted">Ended in the last 30 days, not renewed</span>
+          <span className="kpi-value text-red">{(ydl ? s?.present_expired : s?.expired_recent) ?? '–'}</span>
+          <span className="text-[12px] text-muted">{ydl ? 'Checked in today · view clients' : 'Ended in the last 30 days, not renewed'}</span>
         </Link>
-        <Link to="/registers/expired" className="kpi border-amber/30">
+        <Link to={ydl ? '/attendance/clients?day=today&with=soon' : '/registers/expired'} className="kpi border-amber/30">
           <span className="kpi-label">Clients with about-to-expire membership</span>
-          <span className="kpi-value text-amber">{s?.about_to_expire ?? '–'}</span>
-          <span className="text-[12px] text-muted">Ending in the next {soonDays} days</span>
+          <span className="kpi-value text-amber">{(ydl ? s?.present_about : s?.about_to_expire) ?? '–'}</span>
+          <span className="text-[12px] text-muted">{ydl ? `Checked in today, ending within ${soonDays} days` : `Ending in the next ${soonDays} days`}</span>
         </Link>
-        <Link to="/registers/balance-due" className="kpi border-gold/30">
+        <Link to={ydl ? '/attendance/clients?day=today&with=balance' : '/registers/balance-due'} className="kpi border-gold/30">
           <span className="kpi-label">Clients with balance payments</span>
-          <span className="kpi-value text-gold">{s?.balance_clients ?? '–'}</span>
-          <span className="text-[12px] text-muted">{s ? `${money(s.balance_amount)} to collect` : ''}</span>
+          <span className="kpi-value text-gold">{(ydl ? s?.present_balance : s?.balance_clients) ?? '–'}</span>
+          <span className="text-[12px] text-muted">{ydl ? 'Checked in today · view clients' : s ? `${money(s.balance_amount)} to collect` : ''}</span>
         </Link>
       </div>
 
@@ -209,7 +275,8 @@ export default function Dashboard() {
         </div>
       </Block>
 
-      <Block id="expected-h" title={`Expected payments (total payments: ${expected.data?.total ?? 0}, total amount: ${money(expectedTotal)})`}>
+      <Block id="expected-h" title={`Expected payments (total payments: ${expected.data?.total ?? 0}, total amount: ${money(expectedTotal)})`}
+        right={<span className="text-[13px] text-muted">Renewals {money(expectedSplit.renewals)} · Balance {money(expectedSplit.balance)} · New {money(expectedSplit.fresh)}</span>}>
         <DataTable caption="Expected payments" rows={expected.data?.rows ?? []} loading={expected.isLoading} rowKey={(r) => r.id}
           columns={fuColumns(true)} card={fuCard(true)} empty="No payments expected in this period." />
       </Block>
@@ -259,21 +326,33 @@ export default function Dashboard() {
 
       <div className="grid grid-cols-1 gap-0 lg:grid-cols-2">
         <Block id="traffic-h" title={`Current traffic (${fmtDay(today)})`} right={<Link to="/reports/traffic" className="btn btn-sm">See traffic insights</Link>}>
-          <div className="card grid grid-cols-2 gap-3 p-4">
-            <div><div className="kpi-label">In the studio now</div><div className="kpi-value">{s?.present_checkins ?? '–'}</div></div>
+          <div className="card grid grid-cols-2 gap-3 p-4 sm:grid-cols-3">
+            <div><div className="kpi-label">Present traffic</div><div className="kpi-value">{s?.present_checkins ?? '–'}</div></div>
+            <div><div className="kpi-label">Traffic rate</div><div className="kpi-value">{s?.capacity ? `${Math.round(((s.present_checkins ?? 0) / s.capacity) * 1000) / 10}%` : '–'}</div>
+              <div className="text-[12px] text-muted">{s?.capacity ? `of ${s.capacity} capacity` : 'Set the capacity in My Fitness Centers'}</div></div>
             <div><div className="kpi-label">Checked in today</div><div className="kpi-value">{s?.checkins_today ?? '–'}</div></div>
+            {ydl && <>
+              <div><div className="kpi-label">Total men</div><div className="kpi-value">{s?.checkins_men}</div></div>
+              <div><div className="kpi-label">Total women</div><div className="kpi-value">{s?.checkins_women}</div></div>
+              <div><div className="kpi-label">Gender not given</div><div className="kpi-value">{(s?.checkins_unknown ?? 0) + (s?.checkins_other ?? 0)}</div></div>
+            </>}
           </div>
         </Block>
         <Block id="links-h" title="Quick links">
-          <div className="grid grid-cols-3 gap-2.5">
+          <div className="card overflow-hidden">
             {[
-              { to: '/enquiries/new', label: 'Add enquiry', icon: 'userPlus' },
-              { to: '/members/new', label: 'Add member', icon: 'person' },
-              { to: '/quick-billing', label: 'Quick billing', icon: 'receipt' },
-              { to: '/attendance/mark', label: 'Mark attendance', icon: 'check' },
-              { to: '/follow-ups', label: 'Follow-ups', icon: 'list' },
-              { to: '/registers/receipts', label: 'Receipts', icon: 'doc' },
-            ].map((q) => <Link key={q.to} to={q.to} className="qa min-h-[76px]"><Icon name={q.icon} size={20} />{q.label}</Link>)}
+              { to: '/attendance/clients?day=yesterday&with=expired', label: 'Members who checked in yesterday whose membership got expired', n: s?.yesterday_expired },
+              ...(access.can('dashboard_cards', 'balance') ? [{ to: '/attendance/clients?day=yesterday&with=balance', label: 'Members who checked in yesterday whose balance payment is pending', n: s?.yesterday_balance }] : []),
+              { to: `/follow-ups?mode=due&from=${yesterday}&to=${yesterday}`, label: "Yesterday's missed follow ups", n: undefined },
+              { to: `/follow-ups?mode=due&to=${yesterday}`, label: 'Missed follow ups overall', n: undefined },
+              { to: '/attendance/mark', label: 'Mark attendance', n: undefined },
+            ].map((q) => (
+              <Link key={q.label} to={q.to} className="row no-underline">
+                <span className="min-w-0 flex-1 text-[14px]">{q.label}</span>
+                {q.n !== undefined && <span className="chip chip-muted">{q.n}</span>}
+                <Icon name="chevronRight" size={16} />
+              </Link>
+            ))}
           </div>
         </Block>
       </div>
@@ -329,6 +408,7 @@ export default function Dashboard() {
         })}
       </div>
 
+      <QuickFollowUp open={quick} onClose={() => setQuick(false)} onPick={(t) => { setQuick(false); setRespond(t) }} />
       <FollowUpDialog target={respond} onClose={() => setRespond(null)} />
       <FollowUpHistory member={history} onClose={() => setHistory(null)} />
     </>

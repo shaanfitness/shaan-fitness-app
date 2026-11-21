@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { useMe } from '../../auth'
 import { supabase } from '../../lib/supabase'
-import { amt, stateChip, STATE_LABEL, type Sub } from '../../db/billing'
+import { amt, stateChip, STATE_LABEL, ydlState, type Sub } from '../../db/billing'
 import { useStudio } from '../../db/studio'
 import { fmtDay, plusDays, studioToday } from '../../lib/dates'
 import { downloadCsv } from '../../lib/csv'
@@ -25,8 +25,11 @@ function query(studioId: string, f: { search: string; genders: string[]; states:
   if (f.genders.length) q = q.in('member_gender', f.genders)
   const st = f.states
   const ors: string[] = []
-  const plain = st.filter((x) => ['active', 'pending', 'expired', 'used'].includes(x))
+  // YDL: "Expired" = ended and not renewed; "Used" = sessions used up, or ended and renewed.
+  const plain = st.filter((x) => ['active', 'pending'].includes(x))
   if (plain.length) ors.push(`state.in.(${plain.join(',')})`)
+  if (st.includes('expired')) ors.push('and(state.eq.expired,renewed.eq.false)')
+  if (st.includes('used')) ors.push('state.eq.used,and(state.eq.expired,renewed.eq.true)')
   if (st.includes('soon')) ors.push(`and(state.eq.active,end_date.gte.${today},end_date.lte.${plusDays(today, f.soon)})`)
   if (st.includes('retained')) ors.push('is_renewal.eq.true')
   if (ors.length) q = q.or(ors.join(','))
@@ -68,7 +71,7 @@ export default function Subscriptions() {
     downloadCsv(`subscriptions-${today}.csv`, (res.data ?? []) as Sub[], [
       ['Invoice No.', (r) => r.invoice_no], ['Invoice Date', (r) => r.invoice_date], ['Customer Name', (r) => r.member_name], ['Customer Code', (r) => r.client_code],
       ['Mobile', (r) => (r.member_phone ? `${r.member_country_code} ${r.member_phone}` : '')], ['Plan Name', (r) => r.plan_name], ['Type', (r) => r.kind],
-      ['Start Date', (r) => r.start_date], ['End Date', (r) => r.end_date], ['Plan Status', (r) => STATE_LABEL[r.state]], ['Total Price', (r) => r.total_amount],
+      ['Start Date', (r) => r.start_date], ['End Date', (r) => r.end_date], ['Plan Status', (r) => STATE_LABEL[ydlState(r)]], ['Total Price', (r) => r.total_amount],
       ['Paid Price', (r) => r.paid_amount], ['Balance Price', (r) => r.balance_amount], ['Payment Status', (r) => r.payment_status], ['Trainer', (r) => r.trainer_name],
       ['Bill Rep', (r) => r.bill_rep_name], ['Renewal', (r) => (r.is_renewal ? 'Yes' : 'No')],
     ])
@@ -86,7 +89,7 @@ export default function Subscriptions() {
     { key: 'plan', header: 'Plan Name', cell: (r) => <><div>{r.plan_name}</div>{r.kind !== 'gym' && <div className="text-[12px] text-muted">{r.kind === 'pt' ? 'Personal training' : 'Trial'}</div>}</> },
     { key: 'start', header: 'Start Date', className: 'nowrap', cell: (r) => fmtDay(r.start_date) },
     { key: 'end', header: 'End Date', className: 'nowrap', cell: (r) => fmtDay(r.end_date) },
-    { key: 'state', header: 'Plan Status', cell: (r) => <span className={`chip ${stateChip(r.state)}`}>{STATE_LABEL[r.state]}</span> },
+    { key: 'state', header: 'Plan Status', cell: (r) => <span className={`chip ${stateChip(ydlState(r))}`}>{STATE_LABEL[ydlState(r)]}</span> },
     { key: 'total', header: 'Total Price', className: 'num', cell: (r) => amt(r.total_amount) },
     { key: 'paid', header: 'Paid Price', className: 'num', cell: (r) => amt(r.paid_amount) },
     { key: 'bal', header: 'Balance Price', className: 'num', cell: (r) => <span className={r.balance_amount > 0 ? 'font-semibold text-red' : ''}>{amt(r.balance_amount)}</span> },
@@ -96,7 +99,7 @@ export default function Subscriptions() {
   const card = (r: Sub) => (
     <div className="flex flex-col gap-2">
       <div className="flex items-start justify-between gap-2"><ClientCell id={r.member_id} name={r.member_name} code={r.client_code} countryCode={r.member_country_code} phone={r.member_phone} />
-        <span className={`chip ${stateChip(r.state)}`}>{STATE_LABEL[r.state]}</span></div>
+        <span className={`chip ${stateChip(ydlState(r))}`}>{STATE_LABEL[ydlState(r)]}</span></div>
       <div className="text-[13px]">{r.plan_name} · {fmtDay(r.start_date)} – {fmtDay(r.end_date)}</div>
       <div className="text-[12px] text-muted">{r.invoice_no} · Total {amt(r.total_amount)} · Paid {amt(r.paid_amount)} · <span className={r.balance_amount > 0 ? 'text-red' : ''}>Balance {amt(r.balance_amount)}</span></div>
       {actions(r)}

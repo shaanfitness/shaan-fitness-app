@@ -284,7 +284,7 @@ function SocialForm({ studio }: { studio: Studio }) {
   )
 }
 
-function QrCard({ title, text, url, file }: { title: string; text: string; url: string; file: string }) {
+export function QrCard({ title, text, url, file }: { title: string; text: string; url: string; file: string }) {
   const [svg, setSvg] = useState('')
   useEffect(() => {
     let live = true
@@ -307,5 +307,26 @@ function QrCard({ title, text, url, file }: { title: string; text: string; url: 
         </div>
       </div>
     </section>
+  )
+}
+
+// YDL "QR Codes & Links" (the dashboard's shortcut): every public link of the studio with its QR code, to copy,
+// print or share. The forms are the app's own; people who fill them in land as enquiries in the CRM.
+export function QrLinks() {
+  const origin = window.location.origin
+  const { data: studio } = useStudio()
+  const links = [
+    { title: 'Enroll Now', text: 'The join form: whoever fills it in becomes an enquiry, with a follow-up for the front desk.', url: `${origin}/join`, file: 'enroll-now' },
+    { title: 'Free assessment form', text: 'The website\'s assessment form: name and number, and the studio calls back.', url: `${origin}/fitness-assessment-kakinada`, file: 'assessment-form' },
+    { title: 'Member app', text: 'Members open their app here and add it to the home screen (Android and iPhone).', url: `${origin}/app`, file: 'member-app' },
+    { title: 'Website', text: 'The studio\'s website.', url: `${origin}/`, file: 'website' },
+  ]
+  return (
+    <>
+      <PageHeader title="QR Codes & Links" sub={studio?.name ?? ''} />
+      <div className="grid grid-cols-1 gap-4 px-5 py-5 lg:grid-cols-2 lg:px-8">
+        {links.map((l) => <QrCard key={l.file} {...l} />)}
+      </div>
+    </>
   )
 }

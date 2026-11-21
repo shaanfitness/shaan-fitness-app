@@ -285,6 +285,18 @@ export interface DashboardSummary {
   app_installs: number
   expired_recent: number
   about_to_expire: number
+  // Added to match YDL (migration 24); missing until the database update is run.
+  members_total?: number
+  capacity?: number | null
+  checkins_men?: number
+  checkins_women?: number
+  checkins_other?: number
+  checkins_unknown?: number
+  present_expired?: number
+  present_about?: number
+  present_balance?: number
+  yesterday_expired?: number
+  yesterday_balance?: number
 }
 
 export interface BatchSummaryRow {

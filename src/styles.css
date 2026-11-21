@@ -252,3 +252,7 @@
   :root[data-theme="clinic"] .lang-switch button { border-radius: 999px; font-size: 13px; }
   :root[data-theme="clinic"] .me-avatar { border: 0; background: var(--color-accent-tint); color: var(--color-gold); font-family: var(--font-sans); font-size: 14px; font-weight: 700; }
 }
+
+/* A row that scrolls sideways on phones (dashboard shortcuts) without a visible scrollbar. */
+.no-scrollbar { scrollbar-width: none; }
+.no-scrollbar::-webkit-scrollbar { display: none; }

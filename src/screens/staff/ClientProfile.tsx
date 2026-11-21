@@ -3,7 +3,7 @@ import { Link, NavLink, useNavigate, useParams } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useMe } from '../../auth'
 import {
-  amt, checkInClient, freezeHistory, isOpen, memberSubscriptions, PAR_Q, DOCUMENT_TYPES, saveMedical, sendNotification, stateChip, STATE_LABEL, type Sub,
+  amt, checkInClient, freezeHistory, isOpen, memberSubscriptions, PAR_Q, DOCUMENT_TYPES, saveMedical, sendNotification, stateChip, STATE_LABEL, ydlState, type Sub,
 } from '../../db/billing'
 import { followUpHistory } from '../../db/followUps'
 import {
@@ -215,7 +215,7 @@ function SubTable({ subs, isDesk, onEdit, full }: { subs: Sub[]; isDesk: boolean
                 <td className="nowrap">{fmtDay(s.start_date, 'dd-MM-yyyy')}</td>
                 <td className="nowrap">{fmtDay(s.end_date, 'dd-MM-yyyy')}</td>
                 <td className="num">{isDesk ? amt(s.total_amount) : '—'}</td>
-                <td><span className={`chip ${stateChip(s.state)}`}>{STATE_LABEL[s.state]}</span></td>
+                <td><span className={`chip ${stateChip(ydlState(s))}`}>{STATE_LABEL[ydlState(s)]}</span></td>
                 <td>{isDesk && (s.payment_status === 'paid'
                   ? <span className="chip chip-green">Paid</span>
                   : <span className="text-[12px] font-semibold text-red">Balance:: {amt(s.balance_amount)}</span>)}</td>

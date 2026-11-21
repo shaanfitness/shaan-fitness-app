@@ -33,8 +33,9 @@ export default function FollowUps() {
   const isDesk = me.role === 'owner' || me.role === 'front_desk'
 
   const [mode, setMode] = useState<Mode>((params.get('mode') as Mode) || 'due')
-  const [from, setFrom] = useState('')
-  const [to, setTo] = useState(today)
+  // The dashboard's links open it on a period (YDL "Missed Follow-ups of 60 days", "Yesterday's Missed Follow ups").
+  const [from, setFrom] = useState(params.get('from') ?? '')
+  const [to, setTo] = useState(params.get('to') ?? today)
   const [search, setSearch] = useState('')
   const [gender, setGender] = useState('')
   const [conv, setConv] = useState('')

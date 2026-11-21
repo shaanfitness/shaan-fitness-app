@@ -4,7 +4,7 @@ import { decideRequest } from '../../db/team'
 import { CsvOnly } from '../../access-ui'
 import { Link } from 'react-router-dom'
 import type { ReactNode } from 'react'
-import { amt, stateChip, STATE_LABEL, type Receipt, type Sub, type SubState } from '../../db/billing'
+import { amt, stateChip, STATE_LABEL, ydlState, type Receipt, type Sub, type SubState } from '../../db/billing'
 import { fmtDateTime, fmtDay } from '../../lib/dates'
 import { ClientCell } from '../../components/client'
 import { ActionMenu } from '../../components/controls'
@@ -108,7 +108,7 @@ const subActions = (ctx: RegisterCtx, extra: { label: string; onClick: (r: S) =>
 const subCsv = (): [string, (r: S) => unknown][] => [
   ['Invoice No.', (r) => r.invoice_no], ['Invoice Date', (r) => r.invoice_date], ['Customer Name', (r) => r.member_name], ['Customer Code', (r) => r.client_code],
   ['Mobile', (r) => r.member_phone], ['Plan Name', (r) => r.plan_name], ['Type', (r) => r.kind], ['Start Date', (r) => r.start_date], ['End Date', (r) => r.end_date],
-  ['Plan Status', (r) => STATE_LABEL[r.state]], ['Net Sale Amount', (r) => r.net_amount], ['GST', (r) => r.gst_amount], ['Total Sale Amount', (r) => r.total_amount],
+  ['Plan Status', (r) => STATE_LABEL[ydlState(r)]], ['Net Sale Amount', (r) => r.net_amount], ['GST', (r) => r.gst_amount], ['Total Sale Amount', (r) => r.total_amount],
   ['Paid', (r) => r.paid_amount], ['Balance', (r) => r.balance_amount], ['Payment Status', (r) => r.payment_status], ['Trainer', (r) => r.trainer_name],
   ['Bill Rep', (r) => r.bill_rep_name], ['Client Rep', (r) => r.client_rep_name], ['Renewal', (r) => (r.is_renewal ? 'Yes' : 'No')],
 ]
@@ -119,7 +119,7 @@ const saleCols = (ctx: RegisterCtx): Column<S>[] => [
   { key: 'plan', header: 'Plan Name', cell: (r) => <>{r.plan_name}{r.is_renewal ? <div className="text-[12px] text-muted">Renewal</div> : null}</> },
   { key: 'start', header: 'Start Date', className: 'nowrap', cell: (r) => day(r.start_date) },
   { key: 'end', header: 'End Date', className: 'nowrap', cell: (r) => day(r.end_date) },
-  { key: 'state', header: 'Plan Status', cell: (r) => chip(r.state) },
+  { key: 'state', header: 'Plan Status', cell: (r) => chip(ydlState(r)) },
   { key: 'net', header: 'Net Sale Amount', className: 'num', cell: (r) => amt(r.net_amount) },
   { key: 'gst', header: 'GST', className: 'num', cell: (r) => amt(r.gst_amount) },
   { key: 'total', header: 'Total Sale Amount', className: 'num', cell: (r) => amt(r.total_amount) },
@@ -190,7 +190,7 @@ export const couponRegister: RegisterDef<S> = {
   columns: (ctx) => [
     nameCol, { key: 'plan', header: 'Plan Name', cell: (r) => r.plan_name },
     { key: 'start', header: 'Start Date', className: 'nowrap', cell: (r) => day(r.start_date) }, { key: 'end', header: 'End Date', className: 'nowrap', cell: (r) => day(r.end_date) },
-    { key: 'state', header: 'Plan Status', cell: (r) => chip(r.state) }, { key: 'pd', header: 'Payment Date', className: 'nowrap', cell: (r) => day(r.last_receipt_date ?? r.invoice_date) },
+    { key: 'state', header: 'Plan Status', cell: (r) => chip(ydlState(r)) }, { key: 'pd', header: 'Payment Date', className: 'nowrap', cell: (r) => day(r.last_receipt_date ?? r.invoice_date) },
     { key: 'cn', header: 'Coupon Name', cell: (r) => r.coupon_name ?? '—' }, { key: 'cc', header: 'Coupon Code', cell: (r) => <span className="font-semibold">{r.coupon_code}</span> },
     { key: 'ct', header: 'Coupon Type', cell: (r) => (r.coupon_type ?? '').replace('_', ' + ') }, { key: 'cs', header: 'Coupon Status', cell: (r) => (r.coupon_active ? <span className="chip chip-green">Active</span> : <span className="chip chip-muted">Inactive</span>) },
     { key: 'sale', header: 'Sale Amount', className: 'num', cell: (r) => amt(r.selling_price + r.sign_up_fee) }, { key: 'disc', header: 'Coupon Discount', className: 'num', cell: (r) => amt(r.coupon_discount) },
@@ -258,7 +258,7 @@ export const recurringRegister: RegisterDef<S> = {
     { key: 'inv', header: 'Invoice No.', className: 'nowrap', cell: (r) => r.invoice_no ?? '—' }, nameCol,
     { key: 'pd', header: 'Purchase Date', className: 'nowrap', cell: (r) => day(r.invoice_date) }, { key: 'plan', header: 'Plan Name', cell: (r) => r.plan_name },
     { key: 'start', header: 'Start Date', className: 'nowrap', cell: (r) => day(r.start_date) }, { key: 'end', header: 'End Date', className: 'nowrap', cell: (r) => day(r.end_date) },
-    { key: 'state', header: 'Plan Status', cell: (r) => chip(r.state) }, { key: 'total', header: 'Total Price', className: 'num', cell: (r) => amt(r.total_amount) },
+    { key: 'state', header: 'Plan Status', cell: (r) => chip(ydlState(r)) }, { key: 'total', header: 'Total Price', className: 'num', cell: (r) => amt(r.total_amount) },
     { key: 'bal', header: 'Total Balance Amount', className: 'num', cell: (r) => amt(r.balance_amount) }, { key: 'paid', header: 'Paid Price', className: 'num', cell: (r) => amt(r.paid_amount) },
     { key: 'npa', header: 'Next Payable Amount', className: 'num', cell: (r) => amt((r as S & { next_payable_amount: number | null }).next_payable_amount) },
     { key: 'npd', header: 'Next Payable Date', className: 'nowrap', cell: (r) => day((r as S & { next_payable_date: string | null }).next_payable_date) }, subActions(ctx),

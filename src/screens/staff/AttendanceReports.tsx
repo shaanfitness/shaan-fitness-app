@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useMe } from '../../auth'
 import { supabase } from '../../lib/supabase'
@@ -180,11 +180,16 @@ export function ClientTraffic() {
   const { data: plans = [] } = usePlans()
   const today = studioToday()
   const soon = Number(studio?.settings.about_to_expire_days ?? 7)
-  const [range, setRange] = useState({ key: 'last_3', from: plusDays(today, -3), to: today })
+  // The dashboard's links open it filtered, like YDL's (?day=today|yesterday, ?with=expired,soon,balance, ?who=irregular_3d).
+  const [params] = useSearchParams()
+  const day = params.get('day')
+  const list = (k: string) => (params.get(k) ?? '').split(',').filter(Boolean)
+  const [range, setRange] = useState(day === 'today' ? { key: 'custom', from: today, to: today }
+    : day === 'yesterday' ? { key: 'custom', from: plusDays(today, -1), to: plusDays(today, -1) } : { key: 'last_3', from: plusDays(today, -3), to: today })
   const [search, setSearch] = useState('')
   const [panel, setPanel] = useState(false)
   const [f, setF] = useState({ genders: [] as string[], present: [] as string[], time: [] as string[], ages: [] as string[], levels: [] as string[],
-    who: [] as string[], balance: [] as string[], status: [] as string[], withSub: [] as string[], category: '', plan: '' })
+    who: list('who'), balance: [] as string[], status: [] as string[], withSub: list('with'), category: '', plan: '' })
   const [selected, setSelected] = useState<Set<string>>(new Set())
   const [fu, setFu] = useState<FollowUpTarget | null>(null)
   const [page, setPage] = useState(0)

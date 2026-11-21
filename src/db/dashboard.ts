@@ -14,13 +14,14 @@ export async function batchSummary(studioId: string, from: string, to: string) {
 
 export async function expiredSubscriptions(studioId: string, today: string, limit = 8) {
   const since = new Date(Date.parse(today) - 30 * 86400_000).toISOString().slice(0, 10)
-  return throwIf(await supabase.from('subscription_overview').select('*').eq('studio_id', studioId).eq('state', 'expired')
+  // YDL "Expired": ended and not renewed
+  return throwIf(await supabase.from('subscription_overview').select('*').eq('studio_id', studioId).eq('state', 'expired').eq('renewed', false)
     .in('kind', ['gym', 'pt']).gte('end_date', since).order('end_date', { ascending: false }).limit(limit)) as SubscriptionOverview[]
 }
 
 export async function upcomingRenewals(studioId: string, today: string, days: number, limit = 8) {
   const until = new Date(Date.parse(today) + days * 86400_000).toISOString().slice(0, 10)
-  return throwIf(await supabase.from('subscription_overview').select('*').eq('studio_id', studioId).in('state', ['active', 'frozen'])
+  return throwIf(await supabase.from('subscription_overview').select('*').eq('studio_id', studioId).in('state', ['active', 'frozen']).eq('renewed', false)
     .in('kind', ['gym', 'pt']).gte('end_date', today).lte('end_date', until).order('end_date').limit(limit)) as SubscriptionOverview[]
 }
 

@@ -4,7 +4,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useMe } from '../../auth'
 import { supabase } from '../../lib/supabase'
 import { throwIf, useStudio, useTeam } from '../../db/studio'
-import { getSubscription, stateChip, STATE_LABEL } from '../../db/billing'
+import { getSubscription, stateChip, STATE_LABEL, ydlState } from '../../db/billing'
 import { daysFrom, fmtDateTime, fmtDay, plusDays, studioToday } from '../../lib/dates'
 import { downloadCsv } from '../../lib/csv'
 import { Field, Notice, Select, TextInput } from '../../components/controls'
@@ -61,7 +61,7 @@ function SubscriptionSessions({ id }: { id: string }) {
         actions={<Link to="/registers/sessions" className="btn btn-sm">All PT subscriptions</Link>} />
       <div className="flex flex-col gap-4 px-5 pt-5 pb-8 lg:px-8">
         <div className="card grid grid-cols-2 gap-4 p-5 text-[13px] md:grid-cols-4">
-          <div><div className="text-muted">Plan</div><div className="font-semibold">{s.plan_name}</div><span className={`chip ${stateChip(s.state)} mt-1`}>{STATE_LABEL[s.state]}</span></div>
+          <div><div className="text-muted">Plan</div><div className="font-semibold">{s.plan_name}</div><span className={`chip ${stateChip(ydlState(s))} mt-1`}>{STATE_LABEL[ydlState(s)]}</span></div>
           <div><div className="text-muted">Trainer</div><div className="font-semibold">{s.trainer_name ?? '—'}</div></div>
           <div><div className="text-muted">Dates</div><div className="font-semibold">{fmtDay(s.start_date)} – {fmtDay(s.end_date)}</div></div>
           <div><div className="text-muted">Sessions</div><div className="text-[22px] font-bold">{s.sessions_used} <span className="text-[14px] font-normal text-muted">/ {s.sessions_total ?? '∞'} · {s.sessions_left ?? '∞'} left</span></div></div>

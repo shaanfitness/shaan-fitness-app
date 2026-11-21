@@ -64,6 +64,7 @@ export function presets(kind: Kind, todayIso = studioToday()): Preset[] {
       { key: 'next_7', label: 'Next 7 Days', range: r(t, addDays(t, 7)) },
       { key: 'next_30', label: 'Next 30 Days', range: r(t, addDays(t, 30)) },
       { key: 'last_30', label: 'Last 30 Days', range: r(addDays(t, -30), t) },
+      { key: 'over_7', label: 'Not renewed for more than 7 days', range: r(null, addDays(t, -8)) },
     ]
   }
 }

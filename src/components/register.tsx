@@ -1,5 +1,5 @@
 import { useMemo, useState, type ReactNode } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useMe } from '../auth'
 import { supabase } from '../lib/supabase'
@@ -103,10 +103,16 @@ export function Register<T extends { id?: string }>({ def }: { def: RegisterDef<
   const me = useMe()
   const ctx = useRegisterCtx()
   const choices = rangePresets(def.presetKind, ctx.today)
-  const [rangeKey, setRangeKey] = useState(def.defaultPreset ?? choices[0].key)
-  const [range, setRange] = useState<Range>((choices.find((c) => c.key === (def.defaultPreset ?? choices[0].key)) ?? choices[0]).range)
+  // Links can open a register already filtered (the dashboard's quick links, like YDL's):
+  //   ?preset=<range key>  or  ?from=yyyy-mm-dd&to=yyyy-mm-dd,  and  ?f_<filter key>=<value>
+  const [params] = useSearchParams()
+  const asked = params.get('preset')
+  const startKey = asked && choices.some((c) => c.key === asked) ? asked : params.get('from') || params.get('to') ? 'custom' : def.defaultPreset ?? choices[0].key
+  const [rangeKey, setRangeKey] = useState(startKey)
+  const [range, setRange] = useState<Range>(startKey === 'custom' ? { from: params.get('from'), to: params.get('to') }
+    : (choices.find((c) => c.key === startKey) ?? choices[0]).range)
   const [search, setSearch] = useState('')
-  const [ui, setUi] = useState<Record<string, string>>({})
+  const [ui, setUi] = useState<Record<string, string>>(() => Object.fromEntries([...params.entries()].filter(([k]) => k.startsWith('f_')).map(([k, v]) => [k.slice(2), v])))
   const [genders, setGenders] = useState<string[]>([])
   const [states, setStates] = useState<string[]>([])
   const [payments, setPayments] = useState<string[]>([])

@@ -7,6 +7,8 @@ export type SubState = 'pending' | 'active' | 'frozen' | 'expired' | 'used' | 'c
 
 export interface Sub {
   id: string
+  /** A later plan of the same kind started after this one (subscription_overview.renewed). */
+  renewed?: boolean | null
   studio_id: string
   member_id: string
   plan_id: string
@@ -103,6 +105,8 @@ export const STATE_LABEL: Record<SubState, string> = {
   pending: 'Pending', active: 'Active', frozen: 'Frozen', expired: 'Expired', used: 'Used', cancelled: 'Cancelled',
   deleted: 'Deleted', transferred: 'Transferred', upgraded: 'Upgraded', downgraded: 'Downgraded',
 }
+/** The status YDL shows: an ended plan the client renewed is "Used"; "Expired" means ended and not renewed. */
+export const ydlState = (s: { state: SubState; renewed?: boolean | null }): SubState => (s.state === 'expired' && s.renewed ? 'used' : s.state)
 export const stateChip = (s: SubState) =>
   s === 'active' ? 'chip-green' : s === 'pending' || s === 'frozen' ? 'chip-amber' : s === 'expired' || s === 'used' ? 'chip-muted' : 'chip-red'
 
