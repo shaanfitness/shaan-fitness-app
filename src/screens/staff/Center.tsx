@@ -444,7 +444,28 @@ export function CurrencySetting() {
 }
 
 // Biometric Manager and Extended Biometric Manager ----------------------------------------------------------------
-interface Device { id: string; serial: string; name: string; device_type: string; storage_types: string[]; scan_type: string; expiry_rule: boolean; server: string; active: boolean; created_at: string }
+interface Device {
+  id: string; serial: string; name: string; device_type: string; storage_types: string[]; scan_type: string; expiry_rule: boolean; server: string; active: boolean; created_at: string
+  last_seen_at?: string | null; push_version?: string | null
+}
+interface DeviceCount { device_id: string; users: number; with_fingers: number; blocked: number; punches_today: number; waiting: number }
+interface Punch { id: number; device_id: string; pin: string; punched_at: string; result: string; member_id: string | null; member_name: string | null; client_code: string | null; staff_name: string | null }
+interface DeviceCmd { id: string; command: string; biometric_code: string | null; status: string; result: string | null; created_at: string; member_id: string | null; member_name: string | null; staff_name: string | null }
+interface UnknownDevice { serial: string; last_seen_at: string; hits: number }
+const PUNCH: Record<string, [string, string]> = {
+  check_in: ['Checked in', 'chip-green'], check_out: ['Checked out', 'chip-info'], repeat: ['Repeat punch', 'chip-muted'], unknown: ['Code not found', 'chip-amber'],
+  before_switch: ['Before the switch', 'chip-muted'], staff_in: ['Staff in', 'chip-green'], staff_out: ['Staff out', 'chip-info'],
+}
+const CMD: Record<string, string> = { add: 'Add to device', re_add: 'Add again', block: 'Block', unblock: 'Unblock', delete: 'Delete from device', sync: 'Sync', update_expiry: 'Update expiry', fingers: 'Read fingerprints' }
+const CMD_STATUS: Record<string, [string, string]> = { queued: ['Waiting for device', 'chip-muted'], sent: ['Sent', 'chip-info'], done: ['Done', 'chip-green'], failed: ['Failed', 'chip-red'] }
+// The device asks for commands every few seconds, so a device heard from in the last 3 minutes is online.
+function deviceState(d: Device): [string, string] {
+  if (!d.last_seen_at) return ['Not connected yet', 'chip-muted']
+  return Date.now() - Date.parse(d.last_seen_at) < 180_000 ? ['Online', 'chip-green'] : [`Last seen ${fmtDateTime(d.last_seen_at)}`, 'chip-amber']
+}
+// Device activity is refreshed every 30 seconds while the page is open; before the database update it's simply empty.
+const LIVE = { retry: false, refetchInterval: 30_000 } as const
+const people = (n: number) => `${n} ${n === 1 ? 'person' : 'people'}`
 interface Operation { id: string; device_id: string; operation: string; status: string; result: string | null; created_at: string }
 const OPS = [['clear_logs', 'Clear Logs From Device'], ['restart', 'Restart Biometric Device'], ['reset_op_stamp', 'Reset OP Stamp'], ['unblock_active', 'Unblock Active Members']]
 const SCAN = [['finger', 'Finger'], ['face', 'Face'], ['face_ex', 'Face Ex'], ['face_finger', 'Face & Finger']]
@@ -466,15 +487,27 @@ export function BiometricManager({ extended }: { extended?: boolean }) {
   const toast = useToast()
   const qc = useQueryClient()
   const { data: studio } = useStudio()
-  const devices = useQuery({ queryKey: ['biometric_devices', me.studioId], queryFn: async () =>
+  const devices = useQuery({ queryKey: ['biometric_devices', me.studioId], refetchInterval: 30_000, queryFn: async () =>
     throwIf(await supabase.from('biometric_devices').select('*').eq('studio_id', me.studioId).order('created_at')) as Device[] })
+  const counts = useQuery({ queryKey: ['device_summary', me.studioId], ...LIVE, queryFn: async () =>
+    throwIf(await supabase.rpc('device_summary', { p_studio: me.studioId })) as DeviceCount[] })
+  const punches = useQuery({ queryKey: ['device_punches', me.studioId], ...LIVE, queryFn: async () =>
+    throwIf(await supabase.from('device_punch_list').select('*').eq('studio_id', me.studioId).order('punched_at', { ascending: false }).limit(50)) as Punch[] })
+  const cmds = useQuery({ queryKey: ['device_commands', me.studioId], ...LIVE, queryFn: async () =>
+    throwIf(await supabase.from('device_command_list').select('*').eq('studio_id', me.studioId).order('created_at', { ascending: false }).limit(50)) as DeviceCmd[] })
+  const unknown = useQuery({ queryKey: ['device_unknown'], ...LIVE, enabled: me.role === 'owner', queryFn: async () =>
+    throwIf(await supabase.from('device_unknown').select('serial,last_seen_at,hits').order('last_seen_at', { ascending: false }).limit(10)) as UnknownDevice[] })
   const ops = useQuery({ queryKey: ['device_operations', me.studioId], queryFn: async () =>
     throwIf(await supabase.from('device_operations').select('*').eq('studio_id', me.studioId).order('created_at', { ascending: false }).limit(50)) as Operation[] })
-  const [sheet, setSheet] = useState<null | 'settings' | 'ops' | 'add' | { edit: Device } | { del: Device }>(null)
+  const [sheet, setSheet] = useState<null | 'settings' | 'ops' | { add: string } | { edit: Device } | { del: Device }>(null)
   const [bio, setBio] = useState<Record<string, unknown> | null>(null)
   const [op, setOp] = useState({ device: '', operation: '' })
   const close = () => setSheet(null)
   const names = useMemo(() => Object.fromEntries((devices.data ?? []).map((d) => [d.id, d.name])), [devices.data])
+  const countOf = (id: string) => (counts.data ?? []).find((c) => c.device_id === id)
+  const added = new Set((devices.data ?? []).map((d) => d.serial.trim().toUpperCase()))
+  const callers = (unknown.data ?? []).filter((u) => !added.has(u.serial.toUpperCase()))
+  const connected = (devices.data ?? []).some((d) => d.last_seen_at)
   const saveBio = useMutation({
     mutationFn: () => saveSection(me.studioId, 'biometric', bio ?? {}),
     onSuccess: async () => { await qc.invalidateQueries({ queryKey: ['studio'] }); close(); toast('Biometric settings saved') },
@@ -502,10 +535,16 @@ export function BiometricManager({ extended }: { extended?: boolean }) {
         actions={<>
           <button type="button" className="btn btn-sm" onClick={() => { setBio(sect(studio, 'biometric')); setSheet('settings') }}>FC Biometric Settings</button>
           <button type="button" className="btn btn-sm" onClick={() => setSheet('ops')}>Biometric Device Operations</button>
-          <button type="button" className="btn-gold min-h-10 px-4" onClick={() => setSheet('add')}><Icon name="plus" size={18} />Add Biometric Device</button>
+          <button type="button" className="btn-gold min-h-10 px-4" onClick={() => setSheet({ add: '' })}><Icon name="plus" size={18} />Add Biometric Device</button>
         </>} />
       <div className="flex flex-col gap-4 px-5 pt-5 pb-10 lg:px-8">
-        <Notice>Your eSSL device keeps working with YDL until switch day. This page holds its details and rules; once the device is connected to this system, queued operations run on it and memberships block or unblock members automatically.</Notice>
+        {!devices.isLoading && !connected && <Notice>Until your device is connected here it keeps sending punches to YDL. Once it's connected, punches check clients in and out here, and the device blocks members when their plan ends and lets them back in when they renew.</Notice>}
+        {callers.map((u) => (
+          <div key={u.serial} className="card flex flex-wrap items-center justify-between gap-3 p-4">
+            <p className="m-0 text-[14px]">A device with serial <strong>{u.serial}</strong> is trying to connect (last try {fmtDateTime(u.last_seen_at)}). It isn't added yet, so nothing it sends is kept.</p>
+            <button type="button" className="btn btn-sm" onClick={() => setSheet({ add: u.serial })}>Add this device</button>
+          </div>
+        ))}
         <h2 className="eyebrow">{studioLine(studio)}</h2>
         {devices.isLoading ? <Loading /> : (devices.data ?? []).length === 0 ? <div className="card p-5 text-[14px] text-muted">No device yet. Add your biometric device.</div> : (
           <div className="grid gap-3 md:grid-cols-2">
@@ -513,10 +552,15 @@ export function BiometricManager({ extended }: { extended?: boolean }) {
               <article key={d.id} className="card flex flex-col gap-3 p-5">
                 <div className="flex items-start justify-between gap-3">
                   <div><h3 className="m-0 text-[16px] font-bold">{d.name}</h3><div className="text-[13px] text-muted">{d.serial}</div></div>
-                  <span className="chip chip-muted">Not connected yet</span>
+                  <span className={`chip ${deviceState(d)[1]}`}>{deviceState(d)[0]}</span>
                 </div>
                 <dl className="m-0 grid grid-cols-2 gap-2 text-[13px]">
-                  <Info label="Server">{d.server === 'EPUSH' ? 'EPUSH SERVER' : 'E-TIME TRACK LITE'}</Info>
+                  {d.last_seen_at && <>
+                    <Info label="Punches today">{String(countOf(d.id)?.punches_today ?? 0)}</Info>
+                    <Info label="On the device">{people(countOf(d.id)?.users ?? 0)}{`, ${countOf(d.id)?.with_fingers ?? 0} with fingerprints kept here`}</Info>
+                    <Info label="Blocked">{String(countOf(d.id)?.blocked ?? 0)}</Info>
+                    <Info label="Commands waiting">{String(countOf(d.id)?.waiting ?? 0)}</Info>
+                  </>}
                   <Info label="Type">{SCAN.find((s) => s[0] === d.scan_type)?.[1] ?? d.scan_type}</Info>
                   <Info label="Stores">{d.storage_types.map((x) => x === 'staff_members' ? 'Staff Members' : x[0].toUpperCase() + x.slice(1)).join(', ')}</Info>
                   <Info label="Expiry rule">{d.expiry_rule ? 'Applicable' : 'Not Applicable'}</Info>
@@ -529,15 +573,36 @@ export function BiometricManager({ extended }: { extended?: boolean }) {
             ))}
           </div>
         )}
+        <ConnectGuide open={!connected} />
+        <h2 className="eyebrow pt-2">Latest punches</h2>
+        <DataTable<Punch> loading={punches.isLoading} rows={punches.data ?? []} rowKey={(p) => String(p.id)} caption="Latest punches on the device" empty="No punches yet. They appear here as soon as the device is connected."
+          columns={[
+            { key: 'at', header: 'Date & Time', cell: (p) => fmtDateTime(p.punched_at) },
+            { key: 'code', header: 'Code', cell: (p) => p.pin },
+            { key: 'who', header: 'Name', cell: (p) => p.member_id ? <Link className="font-semibold" to={`/clients/${p.member_id}`}>{p.member_name}{p.client_code ? ` (${p.client_code})` : ''}</Link> : p.staff_name ?? '—' },
+            { key: 'result', header: 'Result', cell: (p) => <span className={`chip ${PUNCH[p.result]?.[1] ?? 'chip-muted'}`}>{PUNCH[p.result]?.[0] ?? p.result}</span> },
+          ]}
+          card={(p) => <div className="flex items-center justify-between gap-3"><div className="flex flex-col gap-0.5"><strong>{p.member_name ?? p.staff_name ?? p.pin}</strong><span className="text-[12px] text-muted">{fmtDateTime(p.punched_at)}{p.member_name ?? p.staff_name ? ` · code ${p.pin}` : ''}</span></div><span className={`chip ${PUNCH[p.result]?.[1] ?? 'chip-muted'}`}>{PUNCH[p.result]?.[0] ?? p.result}</span></div>} />
+        {(punches.data ?? []).some((p) => p.result === 'unknown') && <p className="m-0 text-[13px] text-muted">Code not found: the code on the device isn't any client's mobile number or biometric code. Open the client's profile, choose Add User and enter that code as the Biometric Code; their next punch checks them in.</p>}
+        <h2 className="eyebrow pt-2">Device commands</h2>
+        <DataTable<DeviceCmd> loading={cmds.isLoading} rows={cmds.data ?? []} rowKey={(c) => c.id} caption="Commands sent to the device" empty="No commands yet."
+          columns={[
+            { key: 'at', header: 'Date & Time', cell: (c) => fmtDateTime(c.created_at) },
+            { key: 'who', header: 'Name', cell: (c) => c.member_id ? <Link className="font-semibold" to={`/clients/${c.member_id}`}>{c.member_name}</Link> : c.staff_name ?? '—' },
+            { key: 'cmd', header: 'Command', cell: (c) => `${CMD[c.command] ?? c.command}${c.biometric_code ? ` · code ${c.biometric_code}` : ''}` },
+            { key: 'status', header: 'Status', cell: (c) => <span className={`chip ${CMD_STATUS[c.status]?.[1] ?? 'chip-muted'}`}>{CMD_STATUS[c.status]?.[0] ?? c.status}</span> },
+            { key: 'result', header: 'Result', cell: (c) => c.result ?? '' },
+          ]}
+          card={(c) => <div className="flex flex-col gap-1"><div className="flex items-center justify-between gap-3"><strong>{c.member_name ?? c.staff_name ?? c.biometric_code}</strong><span className={`chip ${CMD_STATUS[c.status]?.[1] ?? 'chip-muted'}`}>{CMD_STATUS[c.status]?.[0] ?? c.status}</span></div><span className="text-[12px] text-muted">{CMD[c.command] ?? c.command} · {fmtDateTime(c.created_at)}</span>{c.result && <span className="text-[12px] text-muted">{c.result}</span>}</div>} />
         <h2 className="eyebrow pt-2">Cron Log Details</h2>
         <DataTable<Operation> loading={ops.isLoading} rows={ops.data ?? []} rowKey={(o) => o.id} caption="Device operations" empty="No device operations yet."
           columns={[
             { key: 'at', header: 'Date & Time', cell: (o) => fmtDateTime(o.created_at) },
             { key: 'device', header: 'Device', cell: (o) => names[o.device_id] ?? '' },
             { key: 'op', header: 'Operation', cell: (o) => OPS.find((x) => x[0] === o.operation)?.[1] ?? o.operation },
-            { key: 'status', header: 'Status', cell: (o) => <span className={`chip ${o.status === 'done' ? 'chip-green' : o.status === 'failed' ? 'chip-red' : 'chip-muted'}`}>{o.status === 'queued' ? 'Waiting for device' : o.status}</span> },
+            { key: 'status', header: 'Status', cell: (o) => <span className={`chip ${CMD_STATUS[o.status]?.[1] ?? 'chip-muted'}`}>{CMD_STATUS[o.status]?.[0] ?? o.status}</span> },
           ]}
-          card={(o) => <div className="flex flex-col gap-1"><strong>{OPS.find((x) => x[0] === o.operation)?.[1]}</strong><span className="text-[12px] text-muted">{names[o.device_id]} · {fmtDateTime(o.created_at)} · {o.status}</span></div>} />
+          card={(o) => <div className="flex flex-col gap-1"><strong>{OPS.find((x) => x[0] === o.operation)?.[1]}</strong><span className="text-[12px] text-muted">{names[o.device_id]} · {fmtDateTime(o.created_at)} · {CMD_STATUS[o.status]?.[0] ?? o.status}</span></div>} />
       </div>
 
       <Sheet wide open={sheet === 'settings'} onClose={close} title="FITNESS CENTER EXTENDED BIOMETRIC SETTINGS (NEW)">
@@ -557,11 +622,10 @@ export function BiometricManager({ extended }: { extended?: boolean }) {
             <button type="submit" className="btn-gold flex-1" disabled={runOp.isPending}>Perform Operations On Device</button></div>
         </form>
       </Sheet>
-      <Sheet open={sheet === 'add' || (!!sheet && typeof sheet === 'object' && 'edit' in sheet)} onClose={close}
-        title={sheet === 'add' ? 'ADD BIOMETRIC DEVICE' : 'UPDATE BIOMETRIC DEVICE'}>
-        {(sheet === 'add' || (sheet && typeof sheet === 'object' && 'edit' in sheet)) && (
-          <DeviceForm device={sheet === 'add' ? null : (sheet as { edit: Device }).edit} onDone={close} />
-        )}
+      <Sheet open={!!sheet && typeof sheet === 'object' && ('add' in sheet || 'edit' in sheet)} onClose={close}
+        title={sheet && typeof sheet === 'object' && 'add' in sheet ? 'ADD BIOMETRIC DEVICE' : 'UPDATE BIOMETRIC DEVICE'}>
+        {sheet && typeof sheet === 'object' && 'add' in sheet && <DeviceForm device={null} serial={sheet.add} onDone={close} />}
+        {sheet && typeof sheet === 'object' && 'edit' in sheet && <DeviceForm device={sheet.edit} onDone={close} />}
       </Sheet>
       <Sheet open={!!sheet && typeof sheet === 'object' && 'del' in sheet} onClose={close} title="DELETE BIOMETRIC DEVICE">
         {sheet && typeof sheet === 'object' && 'del' in sheet && (
@@ -576,12 +640,29 @@ export function BiometricManager({ extended }: { extended?: boolean }) {
   )
 }
 
-function DeviceForm({ device, onDone }: { device: Device | null; onDone: () => void }) {
+// How to point the device at this app (eSSL / ZKTeco "Cloud Server" or ADMS menu). Steps in order.
+function ConnectGuide({ open }: { open: boolean }) {
+  return (
+    <details className="card p-5" open={open}>
+      <summary className="cursor-pointer text-[15px] font-bold">Connect the device to this app</summary>
+      <ol className="m-0 mt-3 flex flex-col gap-2 pl-5 text-[14px] leading-normal">
+        <li>Add the device here with its serial number. It's on the label at the back, or on the device under Menu → System Info → Device Info.</li>
+        <li>On the device, open Menu → COMM. → Cloud Server Setting (on some models it's called ADMS).</li>
+        <li>Turn on Enable Domain Name. Set Server Address to <strong>www.shaanfitness.com</strong>, Server Port to <strong>443</strong>, and turn HTTPS on. Leave Proxy off.</li>
+        <li>Save, then go back to the main screen. Within a minute this page shows the device as Online, and it sends the people and fingerprints it holds.</li>
+        <li>Punch a finger to test. The punch appears under Latest punches and the client is checked in.</li>
+      </ol>
+      <p className="m-0 mt-3 text-[13px] text-muted">From this moment the device stops sending punches to YDL. It sends every punch it has stored: those from the day it connects onward check clients in, and older ones are kept for reference only. If the device's menu has no HTTPS option, it can't reach the website directly: use the device address <strong>device.shaanfitness.com</strong> on port <strong>80</strong> once it's set up.</p>
+    </details>
+  )
+}
+
+function DeviceForm({ device, serial, onDone }: { device: Device | null; serial?: string; onDone: () => void }) {
   const me = useMe()
   const toast = useToast()
   const qc = useQueryClient()
   const [f, setF] = useState({
-    name: device?.name ?? '', serial: device?.serial ?? '', storage_types: device?.storage_types ?? ['customers'],
+    name: device?.name ?? '', serial: device?.serial ?? serial ?? '', storage_types: device?.storage_types ?? ['customers'],
     scan_type: device?.scan_type ?? 'face', expiry_rule: device ? (device.expiry_rule ? 'yes' : 'no') : 'yes', server: device?.server ?? 'ETIME',
   })
   const [error, setError] = useState<string | null>(null)

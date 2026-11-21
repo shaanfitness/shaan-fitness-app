@@ -170,7 +170,7 @@ export interface Member {
   level: string | null
   photo_url: string | null
   app_installed_at: string | null
-  biometric_code: number | null
+  biometric_code: string | null
   rfid: string | null
   active: boolean
   joined_on: string | null

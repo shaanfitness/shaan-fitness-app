@@ -94,7 +94,7 @@ export default function ClientProfile() {
               <dt className="text-muted">App</dt><dd className="m-0">{c.has_app ? 'App Installed' : 'App Not Installed'}</dd>
               <dt className="text-muted">Interested In</dt><dd className="m-0">{interested || '—'}</dd>
               <dt className="text-muted">Assigned Trainer</dt><dd className="m-0">{c.trainer_name ?? '—'}</dd>
-              <dt className="text-muted">Biometric Code</dt><dd className="m-0">{c.biometric_code ?? c.phone ?? '—'}</dd>
+              <dt className="text-muted">Biometric Code</dt><dd className="m-0">{deviceCode(c.biometric_code, c.phone) || '—'}</dd>
             </dl>
             {isDesk && (
               <div className="flex flex-wrap gap-2">
@@ -166,7 +166,7 @@ export default function ClientProfile() {
       <WhatsAppDialog open={whatsapp} onClose={() => setWhatsapp(false)} phone={`${c.country_code}${c.phone ?? ''}`} name={c.full_name}
         text={`Hi ${c.first_name}, greetings from ${studio?.name ?? 'Shaan Fitness'}.`} />
       <MedicalDialog open={medical} onClose={() => setMedical(false)} memberId={c.id} name={c.full_name} medical={med} />
-      <DeviceDialog command={device} onClose={() => setDevice(null)} memberId={c.id} name={c.full_name} code={c.biometric_code ? String(c.biometric_code) : c.phone ?? ''} rfid={c.rfid ?? ''} />
+      <DeviceDialog command={device} onClose={() => setDevice(null)} memberId={c.id} name={c.full_name} code={deviceCode(c.biometric_code, c.phone)} rfid={c.rfid ?? ''} />
       <PhotoDialog open={photo} onClose={() => setPhoto(false)} memberId={c.id} hasPhoto={!!c.photo_url} />
     </div>
   )
@@ -579,6 +579,12 @@ function MedicalDialog({ open, onClose, memberId, name, medical }: { open: boole
 const DEVICE_TITLE: Record<string, string> = {
   add: 'ADD CUSTOMER TO BIOMETRIC DEVICE', re_add: 'RE-ENROLL CUSTOMER TO BIOMETRIC DEVICE', block: 'BLOCK CUSTOMER FROM BIOMETRIC DEVICE', unblock: 'UN-BLOCK CUSTOMER FROM BIOMETRIC DEVICE',
 }
+// The code the device knows a client by: their biometric code, or else the last 10 digits of their mobile number.
+function deviceCode(code: string | number | null | undefined, phone: string | null | undefined) {
+  const own = String(code ?? '').trim()
+  return own || (phone ?? '').replace(/\D/g, '').slice(-10)
+}
+
 function DeviceDialog({ command, onClose, memberId, name, code, rfid }: { command: string | null; onClose: () => void; memberId: string; name: string; code: string; rfid: string }) {
   const me = useMe()
   const toast = useToast()
@@ -586,10 +592,22 @@ function DeviceDialog({ command, onClose, memberId, name, code, rfid }: { comman
   const [deviceId, setDeviceId] = useState('')
   const [method, setMethod] = useState('finger')
   const [card, setCard] = useState(rfid)
+  const [bcode, setBcode] = useState(code)
   const [error, setError] = useState<string | null>(null)
+  const qc = useQueryClient()
+  useEffect(() => { if (command) setBcode(code) }, [command, code])
   const m = useMutation({
-    mutationFn: () => queueDeviceCommand({ studio_id: me.studioId, device_id: deviceId, member_id: memberId, command: command!, method, biometric_code: code, rfid: card || null }),
-    onSuccess: () => { toast('Sent to the device'); onClose() },
+    mutationFn: async () => {
+      const next = bcode.trim()
+      if (!/^[0-9A-Za-z]{1,24}$/.test(next)) throw new Error('The biometric code is the number the device knows the client by: digits or letters, up to 24.')
+      // A different code is saved on the client first, so the device's punches with it check this client in.
+      if (next !== code) {
+        const r = await supabase.from('members').update({ biometric_code: next }).eq('id', memberId)
+        if (r.error) throw new Error(r.error.message)
+      }
+      await queueDeviceCommand({ studio_id: me.studioId, device_id: deviceId, member_id: memberId, command: command!, method, biometric_code: next, rfid: card || null })
+    },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['clients', 'profile', memberId] }); toast('Sent to the device'); onClose() },
     onError: (e: Error) => setError(e.message),
   })
   return (
@@ -597,7 +615,7 @@ function DeviceDialog({ command, onClose, memberId, name, code, rfid }: { comman
       <form className="flex flex-col gap-3.5" onSubmit={(e) => { e.preventDefault(); setError(null); if (!deviceId) setError('Select the device.'); else m.mutate() }}>
         <div className="text-[14px] font-semibold">{name}</div>
         {!isLoading && !devices.length && <Notice tone="warn">No biometric device is set up yet. The owner adds it in Fitness Center › Fitness Center Biometric Manager.</Notice>}
-        <Field label="Biometric Code" id="bcode"><TextInput id="bcode" value={code} onChange={() => {}} className="opacity-70" /></Field>
+        <Field label="Biometric Code" id="bcode" hint="The code the device knows the client by. Their mobile number unless you change it."><TextInput id="bcode" value={bcode} onChange={setBcode} inputMode="numeric" /></Field>
         {(command === 'add' || command === 're_add') && <>
           <Field label="RFID Card" id="brfid"><TextInput id="brfid" value={card} onChange={setCard} /></Field>
           <RadioGroup name="bmethod" legend="Biometric Type" value={method} onChange={setMethod} options={[{ value: 'finger', label: 'Finger' }, { value: 'face', label: 'Face' }, { value: 'rfid', label: 'RFID Card' }]} />

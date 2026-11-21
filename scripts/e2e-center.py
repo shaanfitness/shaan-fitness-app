@@ -144,7 +144,7 @@ with sync_playwright() as p:
     dlg.locator("#op-op").select_option("restart")
     dlg.get_by_role("button", name="Perform Operations On Device").click()
     toast(page, "Operation queued")
-    expect(page.get_by_text("Waiting for device")).to_be_visible()
+    expect(page.locator('.chip:text-is("Waiting for device"):visible').first).to_be_visible()
     shot(page, "biometric")
     page.goto(BASE + "/centers/email")
     expect(page.locator("#email-host")).to_have_value("smtp.gmail.com")
