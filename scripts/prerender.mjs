@@ -44,13 +44,15 @@ const shell = template.replace('<head>', '<head>\n    <meta name="robots" conten
 await writeFile(path.join(dist, 'app.html'), shell)
 await writeFile(path.join(dist, '404.html'), shell)
 
-// The website's own fonts (Archivo for everything, Instrument Serif for the story lines), preloaded so the headline
-// paints in them straight away. Vite names the files with a hash: find them in the build.
+// The website's own fonts (Lovelo for the headlines, Archivo for the text, Instrument Serif for the story lines),
+// preloaded so the headline paints in them straight away. Vite names Archivo's and Instrument Serif's files with a
+// hash: find them in the build.
 const assetFiles = await readdir(path.join(dist, 'assets'))
-const preload = [/^archivo-latin-wdth-normal-.*\.woff2$/, /^instrument-serif-latin-400-normal-.*\.woff2$/]
+const preload = ['/fonts/lovelo-black.woff2', ...[/^archivo-latin-wdth-normal-.*\.woff2$/, /^instrument-serif-latin-400-normal-.*\.woff2$/]
   .map((re) => assetFiles.find((f) => re.test(f)))
   .filter(Boolean)
-  .map((f) => `<link rel="preload" href="/assets/${f}" as="font" type="font/woff2" crossorigin />`).join('\n    ')
+  .map((f) => `/assets/${f}`)]
+  .map((f) => `<link rel="preload" href="${f}" as="font" type="font/woff2" crossorigin />`).join('\n    ')
 
 // Home only: on the first visit in a session, a black screen covers the page until the opening loader takes over
 // (hero/HomeHero.tsx), so the static page never flashes first. It lifts itself after 9 seconds whatever happens.

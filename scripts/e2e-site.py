@@ -49,17 +49,21 @@ with sync_playwright() as p:
     expect(page.get_by_role("heading", level=1)).to_contain_text("Semi-private")
     for h in ["The Shaan method", "Choose how you train", "How joining works", "Absolute Athleticism", "Outside the studio", "A day at Shaan", "Questions people ask"]:
         expect(page.get_by_role("heading", name=h)).to_be_visible()
-    # The 24 Oct hero: headline, the assessment and WhatsApp, the SHAAN wordmark, the studio's numbers, and the logo in
-    # the crest's ring (3D, or the flat logo standing in). No prices or plan names up front. No free trial anywhere.
-    hero = page.locator(".sf-home")
-    expect(hero.get_by_role("link", name="Book assessment")).to_have_attribute("href", "#assessment")
-    expect(hero.locator(".sf-word span")).to_have_count(5)
-    expect(hero.locator(".sf-facts")).to_contain_text("days a week")
-    expect(hero.locator(".sf-facts")).to_contain_text("ways to train")
-    expect(hero).not_to_contain_text("₹")
-    expect(hero).not_to_contain_text("Advanced Training")
-    expect(hero.locator(".sf-stage canvas")).to_be_attached()
-    expect(hero.locator(".sf-stage .sf-crest-ring")).to_be_attached()
+    # The logo hero's five chapters tell the story first (studio, small numbers, coaching, the plan, assessment):
+    # no prices or plan names there; the ways to train are drawn as figures. No free trial anywhere.
+    expect(page.locator(".sf-cine-title")).to_have_count(5)
+    expect(page.locator(".sf-cine")).not_to_contain_text("₹")
+    expect(page.locator(".sf-cine")).not_to_contain_text("Advanced Training")
+    expect(page.locator(".sf-cine-ways li")).to_have_count(3)
+    expect(page.locator(".sf-cine-ways li").nth(0).locator(".sf-squad-row .sf-fig")).to_have_count(8)
+    expect(page.locator(".sf-cine-ch").nth(4)).to_contain_text("an assessment")
+    # The first chapter has the two buttons; after the film, the 24 Oct crest, SHAAN edge to edge and the numbers.
+    expect(page.locator(".sf-cine-ch").nth(0).get_by_role("link", name="Book assessment")).to_have_attribute("href", "#assessment")
+    band = page.locator(".sf-crestband")
+    expect(band.locator("svg.sf-crest")).to_be_attached()
+    expect(band.locator(".sf-word span")).to_have_count(5)
+    expect(band.locator(".sf-facts")).to_contain_text("days a week")
+    expect(band.locator(".sf-facts")).to_contain_text("ways to train")
     # The Shaan method, as on 24 Oct: the five pillars in a list, each opening to its line.
     expect(page.locator(".sf-pillar")).to_have_count(5)
     page.locator(".sf-pillar").nth(1).get_by_role("button").click()
@@ -86,7 +90,7 @@ with sync_playwright() as p:
     expect(page.locator('a[href="tel:+919642467896"]').first).to_be_attached()
     expect(page.locator('a[href^="https://wa.me/919963547869"]').first).to_be_attached()
     expect(page.locator("#assessment").get_by_role("heading", name="Train with Shaan.")).to_be_visible()
-    expect(page.locator("svg.sf-stage-poster")).to_be_attached()
+    expect(page.locator("svg.sf-cine-poster")).to_be_attached()
     expect(page.get_by_role("banner").get_by_role("link", name="Log in")).to_be_visible()
     expect(page.get_by_role("banner").get_by_role("link", name="Staff dashboard")).to_have_count(0)
     expect(page.get_by_role("banner").get_by_role("link", name="My Shaan app")).to_have_count(0)
@@ -270,6 +274,7 @@ with sync_playwright() as p:
     expect(first.locator(".sf-squad-row .sf-fig")).to_have_count(6)
     expect(first).to_contain_text("Group of 6 approx")
     expect(first).to_contain_text("₹5,499")
+    expect(page.locator(".sf-cine-ways li").nth(0).locator(".sf-squad-row .sf-fig")).to_have_count(6)
     # Prices off, then group sizes off: neither reaches the page.
     page.goto(BASE + "/settings/website")
     page.get_by_label("Prices", exact=True).uncheck()
@@ -288,6 +293,7 @@ with sync_playwright() as p:
     page.goto(BASE + "/")
     expect(page.locator("#subscriptions .sf-sub")).to_have_count(2)
     expect(page.locator("#subscriptions .sf-squad")).to_have_count(0)
+    expect(page.locator(".sf-cine-ways")).to_have_count(0)
     expect(page.locator("#subscriptions .sf-sub").first).to_contain_text("₹5,499")
     # Back to the studio's three for the rest of the run.
     page.goto(BASE + "/settings/website")

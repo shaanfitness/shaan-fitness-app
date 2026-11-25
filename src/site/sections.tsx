@@ -39,7 +39,7 @@ export function KineticWord({ hostRef }: { hostRef: React.RefObject<HTMLElement 
       probe.style.cssText = 'position:absolute;left:-9999px;top:0;visibility:hidden;white-space:nowrap;font-size:100px;font-stretch:100%;line-height:1'
       probe.style.fontFamily = cs.fontFamily
       probe.style.fontWeight = cs.fontWeight
-      probe.style.letterSpacing = '-2px'
+      probe.style.letterSpacing = '0px'
       document.body.appendChild(probe)
       const used = probe.getBoundingClientRect().width
       probe.remove()
@@ -49,7 +49,7 @@ export function KineticWord({ hostRef }: { hostRef: React.RefObject<HTMLElement 
     const ro = new ResizeObserver(fit)
     ro.observe(el)
     const fonts = document.fonts
-    fonts?.load(`${getComputedStyle(el).fontWeight} 100px "Archivo Variable"`).then(fit).catch(() => {})
+    fonts?.load(`${getComputedStyle(el).fontWeight} 100px Lovelo`).then(fit).catch(() => {})
     fonts?.addEventListener?.('loadingdone', fit)
     return () => { ro.disconnect(); fonts?.removeEventListener?.('loadingdone', fit) }
   }, [])

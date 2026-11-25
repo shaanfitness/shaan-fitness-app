@@ -152,9 +152,14 @@ const en = {
     w1: 'Goblet squat', w2: 'Bench press', w3: 'Lat pull-down', w4: 'Plank', done: '3 of 4 done', glasses: '6 of 12 glasses', lost: 'Weight, last 6 weeks',
   },
   cine: {
-    place: 'Shaan Fitness, Kakinada',
+    place: 'Shaan Fitness, Kakinada', scroll: 'Scroll',
+    chapters: ['Studio', 'Small numbers', 'Coaching', 'Your plan', 'Assessment'],
     h1a: 'Semi-private', h1b: 'training studio.',
     lede: 'Coaching to a world standard, in small numbers, in Kakinada. Your trusted health partner.',
+    c2a: 'Every rep,', c2b: 'coached.', c2: 'Your coach plans each block, watches every set and measures your progress week by week. Nothing is left to chance.',
+    c3a: 'Written for', c3b: 'one body.', c3: 'Yours. Posture, mobility, strength and health history come first, then a plan built on five pillars: FORGE, BLAZE, FLOW, STRIKE and TRIBE.',
+    s3a: 'Small numbers,', s3b: 'by design.', s3: 'Places in every batch are limited, so your coach’s attention never is. Train in a small group, side by side or one-on-one.',
+    c4a: 'It starts with', c4b: 'an assessment.', c4: 'Every member begins with a coach: posture, mobility, strength, health history and your goal. Then you choose how to train.',
   },
   subs: {
     title: 'Choose how you train',
@@ -401,9 +406,14 @@ const te: Copy = {
     w1: 'గాబ్లెట్ స్క్వాట్', w2: 'బెంచ్ ప్రెస్', w3: 'లాట్ పుల్-డౌన్', w4: 'ప్లాంక్', done: '4లో 3 పూర్తి', glasses: '12లో 6 గ్లాసులు', lost: 'బరువు, గత 6 వారాలు',
   },
   cine: {
-    place: 'షాన్ ఫిట్‌నెస్, కాకినాడ',
+    place: 'షాన్ ఫిట్‌నెస్, కాకినాడ', scroll: 'స్క్రోల్ చేయండి',
+    chapters: ['స్టూడియో', 'తక్కువ మంది', 'కోచింగ్', 'మీ ప్లాన్', 'అసెస్‌మెంట్'],
     h1a: 'సెమీ-ప్రైవేట్', h1b: 'ట్రైనింగ్ స్టూడియో.',
     lede: 'ప్రపంచ స్థాయి ప్రమాణంతో కోచింగ్, తక్కువ మందితో, కాకినాడలో. మీ నమ్మకమైన ఆరోగ్య భాగస్వామి.',
+    c2a: 'ప్రతి రెప్‌కూ', c2b: 'కోచ్.', c2: 'కోచ్ ప్రతి బ్లాక్ ప్లాన్ చేస్తారు, ప్రతి సెట్ చూస్తారు, వారం వారం మీ ప్రగతి కొలుస్తారు. ఏదీ అదృష్టానికి వదలరు.',
+    c3a: 'ఒక్కరి కోసం', c3b: 'రాసిన ప్లాన్.', c3: 'అది మీదే. ముందు పోస్చర్, మొబిలిటీ, బలం, ఆరోగ్య చరిత్ర; తర్వాత ఐదు పిల్లర్ల మీద ప్లాన్: FORGE, BLAZE, FLOW, STRIKE, TRIBE.',
+    s3a: 'తక్కువ మంది,', s3b: 'కావాలనే.', s3: 'ప్రతి బ్యాచ్‌లో స్థానాలు పరిమితం, అందుకే మీ కోచ్ శ్రద్ధకు పరిమితి ఉండదు. చిన్న గ్రూప్‌లో, పక్కపక్కనే, లేదా వన్-ఆన్-వన్ ట్రైన్ అవ్వండి.',
+    c4a: 'మొదలు', c4b: 'అసెస్‌మెంట్‌తో.', c4: 'ప్రతి సభ్యుడు ముందు కోచ్‌ను కలుస్తారు: పోస్చర్, మొబిలిటీ, బలం, ఆరోగ్య చరిత్ర, మీ లక్ష్యం. తర్వాతే ఎలా ట్రైన్ అవ్వాలో ఎంచుకుంటారు.',
   },
   subs: {
     title: 'మీరు ఎలా ట్రైన్ అవుతారో ఎంచుకోండి',
