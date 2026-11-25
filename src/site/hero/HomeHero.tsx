@@ -1,17 +1,18 @@
 import { useCallback, useEffect, useRef, useState, type CSSProperties, type RefObject } from 'react'
 import { telLink, whatsappLink, type SiteInfo } from '../../db/site'
-import { Ic, Squad } from '../art'
-import { offers } from '../data'
+import { Crest, Ic } from '../art'
 import { useCopy } from '../layout'
 import { prefersReducedMotion } from '../motion'
-import { LiveChip, sizeLine } from '../sections'
+import { Facts, KineticWord, LiveChip } from '../sections'
 import type { Emblem } from './emblem'
 import { chooseFx, type Fx } from './fx'
 import { LOGO, LOGO_COLORS } from './logoPaths'
 
-// The home page hero: the Shaan logo as a cinematic scroll sequence in five chapters. The section is tall and the
-// stage sticks to the screen while you scroll; the 3D emblem (emblem.ts) follows the scroll. Before the 3D loads,
-// and wherever it can't run, the flat logo stands in with the same glow, and every chapter's words are in the page.
+// The home page hero, as the website opened on 24 Oct: the headline and the two buttons on the left, the crest on the
+// right with its turning ring, the SHAAN wordmark edge to edge and the studio's numbers under it. Inside the ring,
+// where the drawn barbell was, the Shaan logo turns in 3D (emblem.ts, as on 3 Nov): it arrives out of the dark,
+// follows the pointer, and as you scroll the hero away it turns to face you and the barbell burns, throwing sparks.
+// Before the 3D loads, and wherever it can't run, the flat logo stands in its place.
 
 /** The flat logo, transparent, from the traced vectors. */
 export function LogoMark({ className }: { className?: string }) {
@@ -21,32 +22,6 @@ export function LogoMark({ className }: { className?: string }) {
       <path d={LOGO.red} fill={LOGO_COLORS.red} fillRule="evenodd" />
       <path d={LOGO.blue} fill={LOGO_COLORS.blue} fillRule="evenodd" />
     </svg>
-  )
-}
-
-const CHAPTERS = 5
-
-/** A heads-up display around the emblem: rings that turn with the scroll, a sweep, brackets and the chapter readout. */
-function Hud({ ch, names }: { ch: number; names: string[] }) {
-  const ticks = Array.from({ length: 72 }, (_, i) => i)
-  return (
-    <div className="sf-hud" aria-hidden="true" data-ch={ch}>
-      <svg viewBox="-300 -300 600 600">
-        <g className="sf-hud-outer">
-          <circle r="286" className="sf-hud-faint" />
-          {ticks.map((i) => <line key={i} x1="0" y1={-286} x2="0" y2={i % 6 === 0 ? -270 : -279} className={i % 6 === 0 ? 'sf-hud-tick is-long' : 'sf-hud-tick'} transform={`rotate(${i * 5})`} />)}
-        </g>
-        <g className="sf-hud-mid">
-          <circle r="252" className="sf-hud-dash" />
-          <path d="M -252 0 A 252 252 0 0 1 -178 -178" className="sf-hud-arc is-red" />
-          <path d="M 252 0 A 252 252 0 0 1 178 178" className="sf-hud-arc is-blue" />
-        </g>
-        <g className="sf-hud-sweep"><path d="M0 0 L0 -262 A262 262 0 0 1 92 -245 Z" /></g>
-        {[0, 90, 180, 270].map((r) => <path key={r} d="M -26 -298 L -40 -298 L -40 -284 M 26 -298 L 40 -298 L 40 -284" className="sf-hud-bracket" transform={`rotate(${r + 45})`} />)}
-      </svg>
-      <span className="sf-hud-read sf-hud-read-a"><b>{ch + 1} / {names.length}</b>{names[ch]}</span>
-      <span className="sf-hud-read sf-hud-read-b">SF / KKD</span>
-    </div>
   )
 }
 
@@ -123,7 +98,7 @@ function LoaderArt() {
  *  then. It is the hero on devices that don't get the 3D, and stands in until the 3D is there. */
 function PosterMark() {
   return (
-    <svg className="sf-cine-poster" viewBox="0 0 512 512" role="img" aria-label="Shaan Fitness logo">
+    <svg className="sf-stage-poster" viewBox="0 0 512 512" aria-hidden="true">
       <defs>
         <clipPath id="sf-poster-clip">
           <path d={LOGO.white} clipRule="evenodd" /><path d={LOGO.red} clipRule="evenodd" /><path d={LOGO.blue} clipRule="evenodd" />
@@ -144,12 +119,11 @@ function PosterMark() {
   )
 }
 
-export function CineHero({ site }: { site: SiteInfo | null }) {
+export function HomeHero({ site }: { site: SiteInfo | null }) {
   const { c } = useCopy()
   const k = c.cine
   const section = useRef<HTMLElement>(null)
   const canvas = useRef<HTMLCanvasElement>(null)
-  const [ch, setCh] = useState(0)
   // live: the 3D is what you see. warm: it is running behind the loader, which hides it (no fades there).
   const [live, setLive] = useState(false)
   const [warm, setWarm] = useState(false)
@@ -164,16 +138,6 @@ export function CineHero({ site }: { site: SiteInfo | null }) {
   const timers = useRef<number[]>([])
   const wa = whatsappLink(site?.website.whatsapp || site?.studio.mobile, c.lead.waText)
   const tel = telLink(site?.studio.mobile)
-  // The hero tells the story before anything is sold: the studio, small numbers, coaching, the plan, then the
-  // assessment. No prices or plan names here; those come further down the page, once the visitor knows the studio.
-  // Chapter two draws the ways to train as figures (one coach and how many people), from Settings › Website.
-  const names = k.chapters
-  const ways = offers(site).filter((o) => o.size != null).slice(0, 3)
-  const beats = [
-    { a: k.c2a, b: k.c2b, t: k.c2 },
-    { a: k.c3a, b: k.c3b, t: k.c3 },
-  ]
-
   // The loader has finished: the page opens, on the 3D when it is ready behind the loader, arriving as the loader lifts.
   const onLoaderDone = useCallback(() => {
     const cur = ctl.current
@@ -217,11 +181,9 @@ export function CineHero({ site }: { site: SiteInfo | null }) {
     let cancelled = false, raf = 0, p = 0
     const read = () => {
       raf = 0
+      // How far the hero has scrolled away: the 3D turns and the barbell lights over the first three quarters of it.
       const r = sec.getBoundingClientRect()
-      const span = Math.max(1, r.height - window.innerHeight)
-      p = Math.min(1, Math.max(0, -r.top / span))
-      sec.style.setProperty('--p', p.toFixed(4))
-      setCh(Math.min(CHAPTERS - 1, Math.floor(p * CHAPTERS * 0.999)))
+      p = Math.min(1, Math.max(0, -r.top / Math.max(1, r.height * 0.75)))
       emblem?.setProgress(p)
     }
     const on = () => { if (!raf) raf = requestAnimationFrame(read) }
@@ -248,7 +210,7 @@ export function CineHero({ site }: { site: SiteInfo | null }) {
       const run = (startEmblem: typeof import('./emblem').startEmblem) => {
         if (cancelled || cur.dropped) return
         emblem = startEmblem(cv, {
-          mobile, still: prefersReducedMotion(),
+          mobile, still: prefersReducedMotion(), framed: true,
           onReady: () => { cur.ready = true },
           onSteady: () => {
             if (cancelled || cur.dropped) return
@@ -290,65 +252,31 @@ export function CineHero({ site }: { site: SiteInfo | null }) {
   }, [])
 
   const custom = site?.website.hero_title
+  const photo = site?.website.hero_image_url
   return (
     <>
     {intro !== 'off' && <Loader ctl={ctl} state={intro} place={k.place} onDone={onLoaderDone} />}
-    <section ref={section} className={`sf-cine${live ? ' is-live' : ''}${warm ? ' is-warm' : ''}`} style={{ '--n': CHAPTERS } as CSSProperties} aria-labelledby="sf-h1">
-      <div className="sf-cine-stage">
-        <div className="sf-cine-glow" aria-hidden="true" />
+    <section ref={section} className={`sf-hero sf-intro sf-home${live ? ' is-live' : ''}${warm ? ' is-warm' : ''}`} aria-labelledby="sf-h1">
+      <div className="sf-hero-bg" />
+      {photo && /^https:\/\//.test(photo) && <img className="sf-hero-photo" src={photo} alt="" />}
+      <div className="sf-crest sf-stage" aria-hidden="true">
         <PosterMark />
-        <canvas ref={canvas} className="sf-cine-canvas" aria-hidden="true" />
-        <div className="sf-cine-vignette" aria-hidden="true" />
-
-        <div className="sf-wrap sf-cine-hud">
-          <span className="sf-cine-tag">{k.place}</span>
-          {site && <LiveChip site={site} />}
-        </div>
-
-        <div className="sf-wrap sf-cine-copy">
-          <div className={`sf-cine-ch ${ch === 0 ? 'is-on' : ''}`}>
-            <h1 id="sf-h1" className="sf-cine-title">{custom ? custom : <><span>{k.h1a}</span> <em>{k.h1b}</em></>}</h1>
-            <p>{site?.website.hero_text || k.lede}</p>
-          </div>
-          <div className={`sf-cine-ch ${ch === 1 ? 'is-on' : ''}`}>
-            <h2 className="sf-cine-title"><span>{k.s3a}</span> <em className="is-blue">{k.s3b}</em></h2>
-            <p>{k.s3}</p>
-            {ways.length > 0 && (
-              <ul className="sf-cine-ways">
-                {ways.map((o) => {
-                  const size = sizeLine(o, c)!
-                  return <li key={o.name}><Squad size={o.size!} label={size} coach={c.subs.coach} /><span>{size}</span></li>
-                })}
-              </ul>
-            )}
-          </div>
-          {beats.map((b, i) => (
-            <div key={b.a} className={`sf-cine-ch ${ch === i + 2 ? 'is-on' : ''}`}>
-              <h2 className="sf-cine-title"><span>{b.a}</span> <em className={i === 1 ? 'is-blue' : undefined}>{b.b}</em></h2>
-              <p>{b.t}</p>
-            </div>
-          ))}
-          <div className={`sf-cine-ch ${ch === 4 ? 'is-on' : ''}`}>
-            <h2 className="sf-cine-title"><span>{k.c4a}</span> <em>{k.c4b}</em></h2>
-            <p>{k.c4}</p>
-            {/* Only reachable by keyboard once the chapter is on screen; until then Tab skips these invisible buttons. */}
-            <div className="sf-ctas">
-              <a href="#assessment" tabIndex={ch === 4 ? undefined : -1} className="sf-btn sf-btn-red sf-magnet">{c.nav.trial}</a>
-              {wa && <a href={wa} tabIndex={ch === 4 ? undefined : -1} target="_blank" rel="noreferrer" className="sf-btn sf-btn-glass sf-magnet">{Ic.whatsapp(18)}{c.nav.whatsapp}</a>}
-              {tel && <a href={tel} tabIndex={ch === 4 ? undefined : -1} className="sf-btn sf-btn-glass sf-magnet">{Ic.phone(18)}{c.nav.call}</a>}
-            </div>
+        <canvas ref={canvas} className="sf-stage-canvas" />
+        <Crest className="sf-stage-ring" bar={false} />
+      </div>
+      <div className="sf-wrap" style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
+        <div className="sf-hero-body">
+          {site ? <div style={{ '--d': 0 } as CSSProperties}><LiveChip site={site} /></div> : null}
+          <h1 id="sf-h1" className="sf-h1" style={{ '--d': 1 } as CSSProperties}>{custom || `${k.h1a} ${k.h1b}`}</h1>
+          <p className="sf-lede" style={{ '--d': 2 } as CSSProperties}>{site?.website.hero_text || k.lede}</p>
+          <div className="sf-ctas" style={{ '--d': 3 } as CSSProperties}>
+            <a href="#assessment" className="sf-btn sf-btn-red sf-magnet">{c.nav.trial}</a>
+            {wa ? <a href={wa} target="_blank" rel="noreferrer" className="sf-btn sf-magnet">{Ic.whatsapp(18)}{c.nav.whatsapp}</a>
+              : tel ? <a href={tel} className="sf-btn sf-magnet">{Ic.phone(18)}{c.nav.call}</a> : null}
           </div>
         </div>
-
-        <Hud ch={ch} names={names} />
-
-        <div className="sf-wrap sf-cine-foot">
-          <ol className="sf-cine-steps" aria-hidden="true">
-            {names.map((name, i) => <li key={i} className={ch === i ? 'is-on' : ch > i ? 'is-past' : ''}><b>{i + 1}</b>{name}</li>)}
-          </ol>
-          <div className="sf-cine-bar" aria-hidden="true"><i /></div>
-          <span className={`sf-cine-cue ${ch === 0 ? 'is-on' : ''}`} aria-hidden="true">{k.scroll}<i /></span>
-        </div>
+        <KineticWord hostRef={section} />
+        {site && <Facts site={site} />}
       </div>
     </section>
     </>

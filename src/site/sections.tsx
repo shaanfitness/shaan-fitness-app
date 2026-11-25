@@ -1,11 +1,11 @@
-import { useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react'
+import { useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import { addressLines, googlePlace, siteHours, telLink, whatsappLink, prettyPhone, mapsLink, type SiteInfo, type SiteOffer } from '../db/site'
 import { publicRpc } from '../lib/rest'
-import { Crest, GLYPHS, Ic, PAGE_ART, Squad, cosd, sind } from './art'
+import { GLYPHS, Ic, PAGE_ART, Squad, cosd, sind } from './art'
 import { PATHS, fill, type PageId } from './content'
-import { addressText, batchTier, clock, liveStatus, offerTier, offers, openSpans, rupees, services, weeksText, type Tier } from './data'
-import { prefersReducedMotion, useInView, useNow } from './motion'
+import { addressText, batchTier, clock, cycle, liveStatus, offerTier, offers, openSpans, rupees, services, weeksText, type Tier } from './data'
+import { canUseDom, prefersReducedMotion, useCountUp, useInView, useNow } from './motion'
 import { useCopy } from './layout'
 import { guideById, isGuideId } from './guides'
 
@@ -18,6 +18,101 @@ export function LiveChip({ site }: { site: SiteInfo }) {
   if (!now) return <span className="sf-live" aria-hidden="true" style={{ visibility: 'hidden' }}><span className="sf-dot" />&nbsp;</span>
   const st = liveStatus(site, now, c)
   return <span className="sf-live" role="status"><span className={`sf-dot ${st.open ? 'is-open' : ''}`} />{st.text}</span>
+}
+
+// The home hero's SHAAN wordmark and the studio's numbers under it (24 Oct) ------------------------------------------
+const useIsoLayoutEffect = canUseDom ? useLayoutEffect : useEffect
+
+// ---------------------------------------------------------------------------------------------------------------
+/** SHAAN, edge to edge. Letters widen near the pointer (desktop) and condense as you scroll away (phones). */
+export function KineticWord({ hostRef }: { hostRef: React.RefObject<HTMLElement | null> }) {
+  const ref = useRef<HTMLDivElement>(null)
+  useIsoLayoutEffect(() => {
+    const el = ref.current
+    if (!el) return
+    // Measure "SHAAN" at rest (no animation, normal width) with a hidden copy, so a letter that is mid-animation
+    // or a font still loading never throws the size off. The stylesheet has a close first guess for the static page.
+    const fit = () => {
+      const cs = getComputedStyle(el)
+      const probe = document.createElement('span')
+      probe.textContent = 'SHAAN'
+      probe.style.cssText = 'position:absolute;left:-9999px;top:0;visibility:hidden;white-space:nowrap;font-size:100px;font-stretch:100%;line-height:1'
+      probe.style.fontFamily = cs.fontFamily
+      probe.style.fontWeight = cs.fontWeight
+      probe.style.letterSpacing = '-2px'
+      document.body.appendChild(probe)
+      const used = probe.getBoundingClientRect().width
+      probe.remove()
+      if (used > 0 && el.clientWidth > 0) el.style.setProperty('--word-size', `${Math.floor((el.clientWidth / used) * 100 * 0.97)}px`)
+    }
+    fit()
+    const ro = new ResizeObserver(fit)
+    ro.observe(el)
+    const fonts = document.fonts
+    fonts?.load(`${getComputedStyle(el).fontWeight} 100px "Archivo Variable"`).then(fit).catch(() => {})
+    fonts?.addEventListener?.('loadingdone', fit)
+    return () => { ro.disconnect(); fonts?.removeEventListener?.('loadingdone', fit) }
+  }, [])
+  useEffect(() => {
+    const host = hostRef.current
+    const el = ref.current
+    if (!host || !el || prefersReducedMotion()) return
+    const letters = [...el.children] as HTMLElement[]
+    const fine = window.matchMedia('(hover: hover) and (pointer: fine)').matches
+    const reset = () => letters.forEach((l) => { l.style.setProperty('--w', '100%'); l.classList.remove('is-hot') })
+    if (fine) {
+      const onMove = (e: PointerEvent) => {
+        let best = -1, bestD = Infinity
+        letters.forEach((l, i) => {
+          const r = l.getBoundingClientRect()
+          const d = (e.clientX - (r.left + r.width / 2)) / r.width
+          const w = 74 + 51 * Math.exp(-(d * d) / 0.9)
+          l.style.setProperty('--w', `${w.toFixed(1)}%`)
+          if (Math.abs(d) < bestD) { bestD = Math.abs(d); best = i }
+        })
+        letters.forEach((l, i) => l.classList.toggle('is-hot', i === best && bestD < .6))
+      }
+      host.addEventListener('pointermove', onMove)
+      host.addEventListener('pointerleave', reset)
+      return () => { host.removeEventListener('pointermove', onMove); host.removeEventListener('pointerleave', reset) }
+    }
+    let raf = 0
+    const onScroll = () => {
+      cancelAnimationFrame(raf)
+      raf = requestAnimationFrame(() => {
+        const p = Math.min(1, Math.max(0, window.scrollY / Math.max(1, host.clientHeight * .8)))
+        letters.forEach((l, i) => l.style.setProperty('--w', `${(100 - p * (26 + i * 4)).toFixed(1)}%`))
+      })
+    }
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => { window.removeEventListener('scroll', onScroll); cancelAnimationFrame(raf) }
+  }, [hostRef])
+  return (
+    <div ref={ref} className="sf-word" aria-hidden="true">
+      {'SHAAN'.split('').map((ch, i) => <span key={i} style={{ '--i': i } as CSSProperties}>{ch}</span>)}
+    </div>
+  )
+}
+
+function Fact({ value, label, run, box }: { value: number; label: string; run: boolean; box: React.RefObject<HTMLDivElement | null> }) {
+  const n = useCountUp(value, run, 1200, box)
+  return <div><b>{n}</b><span>{label}</span></div>
+}
+export function Facts({ site }: { site: SiteInfo }) {
+  const { c } = useCopy()
+  const ref = useRef<HTMLDivElement>(null)
+  const seen = useInView(ref)
+  const spans = openSpans(site)
+  const days = [1, 2, 3, 4, 5, 6, 7].filter((d) => spans[d].length).length
+  const cy = cycle(site)
+  const tiers = new Set(offers(site).map(offerTier)).size
+  const items: [number, string][] = []
+  if (days) items.push([days, c.facts.days])
+  if (site.batches.length) items.push([site.batches.length, c.facts.batches])
+  if (cy?.sessions) items.push([cy.sessions, c.facts.sessions])
+  if (tiers) items.push([tiers, c.facts.ways])
+  if (!items.length) return null
+  return <div ref={ref} className="sf-facts">{items.map(([v, l]) => <Fact key={l} value={v} label={l} run={seen} box={ref} />)}</div>
 }
 
 export function Marquee({ site }: { site: SiteInfo }) {
@@ -128,59 +223,28 @@ export function Subscriptions({ site, only, title, sub, more = true }: { site: S
 // Method: a filmstrip. On a computer the strip slides sideways as you scroll down; on a phone you swipe it. -----------
 export function Method() {
   const { c } = useCopy()
-  const section = useRef<HTMLElement>(null)
-  const track = useRef<HTMLDivElement>(null)
-  const [active, setActive] = useState(0)
-  const n = c.method.pillars.length
-  useEffect(() => {
-    const sec = section.current, tr = track.current
-    if (!sec || !tr) return
-    const pinned = () => window.matchMedia('(min-width: 900px) and (prefers-reduced-motion: no-preference)').matches
-    let raf = 0
-    const update = () => {
-      raf = 0
-      if (!pinned()) { tr.style.transform = ''; return }
-      const r = sec.getBoundingClientRect()
-      const span = Math.max(1, r.height - window.innerHeight)
-      const p = Math.min(1, Math.max(0, -r.top / span))
-      const win = tr.parentElement!, cs = getComputedStyle(win)
-      const max = Math.max(0, tr.scrollWidth - (win.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight)))
-      tr.style.transform = `translate3d(${(-p * max).toFixed(1)}px, 0, 0)`
-      sec.style.setProperty('--p', p.toFixed(4))
-      setActive(Math.min(n - 1, Math.round(p * (n - 1))))
-    }
-    const on = () => { if (!raf) raf = requestAnimationFrame(update) }
-    update()
-    window.addEventListener('scroll', on, { passive: true })
-    window.addEventListener('resize', on)
-    // Phones: the frame in the middle of the swipe is the one lit.
-    const io = new IntersectionObserver((es) => {
-      if (pinned()) return
-      es.forEach((e) => { if (e.isIntersecting) setActive(Number((e.target as HTMLElement).dataset.i)) })
-    }, { root: tr.parentElement, threshold: 0.6 })
-    ;[...tr.children].forEach((el) => io.observe(el))
-    return () => { window.removeEventListener('scroll', on); window.removeEventListener('resize', on); cancelAnimationFrame(raf); io.disconnect() }
-  }, [n])
+  const [open, setOpen] = useState(0)
   return (
-    <section ref={section} className="sf-film" style={{ '--n': n } as CSSProperties} aria-labelledby="sf-method">
-      <div className="sf-film-stage">
-        <div className="sf-wrap sf-film-head">
+    <section className="sf-section is-ink" aria-labelledby="sf-method">
+      <div className="sf-wrap">
+        <div className="sf-head-split">
           <h2 id="sf-method" className="sf-h2">{c.method.title}</h2>
           <p className="sf-lede">{c.method.sub}</p>
         </div>
-        {/* On phones the pillars scroll sideways: the strip can then take keyboard focus and be scrolled with the arrows. */}
-        <div className="sf-film-window" tabIndex={0} role="region" aria-label={c.method.pillars.map((p) => p.name).join(', ')}>
-          <div ref={track} className="sf-film-track">
-            {c.method.pillars.map((p, i) => (
-              <article key={p.name} data-i={i} className={`sf-frame ${active === i ? 'is-on' : ''}`} aria-label={`${p.name}: ${p.label}`}>
-                <div className="sf-frame-top"><span className="sf-frame-label">{p.label}</span>{GLYPHS[p.name]}</div>
-                <h3 className="sf-frame-word">{p.name}</h3>
-                <p>{p.text}</p>
-              </article>
-            ))}
-          </div>
+        <div className="sf-pillars">
+          {c.method.pillars.map((p, i) => (
+            <div key={p.name} className={`sf-pillar ${open === i ? 'is-open' : ''}`}>
+              <h3 style={{ margin: 0 }}>
+                <button type="button" aria-expanded={open === i} aria-controls={`sf-pillar-${i}`} onClick={() => setOpen(i)}>
+                  <span className="sf-pillar-word">{p.name}</span><span className="sf-pillar-label">{p.label}</span>
+                </button>
+              </h3>
+              <div className="sf-pillar-body" id={`sf-pillar-${i}`} role="region" aria-label={p.name}>
+                <div><div className="sf-pillar-inner">{GLYPHS[p.name]}<p>{p.text}</p></div></div>
+              </div>
+            </div>
+          ))}
         </div>
-        <div className="sf-wrap"><div className="sf-film-progress" aria-hidden="true"><i /></div></div>
       </div>
     </section>
   )
@@ -617,13 +681,12 @@ export function Cta({ site, page }: { site: SiteInfo | null; page: PageId }) {
   const phone = site?.studio.mobile
   return (
     <section id="assessment" className="sf-cta" aria-labelledby="sf-cta-h">
-      <Crest className="sf-cta-crest" />
       <div className="sf-wrap sf-cta-row">
         <div style={{ display: 'grid', gap: 24, alignSelf: 'center' }}>
           <h2 id="sf-cta-h">{c.cta.title}</h2>
           <p>{c.cta.text}</p>
           <p style={{ fontSize: 16 }}>{c.lead.sub}</p>
-          {phone && <div><a href={telLink(phone) ?? undefined} className="sf-btn sf-btn-glass sf-magnet">{Ic.phone(18)}{prettyPhone(phone)}</a></div>}
+          {phone && <div><a href={telLink(phone) ?? undefined} className="sf-btn sf-magnet">{Ic.phone(18)}{prettyPhone(phone)}</a></div>}
         </div>
         <LeadForm site={site} page={page} />
       </div>

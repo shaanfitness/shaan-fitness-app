@@ -9,7 +9,7 @@ import {
   Manifesto, Marquee, Method, PageHero, ResultsGrid, Section, Studio, Subscriptions,
 } from './sections'
 import { useHead } from './seo'
-import { CineHero } from './hero/CineHero'
+import { HomeHero } from './hero/HomeHero'
 import { EventCards, EventPage, EventsList } from './eventPages'
 import { isEventId, type EventId } from './events'
 import { GuidePage } from './guidePages'
@@ -40,7 +40,7 @@ function Body({ id, site }: { id: PageId; site: SiteInfo | null }) {
   if (id === 'home') {
     return (
       <>
-        <CineHero site={site} />
+        <HomeHero site={site} />
         {site && <Marquee site={site} />}
         <Manifesto />
         <Method />

@@ -34,6 +34,10 @@ export interface Emblem {
 interface Options {
   mobile: boolean
   still: boolean
+  /** The home hero of the 24 Oct design: the emblem alone, centred in a square inside the crest's ring, on the
+   *  sapphire night. No giant word behind it (the page's SHAAN wordmark is under the headline). Scrolling the hero
+   *  away turns it to face you and lights the barbell, sparks flying, instead of the chapters. */
+  framed?: boolean
   onReady: () => void
   /** The frame rate has been measured and the scene runs smoothly at this quality level (0 full, 1 fewer pixels,
    *  2 no glow): the page can open on it. */
@@ -178,7 +182,7 @@ export function startEmblem(canvas: HTMLCanvasElement, opts: Options): Emblem | 
   renderer.outputColorSpace = SRGBColorSpace
   renderer.toneMapping = ACESFilmicToneMapping
   renderer.toneMappingExposure = 0.95
-  renderer.setClearColor(0x030304, 1)
+  renderer.setClearColor(opts.framed ? 0x0a0f2e : 0x030304, 1)
 
   const scene = new Scene()
   const pmrem = new PMREMGenerator(renderer)
@@ -188,13 +192,16 @@ export function startEmblem(canvas: HTMLCanvasElement, opts: Options): Emblem | 
   scene.environmentIntensity = 0.5
   // The studio lights in the reflection sit low and to the side, like stage footlights, so upward edges stay dark.
   scene.environmentRotation.set(Math.PI * 0.82, 0.6, 0)
-  const camera = new PerspectiveCamera(opts.mobile ? 46 : 34, 1, 0.1, 100)
+  const camera = new PerspectiveCamera(opts.framed ? 30 : opts.mobile ? 46 : 34, 1, 0.1, 100)
+  // Framed: far enough back that the emblem (4.4 units across) spans about four fifths of the square.
+  const fitZ = 4.4 / (0.8 * 2 * Math.tan((camera.fov * Math.PI) / 360))
 
   // Giant word far behind.
   const wordTex = wordTexture()
   const wordMat = new MeshBasicMaterial({ map: wordTex, transparent: true, depthWrite: false, opacity: 0, toneMapped: false })
   const word = new Mesh(new PlaneGeometry(24, 6.56), wordMat)
   word.position.set(0, 0.35, -7.5)
+  word.visible = !opts.framed
   scene.add(word)
 
   // The emblem: each colour of the logo extruded, bevelled edges catching the light.
@@ -352,7 +359,7 @@ export function startEmblem(canvas: HTMLCanvasElement, opts: Options): Emblem | 
   const resize = () => {
     const r = canvas.getBoundingClientRect()
     const w = Math.max(1, Math.round(r.width)), h = Math.max(1, Math.round(r.height))
-    wide = w / h > 1.05
+    wide = opts.framed ? true : w / h > 1.05
     // Older graphics: at most about 800,000 pixels a frame whatever the screen, fewer at each quality step.
     if (direct) renderer.setPixelRatio(Math.min(dpr, Math.sqrt((0.8e6 * [1, 0.75, 0.6][level]) / (w * h))))
     renderer.setSize(w, h, false)
@@ -388,18 +395,25 @@ export function startEmblem(canvas: HTMLCanvasElement, opts: Options): Emblem | 
     const p = prog
     const intro = opts.still ? 1 : smooth(0.1, 2.4, time)
 
-    const pz = pose(p)
+    // Framed, the scroll only plays the first chapter's turn (towards you, the camera closer), then lights the barbell.
+    const pz = pose(opts.framed ? p * 0.17 : p)
     const settle = smooth(0.74, 0.88, p)
-    holder.position.set(wide ? mix(2.5, 2.35, settle) : 0, (wide ? mix(0, 0.45, settle) : 1.55) + Math.sin(time * 0.8) * 0.04, 0)
+    if (opts.framed) holder.position.set(0, Math.sin(time * 0.8) * 0.04, 0)
+    else holder.position.set(wide ? mix(2.5, 2.35, settle) : 0, (wide ? mix(0, 0.45, settle) : 1.55) + Math.sin(time * 0.8) * 0.04, 0)
     holder.rotation.y = pz.ry + pointer.x * 0.12 + Math.sin(time * 0.4) * 0.035 + (1 - intro) * -0.9
     holder.rotation.x = pz.rx + pointer.y * 0.06 + Math.sin(time * 0.3) * 0.02
     holder.scale.setScalar(mix(0.86, 1, intro))
-    camera.position.set(pz.x, pz.y, pz.z / (wide ? 1 : 0.78))
-    camera.lookAt(holder.position.x * (wide ? 0.55 : 1) + pz.lx, holder.position.y * (wide ? 0.6 : 0.3) + pz.ly, 0)
+    if (opts.framed) {
+      camera.position.set(0, pz.y * 0.6, (fitZ * pz.z) / 7.6)
+      camera.lookAt(0, 0, 0)
+    } else {
+      camera.position.set(pz.x, pz.y, pz.z / (wide ? 1 : 0.78))
+      camera.lookAt(holder.position.x * (wide ? 0.55 : 1) + pz.lx, holder.position.y * (wide ? 0.6 : 0.3) + pz.ly, 0)
+    }
 
-    const coached = smooth(0.2, 0.32, p) * (1 - smooth(0.42, 0.5, p))
-    const plan = smooth(0.5, 0.57, p) * (1 - smooth(0.68, 0.75, p))
-    const ignite = smooth(0.76, 0.88, p)
+    const coached = opts.framed ? 0 : smooth(0.2, 0.32, p) * (1 - smooth(0.42, 0.5, p))
+    const plan = opts.framed ? 0 : smooth(0.5, 0.57, p) * (1 - smooth(0.68, 0.75, p))
+    const ignite = opts.framed ? smooth(0.12, 0.6, p) : smooth(0.76, 0.88, p)
     // The emblem stays whole to the end (it used to break into embers, which read as a glitch).
     const breakup = 0 * p
     const sweep = Math.sin(time * 0.6)

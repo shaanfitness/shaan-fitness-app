@@ -44,17 +44,22 @@ const shell = template.replace('<head>', '<head>\n    <meta name="robots" conten
 await writeFile(path.join(dist, 'app.html'), shell)
 await writeFile(path.join(dist, '404.html'), shell)
 
-// The website's own fonts, preloaded so the headline paints in them straight away.
-const preload = ['lovelo-black', 'garet-book', 'glacial-indifference-700'].map((f) => `<link rel="preload" href="/fonts/${f}.woff2" as="font" type="font/woff2" crossorigin />`).join('\n    ')
+// The website's own fonts (Archivo for everything, Instrument Serif for the story lines), preloaded so the headline
+// paints in them straight away. Vite names the files with a hash: find them in the build.
+const assetFiles = await readdir(path.join(dist, 'assets'))
+const preload = [/^archivo-latin-wdth-normal-.*\.woff2$/, /^instrument-serif-latin-400-normal-.*\.woff2$/]
+  .map((re) => assetFiles.find((f) => re.test(f)))
+  .filter(Boolean)
+  .map((f) => `<link rel="preload" href="/assets/${f}" as="font" type="font/woff2" crossorigin />`).join('\n    ')
 
 // Home only: on the first visit in a session, a black screen covers the page until the opening loader takes over
-// (hero/CineHero.tsx), so the static page never flashes first. It lifts itself after 9 seconds whatever happens.
+// (hero/HomeHero.tsx), so the static page never flashes first. It lifts itself after 9 seconds whatever happens.
 // The 3D hero's code starts downloading here, alongside the page's own, instead of after it: the loader is shorter.
-const emblemFile = (await readdir(path.join(dist, 'assets'))).find((f) => /^emblem-.*\.js$/.test(f))
+const emblemFile = assetFiles.find((f) => /^emblem-.*\.js$/.test(f))
 const warm3d = emblemFile ? `var l=document.createElement('link');l.rel='modulepreload';l.fetchPriority='low';l.href='/assets/${emblemFile}';document.head.appendChild(l)` : ''
 const introVeil = `<script>(function(){try{${warm3d}}catch(e){}try{var d=document.documentElement;if(sessionStorage.getItem('sf.intro'))return;if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;d.setAttribute('data-intro','1');setTimeout(function(){d.removeAttribute('data-intro')},9000)}catch(e){}})()</script>`
 // Every website page is dark: say so before the stylesheet arrives, so the browser never paints a white page first.
-const darkFirst = `<meta name="color-scheme" content="dark" />\n    <style id="sf-dark">html{background:#040406}</style>`
+const darkFirst = `<meta name="color-scheme" content="dark" />\n    <style id="sf-dark">html{background:#080C24}</style>`
 
 let count = 0
 for (const id of ssr.PAGE_IDS) {

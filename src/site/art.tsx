@@ -9,7 +9,9 @@ export const cosd = (deg: number) => Math.round(Math.cos(deg * Math.PI / 180) * 
 
 const DIAMOND = '✦'
 
-export function Crest({ className }: { className?: string }) {
+/** The crest: a turning ring of ticks and the studio's line around a barbell. In the home hero the 3D logo takes the
+ *  barbell's place (bar={false}). */
+export function Crest({ className, bar = true }: { className?: string; bar?: boolean }) {
   const ticks = Array.from({ length: 60 }, (_, i) => i)
   const text = `SHAAN FITNESS ${DIAMOND} KAKINADA ${DIAMOND} YOUR TRUSTED HEALTH PARTNER ${DIAMOND} `
   return (
@@ -23,7 +25,7 @@ export function Crest({ className }: { className?: string }) {
         <path id="sf-crest-text" d="M300,300 m-236,0 a236,236 0 1,1 472,0 a236,236 0 1,1 -472,0" />
       </defs>
       <circle cx="300" cy="300" r="300" fill="url(#sf-crest-glow)" />
-      <circle className="sf-crest-draw" cx="300" cy="300" r="292" fill="none" stroke="#F4F2EE" strokeOpacity=".7" strokeWidth="1.2" />
+      <circle className="sf-crest-draw" cx="300" cy="300" r="292" fill="none" stroke="#D9B97A" strokeOpacity=".7" strokeWidth="1.2" />
       <circle className="sf-crest-draw" cx="300" cy="300" r="206" fill="none" stroke="#EEF0F7" strokeOpacity=".16" strokeWidth="1" />
       <g className="sf-crest-ring">
         {ticks.map((i) => {
@@ -31,22 +33,22 @@ export function Crest({ className }: { className?: string }) {
           return <line key={i} x1="300" y1={long ? 14 : 18} x2="300" y2={long ? 38 : 30} stroke={i === 0 ? '#E8283B' : '#EEF0F7'} strokeOpacity={long ? .55 : .25}
             strokeWidth={long ? 2 : 1} transform={`rotate(${i * 6} 300 300)`} />
         })}
-        <text fill="#F4F2EE" fillOpacity=".75" fontSize="17" letterSpacing="6.2" fontFamily="Garet, sans-serif" fontWeight="600">
+        <text fill="#D9B97A" fillOpacity=".75" fontSize="17" letterSpacing="6.2" fontFamily="'Archivo Variable', sans-serif" fontWeight="600">
           <textPath href="#sf-crest-text">{text}{text}</textPath>
         </text>
       </g>
       {/* The barbell: crimson bar, plates in champagne and cobalt. */}
-      <g transform="translate(300 300)">
+      {bar && <g transform="translate(300 300)">
         <rect className="sf-crest-draw" x="-150" y="-4" width="300" height="8" rx="4" fill="none" stroke="#E8283B" strokeWidth="2" />
         <rect x="-150" y="-4" width="300" height="8" rx="4" fill="#E8283B" opacity=".9" />
         {[-1, 1].map((s) => (
           <g key={s} transform={`scale(${s} 1)`}>
-            <rect x="-128" y="-58" width="22" height="116" rx="6" fill="#121A45" stroke="#F4F2EE" strokeWidth="2" />
+            <rect x="-128" y="-58" width="22" height="116" rx="6" fill="#121A45" stroke="#D9B97A" strokeWidth="2" />
             <rect x="-100" y="-44" width="16" height="88" rx="5" fill="#121A45" stroke="#3B5BFF" strokeWidth="2" />
             <rect x="-80" y="-14" width="8" height="28" rx="3" fill="#EEF0F7" opacity=".7" />
           </g>
         ))}
-      </g>
+      </g>}
     </svg>
   )
 }
