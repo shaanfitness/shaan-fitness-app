@@ -801,6 +801,9 @@ html[data-intro='1'] .sf-loader, .sf-loader.is-on { display: grid; }
 .sf-ev-facts dt { font-size: 12px; font-weight: 700; color: var(--sf-mist); }
 .sf-ev-facts dd { margin: 4px 0 0; font-weight: 800; font-size: 16px; color: var(--sf-porcelain); }
 .sf-ev-story { display: grid; gap: 28px; }
+.sf-ev-side { display: grid; gap: 28px; align-content: start; }
+.sf-ev-poster { margin: 0; max-width: 440px; border-radius: 18px; overflow: hidden; border: 1px solid var(--sf-line); box-shadow: 0 34px 70px -34px rgba(0, 0, 0, .7); }
+.sf-ev-poster img { display: block; width: 100%; height: auto; }
 @media (min-width: 900px) { .sf-ev-story { grid-template-columns: .8fr 1.2fr; align-items: start; } }
 .sf-ev-bigstat { display: grid; gap: 6px; }.sf-ev-bigstat b { font-family: var(--sf-display); font-weight: 900; font-size: clamp(56px, 8vw, 112px); line-height: 1; color: var(--sf-crimson-hi); }
 .sf-ev-bigstat span { font-size: 17px; color: var(--sf-mist); }

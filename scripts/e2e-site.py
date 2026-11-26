@@ -132,6 +132,7 @@ with sync_playwright() as p:
              "/about": ("About Shaan Fitness", "About Shaan Fitness"),
              "/events": ("Events and community", "Events in Kakinada"),
              "/events/community-lung-run-2026": ("Community Lung Run 2026", "Community Lung Run 2026"),
+             "/events/bluecrest-charity-fete-2026": ("The Bluecrest School Charity Fete 2026", "The Bluecrest School Charity Fete 2026"),
              "/events/dandiya-nights-2026": ("AuraPeak Dandiya Nights 2K26", "Dandiya Nights 2K26 Lucky Draw"),
              "/events/deadlift-december-2023": ("Deadlift December Challenge 2023", "Deadlift December Challenge 2023"),
              "/events/kids-fitness-workshop-2023": ("Kids Fitness Workshop at Summer Fiesta 2023", "Kids Fitness Workshop"),
@@ -172,6 +173,11 @@ with sync_playwright() as p:
     expect(lung.get_by_role("link", name="See the event")).to_have_attribute("target", "_blank")
     expect(lung.locator("img")).to_have_attribute("src", "/events/lung-run-day.webp")
     expect(page.locator(".sf-ev-card", has_text="Deadlift December").locator("img")).to_have_attribute("src", "/events/deadlift-2023.webp")
+    # Newest first: the Bluecrest School Charity Fete (14 Nov 2026) leads, its "See the event" opening the Instagram post.
+    fete = page.locator(".sf-ev-card").first
+    expect(fete).to_contain_text("The Bluecrest School Charity Fete 2026")
+    expect(fete).to_contain_text("20")
+    expect(fete.get_by_role("link", name="See the event")).to_have_attribute("href", "https://www.instagram.com/p/DfrrVlGz6We/")
     shot(page, "events-desktop")
     lung.get_by_role("link", name=re.compile("^Event gallery")).click()
     page.wait_for_url("**/events/community-lung-run-2026")

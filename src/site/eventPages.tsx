@@ -115,7 +115,7 @@ export function EventPage({ id }: { id: EventId }) {
     <>
       <section className="sf-page-hero sf-ev-hero" aria-labelledby="sf-h1">
         <div className="sf-hero-bg" />
-        {e.image && <img className="sf-ev-hero-img" src={e.image} alt={k.name} decoding="async" fetchPriority="high" />}
+        {e.image && !e.plainHero && <img className="sf-ev-hero-img" src={e.image} alt={k.name} decoding="async" fetchPriority="high" />}
         <div className="sf-wrap sf-enter">
           <nav aria-label={c.common.breadcrumb}>
             <ol className="sf-crumbs">
@@ -140,7 +140,10 @@ export function EventPage({ id }: { id: EventId }) {
 
       <Section title={c.eventsPage.story}>
         <div className="sf-ev-story">
-          <p className="sf-ev-bigstat"><b>{k.stat.v}</b><span>{k.stat.k}</span></p>
+          <div className="sf-ev-side">
+            <p className="sf-ev-bigstat"><b>{k.stat.v}</b><span>{k.stat.k}</span></p>
+            {e.poster && <figure className="sf-ev-poster"><img src={e.poster} alt={k.name} loading="lazy" decoding="async" width={1080} height={1080} /></figure>}
+          </div>
           <div>{k.story.map((p) => <p key={p.slice(0, 24)}>{p}</p>)}</div>
         </div>
       </Section>

@@ -4,7 +4,7 @@ import type { Lang } from './content'
 // Instagram gallery (embedded from the studio's posts), and facts taken from the event's own pages and posts.
 // To add an event: add an id to EventId and PATHS (content.ts), then an entry here.
 
-export type EventId = 'dandiya' | 'lungRun' | 'deadlift' | 'summerFiesta'
+export type EventId = 'bluecrest' | 'dandiya' | 'lungRun' | 'deadlift' | 'summerFiesta'
 
 interface EventCopy {
   name: string
@@ -34,6 +34,11 @@ export interface ShaanEvent {
   start: string
   end?: string
   image?: string
+  /** The page's headline on the plain night, without the image behind it (when the image is a poster full of words,
+   *  which would fight the headline). */
+  plainHero?: boolean
+  /** The announcement poster, shown whole beside the story. */
+  poster?: string
   /** The event's own page, left exactly as it is: its original website (where people registered and donated), or the
    *  Instagram post that announced it. "See the event" on the cards opens this; "Event gallery" opens our page. */
   site: string
@@ -44,6 +49,65 @@ export interface ShaanEvent {
 }
 
 export const EVENTS: ShaanEvent[] = [
+  {
+    id: 'bluecrest',
+    start: '2026-11-14T10:00:00+05:30',
+    end: '2026-11-14T13:00:00+05:30',
+    image: '/events/bluecrest-charity-fete-2026.webp',
+    plainHero: true,
+    poster: '/events/bluecrest-charity-fete-2026-poster.webp',
+    site: 'https://www.instagram.com/p/DfrrVlGz6We/',
+    gallery: ['p/DfrrVlGz6We'],
+    place: { name: 'The Bluecrest School', address: 'Kakinada, Andhra Pradesh' },
+    copy: {
+      en: {
+        name: 'The Bluecrest School Charity Fete 2026',
+        role: 'Sponsor · 20 free entry tickets',
+        when: 'Saturday, 14 November 2026',
+        where: 'The Bluecrest School, Kakinada',
+        summary: 'Little hands, big hearts, one beautiful cause: Shaan Fitness sponsored 20 free entry tickets to the school’s charity fete for our clients and community.',
+        intro: 'Little hands. Big hearts. One beautiful cause. The children of The Bluecrest School held a charity fete, and Shaan Fitness sponsored 20 free entry tickets so our clients and community could come and support them.',
+        facts: [
+          { k: 'Date', v: 'Sat, 14 Nov 2026' },
+          { k: 'Time', v: '10:00 AM to 1:00 PM' },
+          { k: 'Our part', v: 'Sponsor, 20 free entry tickets' },
+          { k: 'Every rupee', v: 'To charity, as communicated by the school' },
+        ],
+        stat: { v: '20', k: 'free entry tickets' },
+        story: [
+          'The children of The Bluecrest School put together a charity fete, with fun games, food stalls and plants. Shaan Fitness sponsored 20 free entry tickets and invited our clients and community to join us in supporting the children and their charitable initiative.',
+          'The ask was simple: attend the fete, enjoy the activities, buy something, make a difference. The school communicated that every rupee collected through tickets and event activities would be donated to charity. The free tickets went first come, first served to those who contacted Shaan Fitness.',
+        ],
+        blocks: [],
+        open: 'Open the event post',
+        seoTitle: 'The Bluecrest School Charity Fete 2026 | Shaan Fitness Kakinada',
+        seoDesc: 'Shaan Fitness sponsored 20 free entry tickets to The Bluecrest School Charity Fete on 14 November 2026, supporting the children and their charitable initiative.',
+      },
+      te: {
+        name: 'ది బ్లూక్రెస్ట్ స్కూల్ చారిటీ ఫేట్ 2026',
+        role: 'స్పాన్సర్ · 20 ఉచిత ఎంట్రీ టికెట్లు',
+        when: 'శనివారం, 14 నవంబర్ 2026',
+        where: 'ది బ్లూక్రెస్ట్ స్కూల్, కాకినాడ',
+        summary: 'చిన్ని చేతులు, పెద్ద మనసులు, ఒక అందమైన లక్ష్యం: స్కూల్ చారిటీ ఫేట్‌కు మా క్లయింట్లు, కమ్యూనిటీ కోసం షాన్ ఫిట్‌నెస్ 20 ఉచిత ఎంట్రీ టికెట్లు స్పాన్సర్ చేసింది.',
+        intro: 'చిన్ని చేతులు. పెద్ద మనసులు. ఒక అందమైన లక్ష్యం. ది బ్లూక్రెస్ట్ స్కూల్ పిల్లలు చారిటీ ఫేట్ నిర్వహించారు. మా క్లయింట్లు, కమ్యూనిటీ వచ్చి వారికి తోడుగా నిలవడానికి షాన్ ఫిట్‌నెస్ 20 ఉచిత ఎంట్రీ టికెట్లు స్పాన్సర్ చేసింది.',
+        facts: [
+          { k: 'తేదీ', v: 'శని, 14 నవం 2026' },
+          { k: 'సమయం', v: 'ఉ. 10:00 నుంచి మ. 1:00' },
+          { k: 'మా పాత్ర', v: 'స్పాన్సర్, 20 ఉచిత ఎంట్రీ టికెట్లు' },
+          { k: 'ప్రతి రూపాయి', v: 'చారిటీకి, స్కూల్ తెలిపిన విధంగా' },
+        ],
+        stat: { v: '20', k: 'ఉచిత ఎంట్రీ టికెట్లు' },
+        story: [
+          'ది బ్లూక్రెస్ట్ స్కూల్ పిల్లలు ఆటలు, ఫుడ్ స్టాల్స్, మొక్కలతో చారిటీ ఫేట్ ఏర్పాటు చేశారు. షాన్ ఫిట్‌నెస్ 20 ఉచిత ఎంట్రీ టికెట్లు స్పాన్సర్ చేసి, పిల్లలకు, వారి చారిటీ ప్రయత్నానికి తోడుగా నిలవమని మా క్లయింట్లను, కమ్యూనిటీని ఆహ్వానించింది.',
+          'అడిగింది సింపుల్: ఫేట్‌కు రండి, యాక్టివిటీలు ఆస్వాదించండి, ఏదైనా కొనండి, మార్పు తీసుకురండి. టికెట్లు, ఈవెంట్ యాక్టివిటీల ద్వారా సేకరించిన ప్రతి రూపాయి చారిటీకి విరాళంగా ఇస్తామని స్కూల్ తెలిపింది. ఉచిత టికెట్లు షాన్ ఫిట్‌నెస్‌ను సంప్రదించిన వారికి, ముందు వచ్చిన వారికి ముందుగా ఇచ్చాం.',
+        ],
+        blocks: [],
+        open: 'ఈవెంట్ పోస్ట్ తెరవండి',
+        seoTitle: 'ది బ్లూక్రెస్ట్ స్కూల్ చారిటీ ఫేట్ 2026 | షాన్ ఫిట్‌నెస్',
+        seoDesc: 'ది బ్లూక్రెస్ట్ స్కూల్ చారిటీ ఫేట్ 2026కు షాన్ ఫిట్‌నెస్ 20 ఉచిత ఎంట్రీ టికెట్లు స్పాన్సర్ చేసింది, పిల్లలు, వారి చారిటీ ప్రయత్నానికి తోడుగా.',
+      },
+    },
+  },
   {
     id: 'dandiya',
     start: '2026-10-18T18:00:00+05:30',

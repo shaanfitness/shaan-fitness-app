@@ -20,6 +20,7 @@ export const PATHS: Record<PageId, string> = {
   about: '/about',
   contact: '/contact',
   events: '/events',
+  bluecrest: '/events/bluecrest-charity-fete-2026',
   dandiya: '/events/dandiya-nights-2026',
   lungRun: '/events/community-lung-run-2026',
   deadlift: '/events/deadlift-december-2023',
