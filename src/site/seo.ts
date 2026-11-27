@@ -38,6 +38,10 @@ export function jsonLd(id: PageId, site: SiteInfo | null, origin: string, lang: 
       openingHoursSpecification: Object.entries(hours).map(([k, days]) => ({ '@type': 'OpeningHoursSpecification', dayOfWeek: days, opens: k.slice(0, 5), closes: k.slice(6) })),
       priceRange: priced.length ? `${rupees(priced[0].price!)} - ${rupees(priced[priced.length - 1].price!)}` : '₹₹',
       amenityFeature: s.facilities.slice(0, 12).map((f) => ({ '@type': 'LocationFeatureSpecification', name: f, value: true })),
+      // The studio's IREFs membership (certificate: Unique ID IREFS1042, 8 July 2025 to 7 July 2027).
+      hasCredential: { '@type': 'EducationalOccupationalCredential', name: 'IREFs Member, Swastha Bharat Abhiyan', credentialCategory: 'certification',
+        identifier: 'IREFS1042', url: 'https://irefs.in/center-detail?id=IREFsSBASH0720251042',
+        recognizedBy: { '@type': 'Organization', name: 'Indian Register for Exercise Facilities (IREFs)', url: 'https://www.irefs.in/' } },
       sameAs: [googlePlace(s)?.listing, w.instagram, w.facebook, w.youtube, w.twitter, w.linkedin].filter((u): u is string => !!u && /^https:\/\//.test(u)),
       ...(priced.length ? {
         hasOfferCatalog: { '@type': 'OfferCatalog', name: 'Subscriptions', itemListElement: priced.map((o) => ({
@@ -82,7 +86,7 @@ export function jsonLd(id: PageId, site: SiteInfo | null, origin: string, lang: 
 
 const NAV_NAME: Record<Exclude<PageId, EventId | GuideId>, string> = {
   home: 'Home', personal: 'Personal training', group: 'Group training', weightLoss: 'Weight loss', plans: 'Membership plans',
-  timings: 'Gym timings', coaches: 'Coaches', results: 'Transformations', about: 'About', contact: 'Contact', events: 'Events',
+  timings: 'Gym timings', coaches: 'Coaches', results: 'Transformations', about: 'About', contact: 'Contact', events: 'Events', certified: 'IREFs certified',
 }
 const navName = (id: PageId) => (isEventId(id) ? eventById(id).copy.en.name : isGuideId(id) ? guideById(id).copy.en.nav : NAV_NAME[id])
 

@@ -5,6 +5,7 @@ import { offers } from '../data'
 import { useCopy } from '../layout'
 import { prefersReducedMotion, useInView } from '../motion'
 import { Facts, KineticWord, LiveChip, sizeLine } from '../sections'
+import { CertBadge } from '../certified'
 import type { Emblem } from './emblem'
 import { chooseFx, type Fx } from './fx'
 import { LOGO, LOGO_COLORS } from './logoPaths'
@@ -348,6 +349,7 @@ function CrestBand({ site }: { site: SiteInfo | null }) {
       <div className="sf-wrap">
         <KineticWord hostRef={band} />
         {site && <Facts site={site} />}
+        <div className="sf-crestband-cert"><CertBadge /></div>
       </div>
     </section>
   )

@@ -34,7 +34,7 @@ export const TRAINING: { id: PageId; icon: keyof typeof Ic; desc: Record<Lang, s
   guideItem('athletes', 'bolt', true),
 ]
 const navLabel = (c: Copy, id: PageId) => (isEventId(id) ? c.nav.events : isGuideId(id) ? guideById(id).copy[c === COPY.te ? 'te' : 'en'].nav : { home: c.nav.home, personal: c.nav.personal, group: c.nav.group, weightLoss: c.nav.weightLoss, plans: c.nav.plans,
-  timings: c.nav.timings, coaches: c.nav.coaches, results: c.nav.results, about: c.nav.about, contact: c.nav.contact, events: c.nav.events }[id])
+  timings: c.nav.timings, coaches: c.nav.coaches, results: c.nav.results, about: c.nav.about, contact: c.nav.contact, events: c.nav.events, certified: c.nav.certified }[id])
 
 export function LangSwitch() {
   const { lang } = useCopy()
@@ -218,7 +218,7 @@ function Footer() {
           <nav aria-label="Shaan Fitness">
             <h2>Shaan</h2>
             <ul>
-              {(['assessment', 'timings', 'coaches', 'results', 'events', 'about', 'contact'] as PageId[]).map((id) => <li key={id}><Link to={PATHS[id]} viewTransition>{navLabel(c, id)}</Link></li>)}
+              {(['assessment', 'timings', 'coaches', 'results', 'events', 'about', 'certified', 'contact'] as PageId[]).map((id) => <li key={id}><Link to={PATHS[id]} viewTransition>{navLabel(c, id)}</Link></li>)}
             </ul>
           </nav>
           {spans && (

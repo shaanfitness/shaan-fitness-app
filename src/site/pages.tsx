@@ -13,6 +13,7 @@ import { HomeHero } from './hero/HomeHero'
 import { EventCards, EventPage, EventsList } from './eventPages'
 import { isEventId, type EventId } from './events'
 import { GuidePage } from './guidePages'
+import { CertBadge, CertifiedPage } from './certified'
 import { guideById, isGuideId, type GuideId } from './guides'
 
 // One component per page. Each page answers one search ("personal trainer in Kakinada", "gym timings", …), ends with
@@ -58,6 +59,7 @@ function Body({ id, site }: { id: PageId; site: SiteInfo | null }) {
   if (id === 'events') return <EventsList site={site} />
   if (isGuideId(id)) return <GuidePage id={id} site={site} />
   if (isEventId(id)) return <EventPage id={id} />
+  if (id === 'certified') return <CertifiedPage />
   const h = hero(c, id)
   const top = <PageHero id={id} title={h.title} intro={h.intro} site={site} />
   switch (id) {
@@ -161,6 +163,7 @@ function Body({ id, site }: { id: PageId; site: SiteInfo | null }) {
           <Manifesto />
           {site ? <Studio site={site} /> : <Section title={c.about.spaceTitle} sub={c.about.space}><span /></Section>}
           <Section title={c.about.valuesTitle} tone="deep"><Cards items={c.about.values} /></Section>
+          <Section><Story title={c.certified.h1} text={c.certified.intro} aside={<div><CertBadge /></div>} /></Section>
           {site && <CoachGrid site={site} limit={3} />}
         </>
       )

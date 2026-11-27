@@ -83,7 +83,7 @@ for (const id of ssr.PAGE_IDS) {
 }
 
 const today = new Date().toISOString().slice(0, 10)
-const priority = { home: '1.0', personal: '0.9', group: '0.9', weightLoss: '0.9', plans: '0.9', timings: '0.8', contact: '0.8', coaches: '0.6', results: '0.6', about: '0.6' }
+const priority = { home: '1.0', personal: '0.9', group: '0.9', weightLoss: '0.9', plans: '0.9', timings: '0.8', contact: '0.8', coaches: '0.6', results: '0.6', about: '0.6', certified: '0.6' }
 await writeFile(path.join(dist, 'sitemap.xml'), `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 ${ssr.PAGE_IDS.map((id) => `  <url><loc>${origin}${ssr.PATHS[id]}</loc><lastmod>${today}</lastmod><priority>${priority[id] ?? '0.5'}</priority></url>`).join('\n')}

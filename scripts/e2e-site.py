@@ -141,6 +141,7 @@ with sync_playwright() as p:
              "/strength-training-kakinada": ("Strength training in Kakinada", "Strength Training in Kakinada"),
              "/fitness-after-40-kakinada": ("Strong at every age: training after 40", "Fitness After 40"),
              "/athletic-training-kakinada": ("Athletic training in Kakinada", "Athletic Training in Kakinada"),
+             "/irefs-certified-gym-kakinada": ("IREFs certified gym in Kakinada", "IREFs Certified Gym in Kakinada"),
              "/contact": ("Visit Shaan Fitness in Kakinada", "Contact Shaan Fitness")}
     for path, (h1, title) in pages.items():
         page.goto(BASE + path)
@@ -162,6 +163,23 @@ with sync_playwright() as p:
     visit = page.locator("#visit")
     expect(visit.get_by_role("link", name="Google reviews")).to_have_attribute("href", re.compile(r"google\.com/maps\?cid="))
     expect(visit.get_by_role("link", name="Get directions")).to_be_visible()
+    # IREFs certified: the certificate's facts, the verify link, the CPR technique, the credential for Google.
+    page.goto(BASE + "/irefs-certified-gym-kakinada")
+    expect(page.locator(".sf-ev-facts")).to_contain_text("IREFS1042")
+    expect(page.locator(".sf-ev-facts")).to_contain_text("7 July 2027")
+    expect(page.get_by_role("heading", level=1)).to_be_visible()
+    expect(page.locator(".sf-lede").first).to_contain_text("Andhra Pradesh’s first IREFs certified gym")
+    expect(page.get_by_role("link", name="See our IREFs listing")).to_have_attribute("href", "https://irefs.in/center-detail?id=IREFsSBASH0720251042")
+    expect(page.locator(".sf-cpr-steps li")).to_have_count(6)
+    expect(page.get_by_role("link", name="Download the poster (PDF)")).to_have_attribute("href", "/certified/cpr-technique-irefs.pdf")
+    ld = page.evaluate("[...document.querySelectorAll('script[type=\"application/ld+json\"]')].map((s) => s.textContent).join(' ')")
+    assert "IREFS1042" in ld, "the IREFs membership is in the data for Google"
+    shot(page, "certified-desktop")
+    # The badge on the home page (after the film) and the About page leads there.
+    page.goto(BASE + "/")
+    expect(page.locator(".sf-crestband .sf-cert-badge")).to_have_attribute("href", "/irefs-certified-gym-kakinada")
+    page.goto(BASE + "/about")
+    expect(page.locator(".sf-cert-badge")).to_be_visible()
     page.goto(BASE + "/events/dandiya-nights-2026")
     expect(page.get_by_text("Rekha & Manikanta")).to_be_visible()
     expect(page.locator("#gallery .sf-ig")).to_have_count(6)

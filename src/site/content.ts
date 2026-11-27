@@ -5,7 +5,7 @@ import { EVENTS, type EventId } from './events'
 import { GUIDES, type GuideId } from './guides'
 
 export type Lang = 'en' | 'te'
-export type PageId = 'home' | 'personal' | 'group' | 'weightLoss' | 'plans' | 'timings' | 'coaches' | 'results' | 'about' | 'contact' | 'events' | EventId | GuideId
+export type PageId = 'home' | 'personal' | 'group' | 'weightLoss' | 'plans' | 'timings' | 'coaches' | 'results' | 'about' | 'contact' | 'certified' | 'events' | EventId | GuideId
 
 export const PATHS: Record<PageId, string> = {
   home: '/',
@@ -19,6 +19,7 @@ export const PATHS: Record<PageId, string> = {
   results: '/transformations',
   about: '/about',
   contact: '/contact',
+  certified: '/irefs-certified-gym-kakinada',
   events: '/events',
   bluecrest: '/events/bluecrest-charity-fete-2026',
   dandiya: '/events/dandiya-nights-2026',
@@ -76,6 +77,10 @@ export const SEO: Record<PageId, { title: string; description: string }> = {
     title: 'About Shaan Fitness | Training Studio in Kakinada',
     description: 'Shaan Fitness, Kakinada: a semi-private training studio run on the model leading studios use worldwide. Our method, and why every session is coached.',
   },
+  certified: {
+    title: 'IREFs Certified Gym in Kakinada | Shaan Fitness',
+    description: 'Shaan Fitness, Kakinada: Andhra Pradesh’s first IREFs certified gym, under the Swastha Bharat Abhiyan. Unique ID IREFS1042, valid till July 2027.',
+  },
   contact: {
     title: 'Contact Shaan Fitness | Gym at Godari Gunta, Kakinada',
     description: 'Visit Shaan Fitness on RTO Office Road, Godari Gunta, near D-Mart, Kakinada. Call, WhatsApp or book an assessment.',
@@ -85,7 +90,7 @@ export const SEO: Record<PageId, { title: string; description: string }> = {
 const en = {
   nav: {
     training: 'Training', personal: 'Personal training', group: 'Group training', weightLoss: 'Weight loss', plans: 'Subscriptions',
-    timings: 'Timings', coaches: 'Coaches', results: 'Transformations', about: 'About', contact: 'Contact', home: 'Home', events: 'Events',
+    timings: 'Timings', coaches: 'Coaches', results: 'Transformations', about: 'About', contact: 'Contact', home: 'Home', events: 'Events', certified: 'IREFs certified',
     menu: 'Menu', close: 'Close menu', login: 'Log in', join: 'Join online', openApp: 'My Shaan app', openDashboard: 'Staff dashboard',
     trial: 'Book assessment', call: 'Call', whatsapp: 'WhatsApp', skip: 'Skip to content',
   },
@@ -310,6 +315,42 @@ const en = {
     ],
     facilitiesTitle: 'Facilities',
   },
+  certified: {
+    h1: 'IREFs certified gym in Kakinada',
+    intro: 'Shaan Fitness is Andhra Pradesh’s first IREFs certified gym. On 8 July 2025 we were inducted into the Indian Register for Exercise Facilities, conforming to its Indian standard and processes, under the Swastha Bharat Abhiyan.',
+    role: 'Indian Register for Exercise Facilities · Swastha Bharat Abhiyan',
+    facts: [
+      { k: 'Member ID', v: 'IREFsSBASH0720251042' },
+      { k: 'Unique ID', v: 'IREFS1042' },
+      { k: 'Issued', v: '8 July 2025' },
+      { k: 'Valid till', v: '7 July 2027' },
+    ],
+    verify: 'See our IREFs listing', post: 'See the announcement',
+    badge: 'Andhra Pradesh’s first IREFs certified gym', badgeSub: 'Swastha Bharat Abhiyan · valid till July 2027',
+    certTitle: 'The certificate',
+    certSub: 'Issued by the Sports, Physical Education, Fitness and Leisure Skills Council (SPEFL-SC). Scan the QR code on it to verify it.',
+    certAlt: 'IREFs member certificate of Shaan Fitness Gym, Unique ID IREFS1042, issued 8 July 2025, valid till 7 July 2027',
+    meansTitle: 'What it means',
+    means: [
+      { t: 'First in Andhra Pradesh', d: 'IREFs, the Indian Register for Exercise Facilities, keeps the national list of verified fitness centres. Shaan Fitness is the first in Andhra Pradesh on it.' },
+      { t: 'Held to an Indian standard', d: 'A gym becomes a member only after conforming to the IREFs standard and processes, under the Swastha Bharat Abhiyan.' },
+      { t: 'A certified coach, CPR ready', d: 'IREFs lists our head coach, Sabir Rasool, as a Fitness Trainer at NSQF Level 4, and Shaan Fitness as CPR certified.' },
+      { t: 'Easy to check', d: 'Our listing on the IREFs website and the QR code on our certificate both show the membership: Unique ID IREFS1042.' },
+    ],
+    cprTitle: 'CPR technique',
+    cprSub: 'From IREFs, under the Swastha Bharat Abhiyan; IREFs lists Shaan Fitness as CPR certified. Knowing it can save a life, in the gym or anywhere.',
+    cprSteps: [
+      { t: 'Check for consciousness', d: 'Gently shake the person’s shoulders and try to make contact: “Hello! Are you OK?”' },
+      { t: 'Check breathing and open the airway', d: 'Look, listen and feel for normal breathing, for no longer than 10 seconds.' },
+      { t: 'No breathing, or not normal: call 112', d: 'Put the phone on speaker and don’t end the call.' },
+      { t: 'Begin CPR at once', d: 'On a hard surface, push the chest down hard, 5 to 6 cm, 100 to 120 times a minute. Alternate 30 compressions with 2 rescue breaths, blowing until the chest rises. Keep going until the person breathes normally or help arrives.' },
+      { t: 'If an AED is there, use it', d: 'Turn it on and attach the pads during CPR, as its pictures show, and follow its instructions. Every 2 minutes it pauses to check the heart rhythm: change the person doing compressions, then carry on with CPR for 2 minutes, shock or no shock.' },
+      { t: 'Recovery position', d: 'When the person is breathing normally, put them in the recovery position and call 112. Keep them warm and keep checking their breathing.' },
+    ],
+    cprAlt: 'IREFs CPR technique poster: check for consciousness, check breathing, call 112, begin CPR, use an AED, recovery position',
+    cprPdf: 'Download the poster (PDF)',
+    postTitle: 'The announcement', postSub: 'Shared with IREFs on Instagram, 14 July 2025.',
+  },
   contact: {
     h1: 'Visit Shaan Fitness in Kakinada',
     intro: 'We are on RTO Office Road at Godari Gunta, near D-Mart. Walk in during opening hours, call, or book an assessment below.',
@@ -329,6 +370,7 @@ const en = {
     cost: { q: 'How much does a personal trainer cost in Kakinada?', a: 'At Shaan Fitness: {{list}}, with your coach beside you for every session.' },
     pace: { q: 'How much weight can I lose in a month?', a: 'A safe pace for most people is about half to one kilogram a week. Your coach sets your target after the assessment.' },
     supplements: { q: 'Do I need supplements?', a: 'No. Your diet plan uses regular food. Supplements are optional and your coach will tell you honestly if they help.' },
+    certified: { q: 'Is Shaan Fitness a certified gym?', a: 'Yes. Shaan Fitness is Andhra Pradesh’s first IREFs certified gym (Indian Register for Exercise Facilities), under the Swastha Bharat Abhiyan, from 8 July 2025 to 7 July 2027. See our listing at irefs.in, Unique ID IREFS1042.' },
     freeze: { q: 'Can I pause my plan?', a: 'Yes. Ask to freeze your plan from the Shaan app when you travel or fall ill. Once the gym approves it, your end date moves.' },
     batchSize: { q: 'How big are the group batches?', a: 'Small enough that the coach knows your name and corrects every rep. Ask us which batch has room at your preferred time.' },
   },
@@ -339,7 +381,7 @@ export type Copy = typeof en
 const te: Copy = {
   nav: {
     training: 'ట్రైనింగ్', personal: 'పర్సనల్ ట్రైనింగ్', group: 'గ్రూప్ ట్రైనింగ్', weightLoss: 'వెయిట్ లాస్', plans: 'సబ్‌స్క్రిప్షన్లు',
-    timings: 'టైమింగ్స్', coaches: 'కోచ్‌లు', results: 'ట్రాన్స్‌ఫర్మేషన్స్', about: 'మా గురించి', contact: 'సంప్రదించండి', home: 'హోమ్', events: 'ఈవెంట్లు',
+    timings: 'టైమింగ్స్', coaches: 'కోచ్‌లు', results: 'ట్రాన్స్‌ఫర్మేషన్స్', about: 'మా గురించి', contact: 'సంప్రదించండి', home: 'హోమ్', events: 'ఈవెంట్లు', certified: 'IREFs సర్టిఫైడ్',
     menu: 'మెనూ', close: 'మెనూ మూసివేయండి', login: 'లాగిన్', join: 'ఆన్‌లైన్‌లో చేరండి', openApp: 'నా షాన్ యాప్', openDashboard: 'స్టాఫ్ డాష్‌బోర్డ్',
     trial: 'అసెస్‌మెంట్ బుక్ చేయండి', call: 'కాల్', whatsapp: 'WhatsApp', skip: 'కంటెంట్‌కు వెళ్ళండి',
   },
@@ -564,6 +606,42 @@ const te: Copy = {
     ],
     facilitiesTitle: 'సౌకర్యాలు',
   },
+  certified: {
+    h1: 'కాకినాడలో IREFs సర్టిఫైడ్ జిమ్',
+    intro: 'షాన్ ఫిట్‌నెస్ ఆంధ్రప్రదేశ్‌లో మొదటి IREFs సర్టిఫైడ్ జిమ్. స్వస్థ భారత్ అభియాన్ కింద, ఇండియన్ రిజిస్టర్ ఫర్ ఎక్సర్‌సైజ్ ఫెసిలిటీస్ భారతీయ ప్రమాణాలు, ప్రక్రియలకు అనుగుణంగా ఉన్నందుకు 8 జూలై 2025న మాకు సభ్యత్వం లభించింది.',
+    role: 'ఇండియన్ రిజిస్టర్ ఫర్ ఎక్సర్‌సైజ్ ఫెసిలిటీస్ · స్వస్థ భారత్ అభియాన్',
+    facts: [
+      { k: 'మెంబర్ ID', v: 'IREFsSBASH0720251042' },
+      { k: 'యూనిక్ ID', v: 'IREFS1042' },
+      { k: 'జారీ', v: '8 జూలై 2025' },
+      { k: 'చెల్లుబాటు', v: '7 జూలై 2027 వరకు' },
+    ],
+    verify: 'మా IREFs లిస్టింగ్ చూడండి', post: 'ప్రకటన చూడండి',
+    badge: 'ఆంధ్రప్రదేశ్‌లో మొదటి IREFs సర్టిఫైడ్ జిమ్', badgeSub: 'స్వస్థ భారత్ అభియాన్ · జూలై 2027 వరకు చెల్లుబాటు',
+    certTitle: 'సర్టిఫికెట్',
+    certSub: 'స్పోర్ట్స్, ఫిజికల్ ఎడ్యుకేషన్, ఫిట్‌నెస్ అండ్ లీజర్ స్కిల్స్ కౌన్సిల్ (SPEFL-SC) జారీ చేసింది. దానిపై ఉన్న QR కోడ్ స్కాన్ చేసి నిర్ధారించుకోండి.',
+    certAlt: 'షాన్ ఫిట్‌నెస్ జిమ్ IREFs సభ్యత్వ సర్టిఫికెట్, యూనిక్ ID IREFS1042, జారీ 8 జూలై 2025, 7 జూలై 2027 వరకు చెల్లుబాటు',
+    meansTitle: 'దీని అర్థం',
+    means: [
+      { t: 'ఆంధ్రప్రదేశ్‌లో మొదటిది', d: 'IREFs (ఇండియన్ రిజిస్టర్ ఫర్ ఎక్సర్‌సైజ్ ఫెసిలిటీస్) ధృవీకరించిన ఫిట్‌నెస్ సెంటర్ల జాతీయ జాబితాను నిర్వహిస్తుంది. అందులో ఆంధ్రప్రదేశ్ నుంచి మొదటిది షాన్ ఫిట్‌నెస్.' },
+      { t: 'భారతీయ ప్రమాణానికి అనుగుణంగా', d: 'స్వస్థ భారత్ అభియాన్ కింద, IREFs ప్రమాణాలు, ప్రక్రియలకు అనుగుణంగా ఉన్న జిమ్‌కే సభ్యత్వం లభిస్తుంది.' },
+      { t: 'సర్టిఫైడ్ కోచ్, CPR సిద్ధం', d: 'మా హెడ్ కోచ్ సబీర్ రసూల్‌ను NSQF లెవల్ 4 ఫిట్‌నెస్ ట్రైనర్‌గా, షాన్ ఫిట్‌నెస్‌ను CPR సర్టిఫైడ్‌గా IREFs జాబితాలో చూపిస్తుంది.' },
+      { t: 'సులభంగా చెక్ చేయవచ్చు', d: 'IREFs వెబ్‌సైట్‌లో మా లిస్టింగ్, మా సర్టిఫికెట్‌పై ఉన్న QR కోడ్ రెండూ సభ్యత్వాన్ని చూపిస్తాయి: యూనిక్ ID IREFS1042.' },
+    ],
+    cprTitle: 'CPR పద్ధతి',
+    cprSub: 'స్వస్థ భారత్ అభియాన్ కింద IREFs అందించినది; IREFs షాన్ ఫిట్‌నెస్‌ను CPR సర్టిఫైడ్‌గా చూపిస్తుంది. ఇది తెలిస్తే జిమ్‌లో అయినా, ఎక్కడైనా ఒక ప్రాణం కాపాడవచ్చు.',
+    cprSteps: [
+      { t: 'స్పృహ ఉందో చూడండి', d: 'వ్యక్తి భుజాలను మెల్లగా కదిలించి మాట్లాడించే ప్రయత్నం చేయండి: “హలో! మీరు బాగున్నారా?”' },
+      { t: 'శ్వాస చూడండి, శ్వాసమార్గం తెరవండి', d: 'సాధారణ శ్వాస ఉందో చూడండి, వినండి, గమనించండి, 10 సెకన్లకు మించకుండా.' },
+      { t: 'శ్వాస లేకపోతే, లేదా సాధారణంగా లేకపోతే: 112కు కాల్', d: 'ఫోన్ స్పీకర్‌లో పెట్టండి, కాల్ కట్ చేయకండి.' },
+      { t: 'వెంటనే CPR మొదలుపెట్టండి', d: 'గట్టి నేలపై, ఛాతీని 5 నుంచి 6 సెం.మీ. బలంగా, నిమిషానికి 100 నుంచి 120 సార్లు నొక్కండి. 30 కంప్రెషన్లు, 2 రెస్క్యూ బ్రీత్‌లు మార్చి మార్చి ఇవ్వండి; ఛాతీ పైకి లేచే వరకు ఊదండి. వ్యక్తి సాధారణంగా శ్వాస తీసుకునే వరకు లేదా సహాయం వచ్చే వరకు ఆపకండి.' },
+      { t: 'AED ఉంటే వాడండి', d: 'CPR చేస్తూనే దాన్ని ఆన్ చేసి, దాని బొమ్మల్లో చూపినట్లు ప్యాడ్‌లు అంటించి, దాని సూచనలు పాటించండి. ప్రతి 2 నిమిషాలకు అది గుండె లయను చెక్ చేయడానికి ఆగుతుంది: కంప్రెషన్లు చేసే వ్యక్తిని మార్చి, షాక్ ఇచ్చినా ఇవ్వకపోయినా మరో 2 నిమిషాలు CPR కొనసాగించండి.' },
+      { t: 'రికవరీ పొజిషన్', d: 'వ్యక్తి సాధారణంగా శ్వాస తీసుకుంటున్నప్పుడు రికవరీ పొజిషన్‌లో పడుకోబెట్టి 112కు కాల్ చేయండి. వెచ్చగా ఉంచండి, శ్వాసను గమనిస్తూ ఉండండి.' },
+    ],
+    cprAlt: 'IREFs CPR పద్ధతి పోస్టర్: స్పృహ, శ్వాస చూడటం, 112కు కాల్, CPR, AED, రికవరీ పొజిషన్',
+    cprPdf: 'పోస్టర్ డౌన్‌లోడ్ (PDF)',
+    postTitle: 'ప్రకటన', postSub: 'IREFsతో కలిసి Instagramలో, 14 జూలై 2025.',
+  },
   contact: {
     h1: 'కాకినాడలో షాన్ ఫిట్‌నెస్‌కు రండి',
     intro: 'మేము గోదారి గుంట RTO ఆఫీస్ రోడ్‌లో, D-Mart దగ్గర ఉన్నాం. పని వేళల్లో నేరుగా రండి, కాల్ చేయండి, లేదా కింద అసెస్‌మెంట్ బుక్ చేయండి.',
@@ -583,6 +661,7 @@ const te: Copy = {
     cost: { q: 'కాకినాడలో పర్సనల్ ట్రైనర్‌కు ఎంత ఖర్చు?', a: 'షాన్ ఫిట్‌నెస్‌లో: {{list}}, ప్రతి సెషన్‌లో కోచ్ మీ పక్కనే.' },
     pace: { q: 'ఒక నెలలో ఎంత బరువు తగ్గవచ్చు?', a: 'చాలా మందికి వారానికి అర కేజీ నుండి ఒక కేజీ సురక్షితమైన వేగం. అసెస్‌మెంట్ తర్వాత కోచ్ మీ లక్ష్యం నిర్ణయిస్తారు.' },
     supplements: { q: 'సప్లిమెంట్లు అవసరమా?', a: 'లేదు. మీ డైట్ ప్లాన్ సాధారణ ఆహారాన్నే వాడుతుంది. సప్లిమెంట్లు ఐచ్ఛికం, అవి ఉపయోగపడితే కోచ్ నిజాయితీగా చెబుతారు.' },
+    certified: { q: 'షాన్ ఫిట్‌నెస్ సర్టిఫైడ్ జిమ్‌నా?', a: 'అవును. షాన్ ఫిట్‌నెస్ ఆంధ్రప్రదేశ్‌లో మొదటి IREFs (ఇండియన్ రిజిస్టర్ ఫర్ ఎక్సర్‌సైజ్ ఫెసిలిటీస్) సర్టిఫైడ్ జిమ్, స్వస్థ భారత్ అభియాన్ కింద 8 జూలై 2025 నుంచి 7 జూలై 2027 వరకు. యూనిక్ ID IREFS1042తో irefs.inలో మా లిస్టింగ్ చూడండి.' },
     freeze: { q: 'నా ప్లాన్‌ను ఆపవచ్చా?', a: 'అవును. ప్రయాణం లేదా అనారోగ్యం సమయంలో షాన్ యాప్ నుండి ప్లాన్ ఫ్రీజ్ కోరండి. జిమ్ ఆమోదించాక మీ ముగింపు తేదీ ముందుకు జరుగుతుంది.' },
     batchSize: { q: 'గ్రూప్ బ్యాచ్‌లు ఎంత పెద్దవి?', a: 'కోచ్‌కు మీ పేరు తెలిసేంత, ప్రతి రెప్ సరిచేసేంత చిన్నవి. మీకు నచ్చిన సమయంలో ఏ బ్యాచ్‌లో చోటు ఉందో అడగండి.' },
   },

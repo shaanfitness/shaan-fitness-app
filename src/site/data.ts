@@ -135,14 +135,15 @@ export function faqFor(id: PageId, site: SiteInfo | null, c: Copy, lang: Lang): 
     if (personal.length) out.push({ q: f.cost.q, a: fill(f.cost.a, { list: personal.map((o) => `${o.name} ${rupees(o.price!)} ${weeks(o)}`).join(', ') }) })
   }
   switch (id) {
-    case 'home': fees(); timings(); out.push(f.assess, f.women, f.weight, f.beginner); where(); steam(); break
+    case 'home': fees(); timings(); out.push(f.assess, f.women, f.weight, f.beginner); where(); steam(); out.push(f.certified); break
     case 'personal': cost(); out.push(f.women); sessions(); out.push(f.assess, f.beginner); break
     case 'group': out.push(f.batchSize, f.beginner, f.women); timings(); break
     case 'weightLoss': out.push(f.weight, f.pace, f.supplements); break
     case 'plans': fees(); sessions(); out.push(f.assess, f.freeze); break
     case 'timings': timings(); where(); break
     case 'contact': where(); timings(); out.push(f.assess); break
-    case 'about': out.push(f.beginner, f.women); steam(); break
+    case 'about': out.push(f.beginner, f.women); steam(); out.push(f.certified); break
+    case 'certified': out.push(f.certified); where(); break
     default:
       if (isGuideId(id)) out.push(...guideById(id).copy[lang].faq)
       break

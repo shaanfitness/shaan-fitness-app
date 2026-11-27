@@ -800,6 +800,30 @@ html[data-intro='1'] .sf-loader, .sf-loader.is-on { display: grid; }
 .sf-ev-facts div { padding: 14px 16px; background: rgba(8, 8, 11, .72); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); }
 .sf-ev-facts dt { font-size: 12px; font-weight: 700; color: var(--sf-mist); }
 .sf-ev-facts dd { margin: 4px 0 0; font-weight: 800; font-size: 16px; color: var(--sf-porcelain); }
+/* IREFs certified: the page (seal, certificate, CPR technique) and the badge that links to it. */
+.sf-cert-hero { display: grid; gap: 36px; align-items: center; }
+@media (min-width: 960px) { .sf-cert-hero { grid-template-columns: 1.5fr .5fr; } }
+.sf-cert-hero .sf-ev-facts dd { overflow-wrap: anywhere; }
+.sf-cert-seal { width: min(280px, 56vw); justify-self: center; filter: drop-shadow(0 30px 60px rgba(0, 0, 0, .45)); animation: sf-cert-bob 7s ease-in-out infinite; }
+@keyframes sf-cert-bob { 50% { translate: 0 -10px; } }
+.sf-cert-doc { margin: 0; border-radius: 18px; overflow: hidden; border: 1px solid var(--sf-line); background: #FBF6E9; box-shadow: 0 40px 80px -40px rgba(0, 0, 0, .7); }
+.sf-cert-doc img { display: block; width: 100%; height: auto; }
+.sf-cpr { display: grid; gap: 32px; }
+@media (min-width: 960px) { .sf-cpr { grid-template-columns: 1.2fr .8fr; align-items: start; } .sf-cpr-poster { position: sticky; top: 96px; } }
+.sf-cpr-steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; }
+.sf-cpr-steps li { display: grid; grid-template-columns: auto 1fr; gap: 18px; padding: 20px 22px; border: 1px solid var(--sf-line); border-radius: 18px; background: rgba(18, 26, 69, .55); }
+.sf-cpr-n { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 50%; background: var(--sf-crimson); color: #fff; font-family: var(--sf-display); font-weight: 900; font-size: 16px; }
+.sf-cpr-steps h3 { margin: 4px 0 8px; font-family: var(--sf-display); font-weight: 900; font-size: 17px; letter-spacing: .01em; line-height: 1.25; }
+.sf-cpr-steps p { margin: 0; color: var(--sf-mist); font-size: 15.5px; line-height: 1.65; }
+.sf-cpr-poster { margin: 0; display: grid; gap: 14px; justify-items: start; }
+.sf-cpr-poster img { display: block; width: 100%; height: auto; border-radius: 14px; border: 1px solid var(--sf-line); }
+.sf-cert-badge { display: inline-flex; align-items: center; gap: 14px; padding: 9px 20px 9px 9px; border-radius: 999px; border: 1px solid var(--sf-line-strong); background: rgba(8, 12, 36, .6); color: inherit; text-decoration: none; transition: border-color .3s, background .3s; }
+.sf-cert-badge:hover { border-color: var(--sf-champagne); background: rgba(18, 26, 69, .8); }
+.sf-cert-badge img { width: 52px; height: 52px; flex: none; }
+.sf-cert-badge b { display: block; font-family: var(--sf-display); font-weight: 900; font-size: 14.5px; letter-spacing: .03em; }
+.sf-cert-badge small { display: block; margin-top: 3px; font-size: 12.5px; line-height: 1.35; color: var(--sf-mist); }
+.sf-crestband-cert { display: flex; justify-content: center; padding: 8px 0 clamp(48px, 7vw, 90px); }
+@media (prefers-reduced-motion: reduce) { .sf-cert-seal { animation: none; } }
 .sf-ev-story { display: grid; gap: 28px; }
 .sf-ev-side { display: grid; gap: 28px; align-content: start; }
 .sf-ev-poster { margin: 0; max-width: 440px; border-radius: 18px; overflow: hidden; border: 1px solid var(--sf-line); box-shadow: 0 34px 70px -34px rgba(0, 0, 0, .7); }
