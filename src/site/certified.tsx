@@ -7,6 +7,9 @@ import { Cards, Section } from './sections'
 // Shaan Fitness's IREFs membership (Indian Register for Exercise Facilities, under the Swastha Bharat Abhiyan): its
 // own page with the certificate, what it means, IREFs' CPR technique, and the announcement post; and the small badge
 // that links to it from the home page, the About page and the footer. Facts are from the certificate itself.
+// The IREFs and Swastha Bharat Abhiyan logos are IREFs' official files, used as its branding guidelines (21 Mar 2025)
+// allow: colours and aspect ratio untouched (IREFs 1:1, Swastha Bharat Abhiyan about 2.05:1), always on white, as
+// they are drawn to be seen; no filters on the logos themselves.
 
 const POST = 'https://www.instagram.com/p/DMFKrynBHGd/'
 // Our listing on the IREFs register (the same page the certificate's QR code verifies against).
@@ -18,7 +21,7 @@ export function CertBadge() {
   const { c } = useCopy()
   return (
     <Link to={PATHS.certified} viewTransition className="sf-cert-badge">
-      <img src="/certified/irefs-badge.webp" alt="IREFs" width={52} height={52} loading="lazy" decoding="async" />
+      <span className="sf-cert-logo"><img src="/certified/irefs-logo.webp" alt="IREFs" width={400} height={400} loading="lazy" decoding="async" /></span>
       <span><b>{c.certified.badge}</b><small>{c.certified.badgeSub}</small></span>
     </Link>
   )
@@ -47,7 +50,10 @@ export function CertifiedPage() {
               <a href={POST} target="_blank" rel="noopener" className="sf-btn sf-btn-glass sf-magnet">{Ic.instagram(18)}{k.post}</a>
             </div>
           </div>
-          <img className="sf-cert-seal" src="/certified/irefs-badge.webp" alt="" width={320} height={320} decoding="async" />
+          <div className="sf-cert-logos">
+            <img src="/certified/irefs-logo.webp" alt="IREFs, Indian Register for Exercise Facilities" width={400} height={400} decoding="async" />
+            <img src="/certified/swastha-bharat-abhiyan.webp" alt="Swastha Bharat Abhiyan" width={600} height={288} decoding="async" />
+          </div>
         </div>
       </section>
 

@@ -804,8 +804,11 @@ html[data-intro='1'] .sf-loader, .sf-loader.is-on { display: grid; }
 .sf-cert-hero { display: grid; gap: 36px; align-items: center; }
 @media (min-width: 960px) { .sf-cert-hero { grid-template-columns: 1.5fr .5fr; } }
 .sf-cert-hero .sf-ev-facts dd { overflow-wrap: anywhere; }
-.sf-cert-seal { width: min(280px, 56vw); justify-self: center; filter: drop-shadow(0 30px 60px rgba(0, 0, 0, .45)); animation: sf-cert-bob 7s ease-in-out infinite; }
-@keyframes sf-cert-bob { 50% { translate: 0 -10px; } }
+/* IREFs' official logos, on white as they are drawn, colours and proportions untouched. */
+.sf-cert-logos { justify-self: center; display: flex; align-items: center; gap: clamp(16px, 2vw, 26px); padding: clamp(18px, 2.2vw, 28px); border-radius: 22px; background: #fff; box-shadow: 0 34px 70px -30px rgba(0, 0, 0, .6); }
+.sf-cert-logos img:first-child { width: clamp(96px, 9vw, 132px); height: auto; }
+.sf-cert-logos img:last-child { width: clamp(150px, 15vw, 230px); height: auto; }
+@media (min-width: 960px) { .sf-cert-logos { flex-direction: column; } }
 .sf-cert-doc { margin: 0; border-radius: 18px; overflow: hidden; border: 1px solid var(--sf-line); background: #FBF6E9; box-shadow: 0 40px 80px -40px rgba(0, 0, 0, .7); }
 .sf-cert-doc img { display: block; width: 100%; height: auto; }
 .sf-cpr { display: grid; gap: 32px; }
@@ -819,11 +822,11 @@ html[data-intro='1'] .sf-loader, .sf-loader.is-on { display: grid; }
 .sf-cpr-poster img { display: block; width: 100%; height: auto; border-radius: 14px; border: 1px solid var(--sf-line); }
 .sf-cert-badge { display: inline-flex; align-items: center; gap: 14px; padding: 9px 20px 9px 9px; border-radius: 999px; border: 1px solid var(--sf-line-strong); background: rgba(8, 12, 36, .6); color: inherit; text-decoration: none; transition: border-color .3s, background .3s; }
 .sf-cert-badge:hover { border-color: var(--sf-champagne); background: rgba(18, 26, 69, .8); }
-.sf-cert-badge img { width: 52px; height: 52px; flex: none; }
+.sf-cert-logo { display: grid; place-items: center; flex: none; width: 56px; height: 56px; border-radius: 50%; background: #fff; }
+.sf-cert-logo img { width: 50px; height: 50px; }
 .sf-cert-badge b { display: block; font-family: var(--sf-display); font-weight: 900; font-size: 14.5px; letter-spacing: .03em; }
 .sf-cert-badge small { display: block; margin-top: 3px; font-size: 12.5px; line-height: 1.35; color: var(--sf-mist); }
 .sf-crestband-cert { display: flex; justify-content: center; padding: 8px 0 clamp(48px, 7vw, 90px); }
-@media (prefers-reduced-motion: reduce) { .sf-cert-seal { animation: none; } }
 .sf-ev-story { display: grid; gap: 28px; }
 .sf-ev-side { display: grid; gap: 28px; align-content: start; }
 .sf-ev-poster { margin: 0; max-width: 440px; border-radius: 18px; overflow: hidden; border: 1px solid var(--sf-line); box-shadow: 0 34px 70px -34px rgba(0, 0, 0, .7); }
